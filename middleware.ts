@@ -8,7 +8,7 @@ export function middleware(req: NextRequest) {
   if (!token && req.nextUrl.pathname.startsWith("/admin")) {
     return NextResponse.redirect(new URL("/auth/login", req.url));
   }
-  return NextResponse.next();
+  return NextResponse.redirect(new URL("/", req.url));
 }
 
 // See "Matching Paths" below to learn more
