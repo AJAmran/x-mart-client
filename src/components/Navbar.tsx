@@ -5,40 +5,103 @@ import {
   AiOutlineMenu,
   AiOutlineShoppingCart,
   AiOutlineUser,
+  AiOutlineHeart,
 } from "react-icons/ai";
 import { FaTimes } from "react-icons/fa";
+import { IoMdArrowDropdown } from "react-icons/io"; // Importing dropdown icon
 import Link from "next/link";
 import Image from "next/image";
 
 const Navbar = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [categoryMenuOpen, setCategoryMenuOpen] = useState(false);
 
   const toggleMobileMenu = () => setMobileMenuOpen(!mobileMenuOpen);
+  const toggleCategoryMenu = () => setCategoryMenuOpen(!categoryMenuOpen);
 
   return (
     <header className="bg-primary text-white">
       {/* Top Section */}
       <div className="container mx-auto flex justify-between items-center px-4 py-3">
         {/* Logo */}
-        <Link href="/" className="text-xl font-bold flex items-center bg-white p-1">
+        <Link href="/" className="text-xl font-bold flex items-center">
           <Image
             src="/logo.png"
             alt="X-Mart Logo"
-            className="h-12 w-12"
+            className="h-12 w-12 bg-white p-1"
             height={48}
             width={48}
           />
+          <span className="ml-2">X-Mart</span>
         </Link>
 
         {/* Desktop Menu */}
-        <nav className="hidden lg:flex space-x-8">
+        <nav className="hidden lg:flex space-x-6">
           <Link href="/" className="hover:text-accent">
             Home
           </Link>
 
-          <Link href="/products" className="hover:text-accent">
-            Products
-          </Link>
+          <div
+            className="relative group"
+            onMouseEnter={() => setCategoryMenuOpen(true)}
+            onMouseLeave={() => setCategoryMenuOpen(false)}
+          >
+            <button
+              onClick={toggleCategoryMenu}
+              className="flex items-center hover:text-accent focus:outline-none"
+            >
+              Categories
+              <IoMdArrowDropdown size={18} className="ml-2" />{" "}
+              {/* Dropdown icon */}
+            </button>
+            {/* Dropdown */}
+            {categoryMenuOpen && (
+              <div className="absolute z-10 bg-white text-black rounded-md shadow-lg mt-[2px]">
+                <ul className="py-2">
+                  <li>
+                    <Link
+                      href="/categories/electronics"
+                      className="block px-4 py-2 hover:bg-gray-100"
+                    >
+                      Electronics
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                      href="/categories/fashion"
+                      className="block px-4 py-2 hover:bg-gray-100"
+                    >
+                      Fashion
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                      href="/categories/home"
+                      className="block px-4 py-2 hover:bg-gray-100"
+                    >
+                      Home Appliances
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                      href="/categories/books"
+                      className="block px-4 py-2 hover:bg-gray-100"
+                    >
+                      Books
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                      href="/categories/sports"
+                      className="block px-4 py-2 hover:bg-gray-100"
+                    >
+                      Sports
+                    </Link>
+                  </li>
+                </ul>
+              </div>
+            )}
+          </div>
 
           <Link href="/about" className="hover:text-accent">
             About
@@ -52,27 +115,35 @@ const Navbar = () => {
         {/* Actions */}
         <div className="flex items-center space-x-4">
           {/* Search */}
-          <div className="hidden md:block">
+          <div className="hidden md:flex items-center bg-white text-black rounded-md overflow-hidden">
             <input
               type="text"
               placeholder="Search products..."
-              className="px-4 py-2 text-black rounded-md outline-none"
+              className="px-4 py-2 outline-none w-48"
             />
+            <button className="bg-accent px-4 py-2">Search</button>
           </div>
 
-          {/* Cart */}
+          {/* Wishlist */}
+          <Link href="/wishlist" className="relative flex items-center">
+            <AiOutlineHeart size={24} />
+            <span className="absolute -top-1 -right-3 text-xs bg-accent text-black rounded-full px-2">
+              5
+            </span>
+          </Link>
 
+          {/* Cart */}
           <Link href="/cart" className="relative flex items-center">
             <AiOutlineShoppingCart size={24} />
-            <span className="absolute top-0 right-0 text-xs bg-accent text-black rounded-full px-2">
+            <span className="absolute -top-1 -right-3 text-xs bg-accent text-black rounded-full px-2">
               3
             </span>
           </Link>
 
           {/* User Account */}
-
-          <Link href="/auth/login">
+          <Link href="/auth/login" className="flex items-center space-x-1">
             <AiOutlineUser size={24} />
+            <span>Login</span>
           </Link>
 
           {/* Mobile Menu Toggle */}
@@ -101,11 +172,11 @@ const Navbar = () => {
             </li>
             <li>
               <Link
-                href="/products"
+                href="/categories"
                 className="hover:text-accent"
                 onClick={toggleMobileMenu}
               >
-                Products
+                Categories
               </Link>
             </li>
             <li>
