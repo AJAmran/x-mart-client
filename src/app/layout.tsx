@@ -4,9 +4,10 @@ import { Link } from "@nextui-org/link";
 import clsx from "clsx";
 
 import { fontSans } from "../config/fonts";
-import { Navbar } from "../components/navbar";
 import { siteConfig } from "../config/site";
 import { Providers } from "../lib/Providers";
+
+import { Navbar } from "@/src/components/navbar";
 
 export const metadata: Metadata = {
   title: {
