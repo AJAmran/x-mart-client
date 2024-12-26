@@ -6,8 +6,7 @@ import clsx from "clsx";
 import { fontSans } from "../config/fonts";
 import { siteConfig } from "../config/site";
 import { Providers } from "../lib/Providers";
-
-import { Navbar } from "@/src/components/navbar";
+import { Navbar } from "../components/navbar";
 
 export const metadata: Metadata = {
   title: {
