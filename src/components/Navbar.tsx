@@ -1,207 +1,141 @@
-"use client";
-
-import React, { useState } from "react";
 import {
-  AiOutlineMenu,
-  AiOutlineShoppingCart,
-  AiOutlineUser,
-  AiOutlineHeart,
-} from "react-icons/ai";
-import { FaTimes } from "react-icons/fa";
-import { IoMdArrowDropdown } from "react-icons/io"; // Importing dropdown icon
-import Link from "next/link";
-import Image from "next/image";
+  Navbar as NextUINavbar,
+  NavbarContent,
+  NavbarMenu,
+  NavbarMenuToggle,
+  NavbarBrand,
+  NavbarItem,
+  NavbarMenuItem,
+} from "@nextui-org/navbar";
+import { Button } from "@nextui-org/button";
+import { Kbd } from "@nextui-org/kbd";
+import { Link } from "@nextui-org/link";
+import { Input } from "@nextui-org/input";
+import { link as linkStyles } from "@nextui-org/theme";
+import NextLink from "next/link";
+import clsx from "clsx";
 
-const Navbar = () => {
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [categoryMenuOpen, setCategoryMenuOpen] = useState(false);
+import { siteConfig } from "../config/site";
+import { ThemeSwitch } from "../components/theme-switch";
+import {
+  TwitterIcon,
+  GithubIcon,
+  DiscordIcon,
+  HeartFilledIcon,
+  SearchIcon,
+  Logo,
+} from "../components/icons";
 
-  const toggleMobileMenu = () => setMobileMenuOpen(!mobileMenuOpen);
-  const toggleCategoryMenu = () => setCategoryMenuOpen(!categoryMenuOpen);
+export const Navbar = () => {
+  const searchInput = (
+    <Input
+      aria-label="Search"
+      classNames={{
+        inputWrapper: "bg-default-100",
+        input: "text-sm",
+      }}
+      endContent={
+        <Kbd className="hidden lg:inline-block" keys={["command"]}>
+          K
+        </Kbd>
+      }
+      labelPlacement="outside"
+      placeholder="Search..."
+      startContent={
+        <SearchIcon className="text-base text-default-400 pointer-events-none flex-shrink-0" />
+      }
+      type="search"
+    />
+  );
 
   return (
-    <header className="bg-primary text-white">
-      {/* Top Section */}
-      <div className="container mx-auto flex justify-between items-center px-4 py-3">
-        {/* Logo */}
-        <Link href="/" className="text-xl font-bold flex items-center">
-          <Image
-            src="/logo.png"
-            alt="X-Mart Logo"
-            className="h-12 w-12 bg-white p-1"
-            height={48}
-            width={48}
-          />
-          <span className="ml-2">X-Mart</span>
-        </Link>
+    <NextUINavbar maxWidth="xl" position="sticky">
+      <NavbarContent className="basis-1/5 sm:basis-full" justify="start">
+        <NavbarBrand as="li" className="gap-3 max-w-fit">
+          <NextLink className="flex justify-start items-center gap-1" href="/">
+            <Logo />
+            <p className="font-bold text-inherit">ACME</p>
+          </NextLink>
+        </NavbarBrand>
+        <ul className="hidden lg:flex gap-4 justify-start ml-2">
+          {siteConfig.navItems.map((item) => (
+            <NavbarItem key={item.href}>
+              <NextLink
+                className={clsx(
+                  linkStyles({ color: "foreground" }),
+                  "data-[active=true]:text-primary data-[active=true]:font-medium"
+                )}
+                color="foreground"
+                href={item.href}
+              >
+                {item.label}
+              </NextLink>
+            </NavbarItem>
+          ))}
+        </ul>
+      </NavbarContent>
 
-        {/* Desktop Menu */}
-        <nav className="hidden lg:flex space-x-6">
-          <Link href="/" className="hover:text-accent">
-            Home
+      <NavbarContent
+        className="hidden sm:flex basis-1/5 sm:basis-full"
+        justify="end"
+      >
+        <NavbarItem className="hidden sm:flex gap-2">
+          <Link isExternal aria-label="Twitter" href={siteConfig.links.twitter}>
+            <TwitterIcon className="text-default-500" />
           </Link>
-
-          <div
-            className="relative group"
-            onMouseEnter={() => setCategoryMenuOpen(true)}
-            onMouseLeave={() => setCategoryMenuOpen(false)}
+          <Link isExternal aria-label="Discord" href={siteConfig.links.discord}>
+            <DiscordIcon className="text-default-500" />
+          </Link>
+          <Link isExternal aria-label="Github" href={siteConfig.links.github}>
+            <GithubIcon className="text-default-500" />
+          </Link>
+          <ThemeSwitch />
+        </NavbarItem>
+        <NavbarItem className="hidden lg:flex">{searchInput}</NavbarItem>
+        <NavbarItem className="hidden md:flex">
+          <Button
+            isExternal
+            as={Link}
+            className="text-sm font-normal text-default-600 bg-default-100"
+            href={siteConfig.links.sponsor}
+            startContent={<HeartFilledIcon className="text-danger" />}
+            variant="flat"
           >
-            <button
-              onClick={toggleCategoryMenu}
-              className="flex items-center hover:text-accent focus:outline-none"
-            >
-              Categories
-              <IoMdArrowDropdown size={18} className="ml-2" />{" "}
-              {/* Dropdown icon */}
-            </button>
-            {/* Dropdown */}
-            {categoryMenuOpen && (
-              <div className="absolute z-10 bg-white text-black rounded-md shadow-lg mt-[2px]">
-                <ul className="py-2">
-                  <li>
-                    <Link
-                      href="/categories/electronics"
-                      className="block px-4 py-2 hover:bg-gray-100"
-                    >
-                      Electronics
-                    </Link>
-                  </li>
-                  <li>
-                    <Link
-                      href="/categories/fashion"
-                      className="block px-4 py-2 hover:bg-gray-100"
-                    >
-                      Fashion
-                    </Link>
-                  </li>
-                  <li>
-                    <Link
-                      href="/categories/home"
-                      className="block px-4 py-2 hover:bg-gray-100"
-                    >
-                      Home Appliances
-                    </Link>
-                  </li>
-                  <li>
-                    <Link
-                      href="/categories/books"
-                      className="block px-4 py-2 hover:bg-gray-100"
-                    >
-                      Books
-                    </Link>
-                  </li>
-                  <li>
-                    <Link
-                      href="/categories/sports"
-                      className="block px-4 py-2 hover:bg-gray-100"
-                    >
-                      Sports
-                    </Link>
-                  </li>
-                </ul>
-              </div>
-            )}
-          </div>
+            Sponsor
+          </Button>
+        </NavbarItem>
+      </NavbarContent>
 
-          <Link href="/about" className="hover:text-accent">
-            About
-          </Link>
+      <NavbarContent className="sm:hidden basis-1 pl-4" justify="end">
+        <Link isExternal aria-label="Github" href={siteConfig.links.github}>
+          <GithubIcon className="text-default-500" />
+        </Link>
+        <ThemeSwitch />
+        <NavbarMenuToggle />
+      </NavbarContent>
 
-          <Link href="/contact" className="hover:text-accent">
-            Contact
-          </Link>
-        </nav>
-
-        {/* Actions */}
-        <div className="flex items-center space-x-4">
-          {/* Search */}
-          <div className="hidden md:flex items-center bg-white text-black rounded-md overflow-hidden">
-            <input
-              type="text"
-              placeholder="Search products..."
-              className="px-4 py-2 outline-none w-48"
-            />
-            <button className="bg-accent px-4 py-2">Search</button>
-          </div>
-
-          {/* Wishlist */}
-          <Link href="/wishlist" className="relative flex items-center">
-            <AiOutlineHeart size={24} />
-            <span className="absolute -top-1 -right-3 text-xs bg-accent text-black rounded-full px-2">
-              5
-            </span>
-          </Link>
-
-          {/* Cart */}
-          <Link href="/cart" className="relative flex items-center">
-            <AiOutlineShoppingCart size={24} />
-            <span className="absolute -top-1 -right-3 text-xs bg-accent text-black rounded-full px-2">
-              3
-            </span>
-          </Link>
-
-          {/* User Account */}
-          <Link href="/auth/login" className="flex items-center space-x-1">
-            <AiOutlineUser size={24} />
-            <span>Login</span>
-          </Link>
-
-          {/* Mobile Menu Toggle */}
-          <button className="lg:hidden" onClick={toggleMobileMenu}>
-            {mobileMenuOpen ? (
-              <FaTimes size={24} />
-            ) : (
-              <AiOutlineMenu size={24} />
-            )}
-          </button>
+      <NavbarMenu>
+        {searchInput}
+        <div className="mx-4 mt-2 flex flex-col gap-2">
+          {siteConfig.navMenuItems.map((item, index) => (
+            <NavbarMenuItem key={`${item}-${index}`}>
+              <Link
+                color={
+                  index === 2
+                    ? "primary"
+                    : index === siteConfig.navMenuItems.length - 1
+                      ? "danger"
+                      : "foreground"
+                }
+                href="#"
+                size="lg"
+              >
+                {item.label}
+              </Link>
+            </NavbarMenuItem>
+          ))}
         </div>
-      </div>
-
-      {/* Mobile Menu */}
-      {mobileMenuOpen && (
-        <nav className="lg:hidden bg-secondary">
-          <ul className="flex flex-col space-y-4 px-4 py-6">
-            <li>
-              <Link
-                href="/"
-                className="hover:text-accent"
-                onClick={toggleMobileMenu}
-              >
-                Home
-              </Link>
-            </li>
-            <li>
-              <Link
-                href="/categories"
-                className="hover:text-accent"
-                onClick={toggleMobileMenu}
-              >
-                Categories
-              </Link>
-            </li>
-            <li>
-              <Link
-                href="/about"
-                className="hover:text-accent"
-                onClick={toggleMobileMenu}
-              >
-                About
-              </Link>
-            </li>
-            <li>
-              <Link
-                href="/contact"
-                className="hover:text-accent"
-                onClick={toggleMobileMenu}
-              >
-                Contact
-              </Link>
-            </li>
-          </ul>
-        </nav>
-      )}
-    </header>
+      </NavbarMenu>
+    </NextUINavbar>
   );
 };
-
-export default Navbar;
