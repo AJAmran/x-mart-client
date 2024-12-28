@@ -16,15 +16,11 @@ export const siteConfig = {
       label: "About",
       href: "/about",
     },
-    
   ],
   navMenuItems: [
     {
       label: "Home",
       href: "/",
-    },
-    {
-      label: "Categories",
     },
     {
       label: "Blog",

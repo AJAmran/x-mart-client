@@ -16,6 +16,7 @@ import clsx from "clsx";
 import { CartIcon, HeartFilledIcon, Logo, SearchIcon } from "./icons";
 import { siteConfig } from "../config/site";
 import { ThemeSwitch } from "./theme-switch";
+import CategoriesDropdwon from "./navbar/dropdown";
 
 export const Navbar = () => {
   const searchInput = (
@@ -62,18 +63,8 @@ export const Navbar = () => {
               </NextLink>
             </NavbarItem>
           ))}
-          <NavbarItem>
-            <NextLink
-              className={clsx(
-                linkStyles({ color: "foreground" }),
-                "data-[active=true]:text-primary data-[active=true]:font-medium"
-              )}
-              color="foreground"
-              href=""
-            >
-              Categories
-            </NextLink>
-          </NavbarItem>
+        
+             <CategoriesDropdwon/>
         </ul>
       </NavbarContent>
 
