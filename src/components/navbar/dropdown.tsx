@@ -8,6 +8,8 @@ import {
   Subcategory,
 } from "@/src/data/CategoriestData";
 import { Button } from "@nextui-org/button";
+import { Link } from "@nextui-org/link";
+import clsx from "clsx";
 
 interface CategoriesDropdownProps {
   categories: Category[];
@@ -69,14 +71,22 @@ const CategoriesDropdown: React.FC<CategoriesDropdownProps> = ({
                 aria-labelledby={`category-${category.id}`}
               >
                 <div className="py-1">
-                  {category.subcategories.map((subcategory: Subcategory) => (
-                    <button
-                      key={subcategory.id}
-                      className="flex flex-col w-full text-left px-4 py-2 text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600 focus:outline-none focus:bg-gray-100 focus:dark:bg-gray-600"
-                    >
-                      {subcategory.name}
-                    </button>
-                  ))}
+                  {category.subcategories.map(
+                    (subcategory: Subcategory, index) => (
+                      <Link
+                        key={subcategory.id}
+                        className={clsx(
+                          "w-full flex flex-col text-left px-4 py-2 text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600 focus:outline-none focus:bg-gray-100 focus:dark:bg-gray-600",
+                          {
+                            "border-b":
+                              index !== category.subcategories.length - 1, // Apply border-b except for the last child
+                          }
+                        )}
+                      >
+                        {subcategory.name}
+                      </Link>
+                    )
+                  )}
                 </div>
               </div>
             </div>
