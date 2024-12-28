@@ -14,16 +14,9 @@ import { Input } from "@nextui-org/input";
 import { link as linkStyles } from "@nextui-org/theme";
 import NextLink from "next/link";
 import clsx from "clsx";
-
-import { siteConfig } from "@/config/site";
-import { ThemeSwitch } from "@/components/theme-switch";
-import {
-  TwitterIcon,
-  HeartFilledIcon,
-  SearchIcon,
-  Logo,
-  CartIcon,
-} from "@/components/icons";
+import { CartIcon, HeartFilledIcon, Logo, SearchIcon } from "./icons";
+import { siteConfig } from "../config/site";
+import { ThemeSwitch } from "./theme-switch";
 
 export const Navbar = () => {
   const searchInput = (
