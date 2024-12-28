@@ -19,11 +19,10 @@ import { siteConfig } from "@/config/site";
 import { ThemeSwitch } from "@/components/theme-switch";
 import {
   TwitterIcon,
-  GithubIcon,
-  DiscordIcon,
   HeartFilledIcon,
   SearchIcon,
   Logo,
+  CartIcon,
 } from "@/components/icons";
 
 export const Navbar = () => {
@@ -44,7 +43,7 @@ export const Navbar = () => {
   );
 
   return (
-    <NextUINavbar maxWidth="xl" position="sticky">
+    <NextUINavbar maxWidth="xl" position="sticky" className="border-b dark:border-gray-900">
       <NavbarContent className="basis-1/5 sm:basis-full" justify="start">
         <NavbarBrand as="li" className="gap-3 max-w-fit">
           <NextLink className="flex justify-start items-center gap-1" href="/">
@@ -74,10 +73,39 @@ export const Navbar = () => {
         className="hidden sm:flex basis-1/5 sm:basis-full"
         justify="end"
       >
+        <NavbarItem className="hidden lg:flex">{searchInput}</NavbarItem>
+        <NavbarItem className="hidden md:flex">
+          <Button
+            isExternal
+            as={Link}
+            className="text-sm font-normal text-default-600 bg-default-100"
+            href="/wishlist"
+            startContent={<HeartFilledIcon className="text-danger" />}
+            variant="flat"
+          >Wishlist</Button>
+        </NavbarItem>
+        <NavbarItem className="hidden md:flex">
+          <Button
+            isExternal
+            as={Link}
+            className="text-sm font-normal text-default-600 bg-default-100"
+            href="/cart"
+            startContent={<CartIcon className="text-danger" size={24}/>}
+            variant="flat"
+          >Cart</Button>
+        </NavbarItem>
+        <NavbarItem className="hidden md:flex">
+          <Button
+            isExternal
+            as={Link}
+            className="text-sm font-normal text-default-600 bg-default-100"
+            href="/profile"
+            variant="flat"
+          >Sign Up</Button>
+        </NavbarItem>
         <NavbarItem className="hidden sm:flex gap-2">
           <ThemeSwitch />
         </NavbarItem>
-        <NavbarItem className="hidden lg:flex">{searchInput}</NavbarItem>
       </NavbarContent>
 
       <NavbarContent className="sm:hidden basis-1 pl-4" justify="end">

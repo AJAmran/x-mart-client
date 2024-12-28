@@ -28,6 +28,10 @@ export const siteConfig = {
       href: "/",
     },
     {
+      label: "Categories",
+      href: "/categories"
+    },
+    {
       label: "Blog",
       href: "/blog",
     },
