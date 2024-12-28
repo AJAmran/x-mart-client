@@ -25,7 +25,6 @@ export const siteConfig = {
     },
     {
       label: "Categories",
-      href: "/categories"
     },
     {
       label: "Blog",

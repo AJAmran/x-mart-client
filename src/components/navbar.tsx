@@ -8,7 +8,6 @@ import {
   NavbarMenuItem,
 } from "@nextui-org/navbar";
 import { Button } from "@nextui-org/button";
-import { Kbd } from "@nextui-org/kbd";
 import { Link } from "@nextui-org/link";
 import { Input } from "@nextui-org/input";
 import { link as linkStyles } from "@nextui-org/theme";
@@ -36,12 +35,16 @@ export const Navbar = () => {
   );
 
   return (
-    <NextUINavbar maxWidth="xl" position="sticky" className="border-b dark:border-gray-900">
+    <NextUINavbar
+      maxWidth="xl"
+      position="sticky"
+      className="border-b dark:border-gray-900"
+    >
       <NavbarContent className="basis-1/5 sm:basis-full" justify="start">
         <NavbarBrand as="li" className="gap-3 max-w-fit">
           <NextLink className="flex justify-start items-center gap-1" href="/">
             <Logo />
-            <p className="font-bold text-inherit">ACME</p>
+            <p className="font-bold text-inherit">X-mart</p>
           </NextLink>
         </NavbarBrand>
         <ul className="hidden lg:flex gap-4 justify-start ml-2">
@@ -53,12 +56,24 @@ export const Navbar = () => {
                   "data-[active=true]:text-primary data-[active=true]:font-medium"
                 )}
                 color="foreground"
-                href={item.href}
+                href={item?.href}
               >
-                {item.label}
+                {item?.label}
               </NextLink>
             </NavbarItem>
           ))}
+          <NavbarItem>
+            <NextLink
+              className={clsx(
+                linkStyles({ color: "foreground" }),
+                "data-[active=true]:text-primary data-[active=true]:font-medium"
+              )}
+              color="foreground"
+              href=""
+            >
+              Categories
+            </NextLink>
+          </NavbarItem>
         </ul>
       </NavbarContent>
 
@@ -67,26 +82,7 @@ export const Navbar = () => {
         justify="end"
       >
         <NavbarItem className="hidden lg:flex">{searchInput}</NavbarItem>
-        <NavbarItem className="hidden md:flex">
-          <Button
-            isExternal
-            as={Link}
-            className="text-sm font-normal text-default-600 bg-default-100"
-            href="/wishlist"
-            startContent={<HeartFilledIcon className="text-danger" />}
-            variant="flat"
-          >Wishlist</Button>
-        </NavbarItem>
-        <NavbarItem className="hidden md:flex">
-          <Button
-            isExternal
-            as={Link}
-            className="text-sm font-normal text-default-600 bg-default-100"
-            href="/cart"
-            startContent={<CartIcon className="text-danger" size={24}/>}
-            variant="flat"
-          >Cart</Button>
-        </NavbarItem>
+
         <NavbarItem className="hidden md:flex">
           <Button
             isExternal
@@ -94,7 +90,9 @@ export const Navbar = () => {
             className="text-sm font-normal text-default-600 bg-default-100"
             href="/profile"
             variant="flat"
-          >Sign Up</Button>
+          >
+            Sign Up
+          </Button>
         </NavbarItem>
         <NavbarItem className="hidden sm:flex gap-2">
           <ThemeSwitch />
