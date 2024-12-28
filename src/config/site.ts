@@ -9,10 +9,6 @@ export const siteConfig = {
       href: "/",
     },
     {
-      label: "Categories",
-      href: "/categories"
-    },
-    {
       label: "Blog",
       href: "/blog",
     },
@@ -20,16 +16,11 @@ export const siteConfig = {
       label: "About",
       href: "/about",
     },
-    
   ],
   navMenuItems: [
     {
       label: "Home",
       href: "/",
-    },
-    {
-      label: "Categories",
-      href: "/categories"
     },
     {
       label: "Blog",
