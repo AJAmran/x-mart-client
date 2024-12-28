@@ -48,7 +48,7 @@ export const Navbar = () => {
             <p className="font-bold text-inherit">X-mart</p>
           </NextLink>
         </NavbarBrand>
-        <ul className="hidden lg:flex gap-4 justify-start ml-2 items-center" >
+        <ul className="hidden lg:flex gap-4 justify-start ml-2 items-center">
           {siteConfig.navItems.map((item) => (
             <NavbarItem key={item.href}>
               <NextLink
@@ -116,6 +116,9 @@ export const Navbar = () => {
               </Link>
             </NavbarMenuItem>
           ))}
+          <NavbarItem>
+            <CategoriesDropdwon />
+          </NavbarItem>
         </div>
       </NavbarMenu>
     </NextUINavbar>

@@ -7,6 +7,7 @@ import {
   Category,
   Subcategory,
 } from "@/src/data/CategoriestData";
+import { Button } from "@nextui-org/button";
 
 interface CategoriesDropdownProps {
   categories: Category[];
@@ -32,14 +33,10 @@ const CategoriesDropdown: React.FC<CategoriesDropdownProps> = ({
   return (
     <div className="relative group">
       {/* Main Categories Button */}
-      <button
-        className={`px-4 py-2 ${buttonColor} ${buttonTextColor} rounded-md hover:${hoverColor} focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-white dark:hover:bg-gray-700`}
-      >
-        {buttonText}
-      </button>
+      <Button>{buttonText}</Button>
 
       {/* Dropdown Menu */}
-      <div className="absolute left-0 mt-2 w-56 shadow-lg rounded-lg border dark:bg-gray-700 border-gray-200 z-10 hidden group-hover:block group-focus:block">
+      <div className="absolute left-0 mt-[2px] w-56 shadow-lg bg-white rounded-lg border dark:bg-gray-700 border-gray-200 z-10 hidden group-hover:block group-focus:block">
         <div className="py-1">
           {/* Loop through categories */}
           {categories.map((category) => (
