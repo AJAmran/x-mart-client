@@ -1,10 +1,11 @@
 import React from 'react';
+import HeroSection from '../components/UI/HeroSection';
 
 const page = () => {
   return (
-    <div>
-      lorem500
-    </div>
+    <>
+     <HeroSection />
+    </>
   );
 };
 
