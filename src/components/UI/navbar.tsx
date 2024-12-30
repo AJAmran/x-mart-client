@@ -13,10 +13,12 @@ import { Input } from "@nextui-org/input";
 import { link as linkStyles } from "@nextui-org/theme";
 import NextLink from "next/link";
 import clsx from "clsx";
-import { Logo, SearchIcon } from "../icons";
-import { siteConfig } from "@/src/config/site";
-import CategoriesDropdownContainer from "../navbar/dropdown";
+
+import { CartIcon, Logo, SearchIcon } from "../icons";
 import { ThemeSwitch } from "../theme-switch";
+import CategoriesDropdownContainer from "../navbar/dropdown";
+
+import { siteConfig } from "@/src/config/site";
 
 export const Navbar = () => {
   const searchInput = (
@@ -86,6 +88,13 @@ export const Navbar = () => {
             Sign Up
           </Button>
         </NavbarItem>
+        <NavbarItem className="relative">
+          <CartIcon className="w-6 h-6 text-gray-700 dark:text-gray-300" />
+          <span className="absolute -top-2 -right-2 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-white text-xs font-bold">
+            4
+          </span>
+        </NavbarItem>
+
         <NavbarItem className="hidden sm:flex gap-2">
           <ThemeSwitch />
         </NavbarItem>
