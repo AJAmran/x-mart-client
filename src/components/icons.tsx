@@ -24,7 +24,6 @@ export const Logo: React.FC<IconSvgProps> = ({
   </svg>
 );
 
-
 export const TwitterIcon: React.FC<IconSvgProps> = ({
   size = 24,
   width,
@@ -171,23 +170,19 @@ export const NextUILogo: React.FC<IconSvgProps> = (props) => {
   );
 };
 
-
-export const CartIcon: React.FC<IconSvgProps> = ({
-  size = 24,
-  width,
-  height,
-  ...props
-}) => (
+export const CartIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
   <svg
+    xmlns="http://www.w3.org/2000/svg"
     fill="none"
-    height={size || height}
     viewBox="0 0 24 24"
-    width={size || width}
+    strokeWidth="1.5"
+    stroke="currentColor"
     {...props}
   >
     <path
-      d="M7 4H3V2H7V4ZM4 6V4H6V6H4ZM9 18H15V16H9V18ZM16 4V2H18V4H16ZM16 6V4H18V6H16ZM7 18V16H9V18H7ZM11 4V6H13V4H11ZM13 16V18H11V16H13ZM11 10H13V12H11V10ZM13 8V10H11V8H13Z"
-      fill="currentColor"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z"
     />
   </svg>
 );
