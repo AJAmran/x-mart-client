@@ -1,10 +1,11 @@
-import React from 'react';
-import HeroSection from '../components/UI/HeroSection';
+import HeroSection from "../components/UI/HeroSection";
+import Category from "../components/UI/Categories";
 
 const page = () => {
   return (
     <>
-     <HeroSection />
+      <HeroSection />
+      <Category />
     </>
   );
 };
