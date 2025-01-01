@@ -1,15 +1,16 @@
 "use client";
 
 import React, { useState } from "react";
+import Image from "next/image"; // Import Next.js Image component
+import clsx from "clsx";
+import { Link } from "@nextui-org/link";
+import { Button } from "@nextui-org/button";
+
 import {
   categoriesData,
   Category,
   Subcategory,
 } from "@/src/data/CategoriestData";
-import { Button } from "@nextui-org/button";
-import { Link } from "@nextui-org/link";
-import clsx from "clsx";
-import Image from "next/image"; // Import Next.js Image component
 
 interface CategoriesDropdownProps {
   categories: Category[];
@@ -22,9 +23,6 @@ interface CategoriesDropdownProps {
 const CategoriesDropdown: React.FC<CategoriesDropdownProps> = ({
   categories,
   buttonText,
-  buttonColor,
-  buttonTextColor,
-  hoverColor,
 }) => {
   const [openCategory, setOpenCategory] = useState<string | null>(null);
 
@@ -35,9 +33,7 @@ const CategoriesDropdown: React.FC<CategoriesDropdownProps> = ({
   return (
     <div className="relative group">
       {/* Main Categories Button */}
-      <Button className="">
-        {buttonText}
-      </Button>
+      <Button className="">{buttonText}</Button>
 
       {/* Dropdown Menu */}
       <div className="absolute left-0 mt-[2px] w-56 shadow-lg rounded-lg border bg-gray-300 dark:bg-gray-700 border-gray-200 z-10 hidden group-hover:block group-focus:block">
@@ -54,11 +50,11 @@ const CategoriesDropdown: React.FC<CategoriesDropdownProps> = ({
               >
                 <div className="flex items-center space-x-2">
                   <Image
-                    src={category.image}
                     alt={category.name}
-                    width={20}
-                    height={20}
                     className="rounded"
+                    height={20}
+                    src={category.image}
+                    width={20}
                   />
                   <span>{category.name}</span>
                 </div>
@@ -74,12 +70,12 @@ const CategoriesDropdown: React.FC<CategoriesDropdownProps> = ({
 
               {/* Subcategories Dropdown */}
               <div
-                id={`subcategory-${category.id}`}
+                aria-labelledby={`category-${category.id}`}
                 className={`absolute left-full top-0 mt-2 w-56 bg-gray-300 shadow-lg rounded-lg border border-gray-200 transition-all duration-300 dark:bg-gray-800 dark:border-gray-600 ${
                   openCategory === category.id ? "block" : "hidden"
                 }`}
+                id={`subcategory-${category.id}`}
                 role="region"
-                aria-labelledby={`category-${category.id}`}
               >
                 <div className="py-1">
                   {category.subcategories.map(
@@ -112,10 +108,10 @@ const CategoriesDropdown: React.FC<CategoriesDropdownProps> = ({
 const CategoriesDropdownContainer = () => {
   return (
     <CategoriesDropdown
-      categories={categoriesData}
-      buttonText="Categories"
       buttonColor="bg-blue-600"
+      buttonText="Categories"
       buttonTextColor="text-white"
+      categories={categoriesData}
       hoverColor="bg-blue-700"
     />
   );
