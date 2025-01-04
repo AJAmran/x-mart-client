@@ -1,8 +1,7 @@
-'use client'
+'use client';
 
 import ProductCard from "@/src/components/UI/ProductCard";
 import { products } from "@/src/data/CategoriestData";
-
 
 export default function Home() {
   const handleProductClick = (productId: string) => {

@@ -1,11 +1,10 @@
 "use client";
 
 import { Card, CardBody, CardFooter } from "@nextui-org/card";
-import { Image } from "@nextui-org/image";
-import { Badge } from "@nextui-org/badge";
 import { Tooltip } from "@nextui-org/tooltip";
 import clsx from "clsx";
 import { Product } from "@/src/types";
+import { Image } from "@nextui-org/image";
 
 interface ProductCardProps {
   product: Product;
@@ -24,8 +23,17 @@ export default function ProductCard({
   showRating = true,
   layout = "vertical",
 }: ProductCardProps) {
-  const { name, price, imageUrl, discount, inStock, brand, rating, reviews } =
-    product;
+  const {
+    name,
+    price,
+    imageUrl,
+    discount = 0,
+    inStock,
+    brand,
+    rating,
+    reviews,
+    description,
+  } = product;
 
   const discountedPrice = discount
     ? (price - price * (discount / 100)).toFixed(2)
@@ -36,28 +44,25 @@ export default function ProductCard({
       isPressable
       shadow="sm"
       className={clsx(
-        "hover:shadow-xl transition-shadow duration-300 rounded-lg border border-gray-200",
+        "hover:shadow-xl transition-shadow duration-300 rounded-lg border border-gray-200 relative overflow-hidden",
         layout === "horizontal" && "flex flex-row items-center"
       )}
       onPress={() => onPress && onPress(product.id)}
     >
-      {/* Image Section */}
-      <CardBody
-        className={clsx(
-          "overflow-hidden p-0 relative",
-          layout === "horizontal" && "flex-shrink-0 w-[30%]"
-        )}
-      >
-        <div
-          className="relative w-full rounded-t-lg"
-          style={{ aspectRatio: "16/9" }}
-        >
-          <img
-            alt={name}
-            src={imageUrl} // Test with a static image
-            className="absolute top-0 left-0 w-full h-full object-contain transition-transform duration-300 hover:scale-105"
-          />
+      {/* Discount Badge */}
+      {showDiscount && discount > 0 && (
+        <div className="absolute top-0 left-0 bg-red-500 text-white text-xs font-bold py-1 px-2 rounded-tr-lg shadow-md">
+          {discount}% OFF
         </div>
+      )}
+
+      {/* Image Section */}
+      <CardBody className="flex items-center justify-center p-4">
+        <Image
+          alt={name}
+          className="object-contain h-[140px] lg:h-[180px] max-w-full"
+          src={imageUrl}
+        />
       </CardBody>
 
       {/* Card Footer */}
@@ -72,28 +77,22 @@ export default function ProductCard({
           </h4>
         </Tooltip>
 
-        {/* Brand and Discount */}
-        <div className="flex items-center justify-between w-full">
-          {showBrand && <p className="text-sm text-gray-500">{brand}</p>}
-        </div>
+        {/* Product Description */}
+        <p className="text-sm text-gray-500 line-clamp-2 text-start">{description}</p>
+
+        {/* Brand */}
+        {showBrand && <p className="text-sm text-gray-500">{brand}</p>}
 
         {/* Pricing Section */}
         <div className="flex items-center justify-between w-full">
           <p className="text-xl font-bold text-primary">
-          ৳{discountedPrice}
-            {discount && (
+            ৳{discountedPrice}
+            {discount > 0 && (
               <span className="line-through text-gray-400 text-sm ml-2">
                 ৳{price.toFixed(2)}
               </span>
             )}
           </p>
-
-          {/* Discount Percentage next to price */}
-          {discount && (
-            <span className="text-xs text-green-500 font-semibold ml-2">
-              -{discount}%
-            </span>
-          )}
         </div>
 
         {/* Availability and Rating */}
