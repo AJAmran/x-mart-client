@@ -4,6 +4,7 @@ import React from "react";
 import Image from "next/image";
 import { Card, CardBody, CardHeader } from "@nextui-org/card";
 import { categoriesData } from "@/src/data/CategoriestData";
+import { Link } from "@nextui-org/link";
 
 const Categories: React.FC = () => {
   return (
@@ -19,7 +20,11 @@ const Categories: React.FC = () => {
       </div>
 
       {/* Categories Grid */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-6">
+      <Link
+        href="/shop"
+        aria-current="page"
+        className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-6"
+      >
         {categoriesData.map((category) => (
           <Card
             key={category.id}
@@ -45,7 +50,7 @@ const Categories: React.FC = () => {
             </CardBody>
           </Card>
         ))}
-      </div>
+      </Link>
     </section>
   );
 };

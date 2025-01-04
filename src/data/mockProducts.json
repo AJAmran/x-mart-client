@@ -1,0 +1,30 @@
+[
+  {
+    "id": "1",
+    "name": "Smartphone",
+    "price": 699,
+    "image": "/images/smartphone.jpg",
+    "category": "Electronics"
+  },
+  {
+    "id": "2",
+    "name": "Laptop",
+    "price": 999,
+    "image": "/images/laptop.jpg",
+    "category": "Electronics"
+  },
+  {
+    "id": "3",
+    "name": "Running Shoes",
+    "price": 120,
+    "image": "/images/shoes.jpg",
+    "category": "Fashion"
+  },
+  {
+    "id": "4",
+    "name": "Wrist Watch",
+    "price": 250,
+    "image": "/images/watch.jpg",
+    "category": "Accessories"
+  }
+]
