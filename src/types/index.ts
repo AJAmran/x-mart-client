@@ -22,8 +22,8 @@ export interface Product {
   variants?: Variant[];
   options?: Option[];
   tags?: string[];
-  createdAt?: Date;
-  updatedAt?: Date;
+createdAt: Date;
+  updatedAt: Date;
 }
 
 export interface Variant {
