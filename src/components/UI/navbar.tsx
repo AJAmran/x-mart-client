@@ -1,3 +1,5 @@
+"use client"
+
 import {
   Navbar as NextUINavbar,
   NavbarContent,
@@ -19,23 +21,15 @@ import { ThemeSwitch } from "../theme-switch";
 import CategoriesDropdownContainer from "../navbar/dropdown";
 
 import { siteConfig } from "@/src/config/site";
+import { useState } from "react";
+import SearchBar from "../SearchBar";
 
 export const Navbar = () => {
-  const searchInput = (
-    <Input
-      aria-label="Search"
-      classNames={{
-        inputWrapper: "bg-default-100",
-        input: "text-sm",
-      }}
-      labelPlacement="outside"
-      placeholder="Search..."
-      startContent={
-        <SearchIcon className="text-base text-default-400 pointer-events-none flex-shrink-0" />
-      }
-      type="search"
-    />
-  );
+  const [searchQuery, setSearchQuery] = useState("");
+  const handleSearch = (query: string) => {
+    setSearchQuery(query);
+    console.log("Search query:", query); // Replace with actual search functionality
+  };
 
   return (
     <NextUINavbar
@@ -75,7 +69,14 @@ export const Navbar = () => {
         className="hidden sm:flex basis-1/5 sm:basis-full"
         justify="end"
       >
-        <NavbarItem className="hidden lg:flex">{searchInput}</NavbarItem>
+        <NavbarItem>
+          <SearchBar
+            value={searchQuery}
+            onChange={handleSearch}
+            className="hidden lg:block w-[300px]"
+            placeholder="Search in X-mart..."
+          />
+        </NavbarItem>
 
         <NavbarItem className="hidden md:flex">
           <Button
@@ -106,7 +107,13 @@ export const Navbar = () => {
       </NavbarContent>
 
       <NavbarMenu>
-        {searchInput}
+        <div className="p-4">
+          <SearchBar
+            value={searchQuery}
+            onChange={handleSearch}
+            className="w-full"
+          />
+        </div>
         <div className="mx-4 mt-2 flex flex-col gap-2">
           {siteConfig.navMenuItems.map((item, index) => (
             <NavbarMenuItem key={`${item}-${index}`}>
