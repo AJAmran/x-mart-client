@@ -1,7 +1,9 @@
-import React from "react";
+import AuthForm from "@/src/components/authFrom";
 
-const page = () => {
-  return <div>Register...........</div>;
-};
-
-export default page;
+export default function RegisterPage() {
+  return (
+    <div className="flex items-center justify-center min-h-screen bg-gray-100">
+      <AuthForm type="register" />
+    </div>
+  );
+}
