@@ -50,7 +50,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ type }) => {
       initial={{ opacity: 0, y: -10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
-      className="flex justify-center items-center min-h-screen bg-gray-100"
+      className="flex justify-center items-center min-h-screen"
     >
       <Card className="w-full max-w-md p-8 shadow-xl rounded-lg bg-white">
         <h2 className="text-2xl font-semibold text-center text-gray-800">

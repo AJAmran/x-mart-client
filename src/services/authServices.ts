@@ -27,12 +27,12 @@ export const loginUser = async (data: LoginData) => {
   return response.data;
 };
 
-export const useLogout = () => {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: logoutUser,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["user"] });
-    },
-  });
-};
+// export const useLogout = () => {
+//   const queryClient = useQueryClient();
+//   return useMutation({
+//     mutationFn: logoutUser,
+//     onSuccess: () => {
+//       queryClient.invalidateQueries({ queryKey: ["user"] });
+//     },
+//   });
+// };
