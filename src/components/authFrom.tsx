@@ -1,49 +1,48 @@
 "use client";
 
 import { useCallback } from "react";
-import { useForm, SubmitHandler } from "react-hook-form";
+import { useForm, SubmitHandler, FieldErrors } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Card } from "@nextui-org/card";
 import { Input } from "@nextui-org/input";
 import { Button } from "@nextui-org/button";
 import { motion } from "framer-motion";
 import Link from "next/link";
+import { useTheme } from "next-themes";
+
 import {
   registerValidationSchema,
   loginValidationSchema,
+  type RegisterFormData,
+  type LoginFormData,
 } from "@/src/validations/validationSchema";
-import { z } from "zod";
-
-// Types for form data
-type FormData = {
-  name?: string;
-  email: string;
-  password: string;
-  mobileNumber: string;
-  profilePhoto?: string;
-};
 
 type AuthFormProps = {
   type: "login" | "register";
 };
 
 const AuthForm: React.FC<AuthFormProps> = ({ type }) => {
-  // Use Form with TypeScript for validation
+  const isRegister = type === "register";
+  const { theme } = useTheme();
+
   const {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
-  } = useForm<FormData>({
+  } = useForm<RegisterFormData | LoginFormData>({
     resolver: zodResolver(
-      type === "register" ? registerValidationSchema : loginValidationSchema
+      isRegister ? registerValidationSchema : loginValidationSchema
     ),
+    mode: "onBlur",
   });
 
-  // Handle form submission
-  const onSubmit: SubmitHandler<FormData> = useCallback(async (data) => {
-    console.log("Form Submitted", data);
-    // Here you'd make your API call or process the data
-  }, []);
+  const onSubmit: SubmitHandler<RegisterFormData | LoginFormData> = useCallback(
+    async (data) => {
+      console.log("Form Submitted", data);
+      // Add API call or data processing logic here
+    },
+    []
+  );
 
   return (
     <motion.div
@@ -52,97 +51,132 @@ const AuthForm: React.FC<AuthFormProps> = ({ type }) => {
       transition={{ duration: 0.3 }}
       className="flex justify-center items-center min-h-screen"
     >
-      <Card className="w-full max-w-md p-8 shadow-xl rounded-lg bg-white">
-        <h2 className="text-2xl font-semibold text-center text-gray-800">
-          {type === "login" ? "Login to Your Account" : "Create a New Account"}
+      <Card
+        className={`w-full max-w-md p-8 rounded-2xl backdrop-blur-md shadow-xl border 
+          ${theme === "dark" ? "bg-gray-900 border-gray-700 text-white" : "bg-white border-gray-200 text-gray-900"}
+        `}
+      >
+        <h2
+          className={`text-3xl font-bold text-center drop-shadow-lg mb-6 
+            ${theme === "dark" ? "text-white" : "text-gray-900"}
+          `}
+        >
+          {isRegister ? "Create a New Account" : "Login to Your Account"}
         </h2>
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-5 mt-5">
-          {type === "register" && (
-            <div>
-              <Input {...register("name")} placeholder="Full Name" />
-              {errors.name && (
-                <p className="text-red-500 text-sm mt-1">
-                  {errors.name.message}
-                </p>
-              )}
-            </div>
-          )}
-          <div>
-            <Input
-              {...register("email")}
-              type="email"
-              placeholder="Email Address"
-            />
-            {errors.email && (
-              <p className="text-red-500 text-sm mt-1">
-                {errors.email.message}
-              </p>
-            )}
-          </div>
-          {type === "register" && (
-            <div>
-              <Input
-                {...register("mobileNumber")}
-                type="text"
-                placeholder="Mobile Number"
-              />
-              {errors.mobileNumber && (
-                <p className="text-red-500 text-sm mt-1">
-                  {errors.mobileNumber.message}
-                </p>
-              )}
-            </div>
-          )}
-          <div>
-            <Input
-              {...register("password")}
-              type="password"
-              placeholder="Password"
-            />
-            {errors.password && (
-              <p className="text-red-500 text-sm mt-1">
-                {errors.password.message}
-              </p>
-            )}
-          </div>
 
-          {type === "register" && (
-            <div>
-              <Input
-                {...register("profilePhoto")}
-                type="text"
-                placeholder="Profile Photo URL"
-              />
-              {errors.profilePhoto && (
-                <p className="text-red-500 text-sm mt-1">
-                  {errors.profilePhoto.message}
-                </p>
-              )}
-            </div>
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+          {isRegister && (
+            <Input
+              {...register("name")}
+              label="Full Name"
+              placeholder="Enter your full name"
+              variant="bordered"
+              isInvalid={!!(errors as FieldErrors<RegisterFormData>).name}
+              errorMessage={
+                (errors as FieldErrors<RegisterFormData>).name?.message
+              }
+              className={`${
+                theme === "dark"
+                  ? "text-white placeholder-gray-400"
+                  : "text-gray-900"
+              }`}
+            />
+          )}
+
+          <Input
+            {...register("email")}
+            label="Email"
+            type="email"
+            placeholder="Enter your email"
+            variant="bordered"
+            isInvalid={!!errors.email}
+            errorMessage={errors.email?.message}
+            className={`${
+              theme === "dark"
+                ? "text-white placeholder-gray-400"
+                : "text-gray-900"
+            }`}
+          />
+
+          {isRegister && (
+            <Input
+              {...register("mobileNumber")}
+              label="Mobile Number"
+              type="text"
+              placeholder="Enter your mobile number"
+              variant="bordered"
+              isInvalid={
+                !!(errors as FieldErrors<RegisterFormData>).mobileNumber
+              }
+              errorMessage={
+                (errors as FieldErrors<RegisterFormData>).mobileNumber?.message
+              }
+              className={`${
+                theme === "dark"
+                  ? "text-white placeholder-gray-400"
+                  : "text-gray-900"
+              }`}
+            />
+          )}
+
+          <Input
+            {...register("password")}
+            label="Password"
+            type="password"
+            placeholder="Enter your password"
+            variant="bordered"
+            isInvalid={!!errors.password}
+            errorMessage={errors.password?.message}
+            className={`${
+              theme === "dark"
+                ? "text-white placeholder-gray-400"
+                : "text-gray-900"
+            }`}
+          />
+
+          {isRegister && (
+            <Input
+              {...register("profilePhoto")}
+              label="Profile Photo URL"
+              type="text"
+              placeholder="Enter profile photo URL"
+              variant="bordered"
+              isInvalid={
+                !!(errors as FieldErrors<RegisterFormData>).profilePhoto
+              }
+              errorMessage={
+                (errors as FieldErrors<RegisterFormData>).profilePhoto?.message
+              }
+              className={`${
+                theme === "dark"
+                  ? "text-white placeholder-gray-400"
+                  : "text-gray-900"
+              }`}
+            />
           )}
 
           <Button
             type="submit"
             color="primary"
-            className="w-full py-3 text-lg font-semibold"
+            className="w-full py-3 text-lg font-semibold mt-4 transition-all"
             disabled={isSubmitting}
+            isLoading={isSubmitting}
           >
-            {isSubmitting
-              ? "Processing..."
-              : type === "login"
-                ? "Login"
-                : "Register"}
+            {isSubmitting ? "Processing..." : isRegister ? "Register" : "Login"}
           </Button>
         </form>
-        <p className="text-sm text-center text-gray-600 mt-4">
-          {type === "login"
-            ? "Don't have an account?"
-            : "Already have an account?"}{" "}
+
+        <p
+          className={`text-sm text-center mt-6 
+            ${theme === "dark" ? "text-gray-400" : "text-gray-700"}
+          `}
+        >
+          {isRegister ? "Already have an account?" : "Don't have an account?"}{" "}
           <Link
-            href={type === "login" ? "/auth/register" : "/auth/login"}
-            className="text-blue-500 hover:underline"
+            href={isRegister ? "/auth/login" : "/auth/register"}
+            className="text-blue-400 hover:underline"
           >
-            {type === "login" ? "Register" : "Login"}
+            {isRegister ? "Login" : "Register"}
           </Link>
         </p>
       </Card>
