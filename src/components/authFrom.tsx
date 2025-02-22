@@ -9,6 +9,7 @@ import { Button } from "@nextui-org/button";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { useTheme } from "next-themes";
+import { useRouter } from "next/navigation";
 
 import {
   registerValidationSchema,
@@ -16,6 +17,7 @@ import {
   type RegisterFormData,
   type LoginFormData,
 } from "@/src/validations/validationSchema";
+import { useLogin, useRegister } from "@/src/hooks/useAuth";
 
 type AuthFormProps = {
   type: "login" | "register";
@@ -24,6 +26,7 @@ type AuthFormProps = {
 const AuthForm: React.FC<AuthFormProps> = ({ type }) => {
   const isRegister = type === "register";
   const { theme } = useTheme();
+  const router = useRouter();
 
   const {
     register,
@@ -36,12 +39,18 @@ const AuthForm: React.FC<AuthFormProps> = ({ type }) => {
     mode: "onBlur",
   });
 
+  const { mutate: login, isPending: isLoggingIn } = useLogin();
+  const { mutate: registerUser, isPending: isRegistering } = useRegister();
+
   const onSubmit: SubmitHandler<RegisterFormData | LoginFormData> = useCallback(
     async (data) => {
-      console.log("Form Submitted", data);
-      // Add API call or data processing logic here
+      if (isRegister) {
+        registerUser(data as RegisterFormData);
+      } else {
+        login(data as LoginFormData);
+      }
     },
-    []
+    [isRegister, login, registerUser]
   );
 
   return (
@@ -159,10 +168,14 @@ const AuthForm: React.FC<AuthFormProps> = ({ type }) => {
             type="submit"
             color="primary"
             className="w-full py-3 text-lg font-semibold mt-4 transition-all"
-            disabled={isSubmitting}
-            isLoading={isSubmitting}
+            disabled={isSubmitting || isLoggingIn || isRegistering}
+            isLoading={isSubmitting || isLoggingIn || isRegistering}
           >
-            {isSubmitting ? "Processing..." : isRegister ? "Register" : "Login"}
+            {isSubmitting || isLoggingIn || isRegistering
+              ? "Processing..."
+              : isRegister
+                ? "Register"
+                : "Login"}
           </Button>
         </form>
 

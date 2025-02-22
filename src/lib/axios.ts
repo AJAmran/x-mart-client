@@ -1,44 +1,53 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import axios from "axios";
-
-const API_BASE_URL = process.env.PUBLIC_API_URL || "http://localhost:5000/api";
+import Cookies from "js-cookie";
 
 const api = axios.create({
-  baseURL: API_BASE_URL,
-  withCredentials: true,
+  baseURL: process.env.NEXT_PUBLIC_API_BASE_URL, 
+  withCredentials: true, 
 });
 
+// Request interceptor to add the access token to headers
 api.interceptors.request.use((config) => {
-  const accessToken =
-    typeof window !== "undefined" ? localStorage.getItem("accessToken") : null;
+  const accessToken = Cookies.get("accessToken");
+
   if (accessToken) {
     config.headers.Authorization = `Bearer ${accessToken}`;
   }
+
   return config;
 });
 
+// Response interceptor to handle token refresh
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
-    if (error.response?.status === 401) {
+    const originalRequest = error.config;
+
+    // If the error is due to an expired access token
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true;
+
       try {
-        // Attempt token refresh
-        const res = await axios.post(
-          `${API_BASE_URL}/auth/refresh-token`,
-          {},
-          { withCredentials: true }
-        );
-        const newAccessToken = res.data.accessToken;
-        if (typeof window !== "undefined") {
-          localStorage.setItem("accessToken", newAccessToken);
-        }
-        error.config.headers.Authorization = `Bearer ${newAccessToken}`;
-        return api(error.config);
+        // Attempt to refresh the token
+        const { data } = await api.post("/refresh-token");
+        const { accessToken } = data;
+
+        // Store the new access token
+        Cookies.set("accessToken", accessToken);
+
+        // Retry the original request with the new token
+        originalRequest.headers.Authorization = `Bearer ${accessToken}`;
+
+        return api(originalRequest);
       } catch (refreshError) {
-        console.error("Refresh token failed:", refreshError);
-        localStorage.removeItem("accessToken");
+        // If refresh fails, log the user out
+        Cookies.remove("accessToken");
+        Cookies.remove("refreshToken");
         window.location.href = "/auth/login";
       }
     }
+
     return Promise.reject(error);
   }
 );
