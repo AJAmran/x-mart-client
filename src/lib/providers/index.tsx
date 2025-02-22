@@ -6,7 +6,8 @@ import * as React from "react";
 import { NextUIProvider } from "@nextui-org/system";
 import { useRouter } from "next/navigation";
 import { ThemeProvider as NextThemesProvider } from "next-themes";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { QueryClientProvider } from "@tanstack/react-query";
+import { queryClient } from "../queryClient";
 
 export interface ProvidersProps {
   children: React.ReactNode;
@@ -20,8 +21,6 @@ declare module "@react-types/shared" {
     >;
   }
 }
-
-const queryClient = new QueryClient();
 
 export function Providers({ children, themeProps }: ProvidersProps) {
   const router = useRouter();
