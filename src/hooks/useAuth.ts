@@ -12,7 +12,7 @@ export const useLogin = () => {
 
   return useMutation({
     mutationFn: (data: { email: string; password: string }) =>
-      api.post("/login", data),
+      api.post("/auth/login", data),
     onSuccess: (data) => {
       const { accessToken, refreshToken } = data.data;
 
@@ -34,7 +34,7 @@ export const useRegister = () => {
       email: string;
       password: string;
       mobileNumber: string;
-    }) => api.post("/register", data),
+    }) => api.post("/auth/register", data),
     onSuccess: () => {
       router.push("/auth/login"); 
     },

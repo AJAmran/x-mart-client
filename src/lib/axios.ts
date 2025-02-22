@@ -1,12 +1,10 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import axios from "axios";
 import Cookies from "js-cookie";
 
 const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_BASE_URL, 
+  baseURL: process.env.PUBLIC_API_URL || "http://localhost:5000/api/v1", 
   withCredentials: true, 
 });
-
 // Request interceptor to add the access token to headers
 api.interceptors.request.use((config) => {
   const accessToken = Cookies.get("accessToken");
