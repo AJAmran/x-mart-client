@@ -5,6 +5,7 @@ const api = axios.create({
   baseURL: process.env.PUBLIC_API_URL || "http://localhost:5000/api/v1", 
   withCredentials: true, 
 });
+
 // Request interceptor to add the access token to headers
 api.interceptors.request.use((config) => {
   const accessToken = Cookies.get("accessToken");
