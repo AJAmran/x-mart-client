@@ -60,16 +60,8 @@ const AuthForm: React.FC<AuthFormProps> = ({ type }) => {
       transition={{ duration: 0.3 }}
       className="flex justify-center items-center min-h-screen"
     >
-      <Card
-        className={`w-full max-w-md p-8 rounded-2xl backdrop-blur-md shadow-xl border 
-          ${theme === "dark" ? "bg-gray-900 border-gray-700 text-white" : "bg-white border-gray-200 text-gray-900"}
-        `}
-      >
-        <h2
-          className={`text-3xl font-bold text-center drop-shadow-lg mb-6 
-            ${theme === "dark" ? "text-white" : "text-gray-900"}
-          `}
-        >
+      <Card className="w-full max-w-md p-6 rounded-2xl shadow-xl border">
+        <h2 className="text-3xl font-bold text-center drop-shadow-lg mb-6 ">
           {isRegister ? "Create a New Account" : "Login to Your Account"}
         </h2>
 
@@ -84,11 +76,6 @@ const AuthForm: React.FC<AuthFormProps> = ({ type }) => {
               errorMessage={
                 (errors as FieldErrors<RegisterFormData>).name?.message
               }
-              className={`${
-                theme === "dark"
-                  ? "text-white placeholder-gray-400"
-                  : "text-gray-900"
-              }`}
             />
           )}
 
@@ -100,11 +87,6 @@ const AuthForm: React.FC<AuthFormProps> = ({ type }) => {
             variant="bordered"
             isInvalid={!!errors.email}
             errorMessage={errors.email?.message}
-            className={`${
-              theme === "dark"
-                ? "text-white placeholder-gray-400"
-                : "text-gray-900"
-            }`}
           />
 
           {isRegister && (
@@ -120,11 +102,6 @@ const AuthForm: React.FC<AuthFormProps> = ({ type }) => {
               errorMessage={
                 (errors as FieldErrors<RegisterFormData>).mobileNumber?.message
               }
-              className={`${
-                theme === "dark"
-                  ? "text-white placeholder-gray-400"
-                  : "text-gray-900"
-              }`}
             />
           )}
 
@@ -136,11 +113,6 @@ const AuthForm: React.FC<AuthFormProps> = ({ type }) => {
             variant="bordered"
             isInvalid={!!errors.password}
             errorMessage={errors.password?.message}
-            className={`${
-              theme === "dark"
-                ? "text-white placeholder-gray-400"
-                : "text-gray-900"
-            }`}
           />
 
           {isRegister && (
@@ -156,11 +128,6 @@ const AuthForm: React.FC<AuthFormProps> = ({ type }) => {
               errorMessage={
                 (errors as FieldErrors<RegisterFormData>).profilePhoto?.message
               }
-              className={`${
-                theme === "dark"
-                  ? "text-white placeholder-gray-400"
-                  : "text-gray-900"
-              }`}
             />
           )}
 
@@ -179,11 +146,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ type }) => {
           </Button>
         </form>
 
-        <p
-          className={`text-sm text-center mt-6 
-            ${theme === "dark" ? "text-gray-400" : "text-gray-700"}
-          `}
-        >
+        <p className={`text-sm text-center mt-6`}>
           {isRegister ? "Already have an account?" : "Don't have an account?"}{" "}
           <Link
             href={isRegister ? "/auth/login" : "/auth/register"}
