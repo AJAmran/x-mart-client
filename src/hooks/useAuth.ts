@@ -1,4 +1,3 @@
-
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import Cookies from "js-cookie";
 import { useRouter } from "next/navigation";
@@ -14,8 +13,8 @@ export const useLogin = () => {
     mutationFn: (data: { email: string; password: string }) =>
       api.post("/auth/login", data),
     onSuccess: (data) => {
-      const { accessToken, refreshToken } = data.data;
-
+      const { accessToken, refreshToken } = data.data.data;
+      
       Cookies.set("accessToken", accessToken);
       Cookies.set("refreshToken", refreshToken);
       queryClient.invalidateQueries({ queryKey: ["user"] });
@@ -36,7 +35,7 @@ export const useRegister = () => {
       mobileNumber: string;
     }) => api.post("/auth/register", data),
     onSuccess: () => {
-      router.push("/auth/login"); 
+      router.push("/auth/login");
     },
   });
 };
@@ -52,7 +51,7 @@ export const useLogout = () => {
       Cookies.remove("accessToken");
       Cookies.remove("refreshToken");
       queryClient.clear();
-      router.push("/auth/login"); 
+      router.push("/auth/login");
     },
   });
 };
@@ -62,6 +61,6 @@ export const useCurrentUser = () => {
   return useQuery({
     queryKey: ["user"],
     queryFn: () => api.get("/me").then((res) => res.data),
-    staleTime: 1000 * 60 * 5, 
+    staleTime: 1000 * 60 * 5,
   });
 };

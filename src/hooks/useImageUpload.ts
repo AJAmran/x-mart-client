@@ -12,18 +12,21 @@ export const useImageUpload = () => {
       if (!file) {
         setPreview(null);
         setFileError(null);
+
         return;
       }
 
       if (!file.type.startsWith("image/")) {
         setFileError("Only image files are allowed.");
         setPreview(null);
+
         return;
       }
 
       if (file.size > 2 * 1024 * 1024) {
         setFileError("File size must be less than 2MB.");
         setPreview(null);
+        
         return;
       }
 
