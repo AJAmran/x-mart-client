@@ -1,54 +1,50 @@
 import axios from "axios";
-import Cookies from "js-cookie";
 
-const api = axios.create({
-  baseURL: process.env.PUBLIC_API_URL || "http://localhost:5000/api/v1", 
-  withCredentials: true, 
+import envConfig from "@/src/config/envConfig";
+import { getNewAccessToken } from "@/src/services/AuthService";
+import { cookies } from "next/headers";
+
+const axiosInstance = axios.create({
+  baseURL: envConfig.baseApi,
 });
 
-// Request interceptor to add the access token to headers
-api.interceptors.request.use((config) => {
-  const accessToken = Cookies.get("accessToken");
+axiosInstance.interceptors.request.use(
+  async function (config) {
+    const cookieStore = await cookies();
+    const accessToken = cookieStore.get("accessToken")?.value;
 
-  if (accessToken) {
-    config.headers.Authorization = `Bearer ${accessToken}`;
-  }
-
-  return config;
-});
-
-// Response interceptor to handle token refresh
-api.interceptors.response.use(
-  (response) => response,
-  async (error) => {
-    const originalRequest = error.config;
-
-    // If the error is due to an expired access token
-    if (error.response?.status === 401 && !originalRequest._retry) {
-      originalRequest._retry = true;
-
-      try {
-        // Attempt to refresh the token
-        const { data } = await api.post("/refresh-token");
-        const { accessToken } = data;
-
-        // Store the new access token
-        Cookies.set("accessToken", accessToken);
-
-        // Retry the original request with the new token
-        originalRequest.headers.Authorization = `Bearer ${accessToken}`;
-
-        return api(originalRequest);
-      } catch (refreshError) {
-        // If refresh fails, log the user out
-        Cookies.remove("accessToken");
-        Cookies.remove("refreshToken");
-        window.location.href = "/auth/login";
-      }
+    if (accessToken) {
+      config.headers.Authorization = accessToken;
     }
 
+    return config;
+  },
+  function (error) {
     return Promise.reject(error);
   }
 );
 
-export default api;
+axiosInstance.interceptors.response.use(
+  function (response) {
+    return response;
+  },
+  async function (error) {
+    const config = error.config;
+
+    if (error?.response?.status === 401 && !config?.sent) {
+      config.sent = true;
+      const res = await getNewAccessToken();
+      const accessToken = res.data.accessToken;
+
+      config.headers["Authorization"] = accessToken;
+      const cookieStore = await cookies();
+      cookieStore.set("accessToken", accessToken);
+
+      return axiosInstance(config);
+    } else {
+      return Promise.reject(error);
+    }
+  }
+);
+
+export default axiosInstance;
