@@ -11,12 +11,11 @@ import {
 } from "@nextui-org/navbar";
 import { Button } from "@nextui-org/button";
 import { Link } from "@nextui-org/link";
-import { Input } from "@nextui-org/input";
 import { link as linkStyles } from "@nextui-org/theme";
 import NextLink from "next/link";
 import clsx from "clsx";
 
-import { CartIcon, Logo, SearchIcon } from "../icons";
+import { CartIcon, Logo } from "../icons";
 import { ThemeSwitch } from "../theme-switch";
 import CategoriesDropdownContainer from "../navbar/dropdown";
 
@@ -28,7 +27,7 @@ export const Navbar = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const handleSearch = (query: string) => {
     setSearchQuery(query);
-    console.log("Search query:", query); // Replace with actual search functionality
+    console.log("Search query:", query); 
   };
 
   return (
