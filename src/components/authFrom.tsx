@@ -48,7 +48,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ type }) => {
         } else {
           const response = await loginUser(data as LoginFormData);
           if (response.success) {
-            router.push("/dashboard");
+            router.push("/");
           }
         }
       } catch (error) {

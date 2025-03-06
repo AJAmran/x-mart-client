@@ -9,6 +9,7 @@
 		"lint": "eslint . --ext .ts,.tsx -c .eslintrc.json --fix"
 	},
 	"dependencies": {
+		"@heroui/modal": "^2.2.12",
 		"@heroui/progress": "^2.2.7",
 		"@heroui/table": "^2.2.9",
 		"@hookform/resolvers": "^3.10.0",
