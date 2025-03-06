@@ -16,7 +16,7 @@ import {
   type RegisterFormData,
   type LoginFormData,
 } from "@/src/validations/validationSchema";
-import { registerUser, loginUser } from "@/src/services/AuthService";
+import { registerUser, loginUser, logout } from "@/src/services/AuthService";
 
 type AuthFormProps = {
   type: "login" | "register";
@@ -43,7 +43,8 @@ const AuthForm: React.FC<AuthFormProps> = ({ type }) => {
         if (isRegister) {
           const response = await registerUser(data as RegisterFormData);
           if (response.success) {
-            router.push("/dashboard"); 
+            await logout();
+            router.push("/auth/login");
           }
         } else {
           const response = await loginUser(data as LoginFormData);
