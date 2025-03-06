@@ -8,7 +8,6 @@ import { Input } from "@nextui-org/input";
 import { Button } from "@nextui-org/button";
 import { motion } from "framer-motion";
 import Link from "next/link";
-import { useTheme } from "next-themes";
 import { useRouter } from "next/navigation";
 
 import {
@@ -17,7 +16,7 @@ import {
   type RegisterFormData,
   type LoginFormData,
 } from "@/src/validations/validationSchema";
-import { useLogin, useRegister } from "@/src/hooks/useAuth";
+import { registerUser, loginUser } from "@/src/services/AuthService";
 
 type AuthFormProps = {
   type: "login" | "register";
@@ -25,7 +24,6 @@ type AuthFormProps = {
 
 const AuthForm: React.FC<AuthFormProps> = ({ type }) => {
   const isRegister = type === "register";
-  const { theme } = useTheme();
   const router = useRouter();
 
   const {
@@ -39,18 +37,25 @@ const AuthForm: React.FC<AuthFormProps> = ({ type }) => {
     mode: "onBlur",
   });
 
-  const { mutate: login, isPending: isLoggingIn } = useLogin();
-  const { mutate: registerUser, isPending: isRegistering } = useRegister();
-
   const onSubmit: SubmitHandler<RegisterFormData | LoginFormData> = useCallback(
     async (data) => {
-      if (isRegister) {
-        registerUser(data as RegisterFormData);
-      } else {
-        login(data as LoginFormData);
+      try {
+        if (isRegister) {
+          const response = await registerUser(data as RegisterFormData);
+          if (response.success) {
+            router.push("/dashboard"); 
+          }
+        } else {
+          const response = await loginUser(data as LoginFormData);
+          if (response.success) {
+            router.push("/");
+          }
+        }
+      } catch (error) {
+        console.error("Authentication error:", error);
       }
     },
-    [isRegister, login, registerUser]
+    [isRegister, router]
   );
 
   return (
@@ -61,7 +66,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ type }) => {
       className="flex justify-center items-center min-h-screen"
     >
       <Card className="w-full max-w-md p-6 rounded-2xl shadow-xl border">
-        <h2 className="text-3xl font-bold text-center drop-shadow-lg mb-6 ">
+        <h2 className="text-3xl font-bold text-center drop-shadow-lg mb-6">
           {isRegister ? "Create a New Account" : "Login to Your Account"}
         </h2>
 
@@ -135,14 +140,9 @@ const AuthForm: React.FC<AuthFormProps> = ({ type }) => {
             type="submit"
             color="primary"
             className="w-full py-3 text-lg font-semibold mt-4 transition-all"
-            disabled={isSubmitting || isLoggingIn || isRegistering}
-            isLoading={isSubmitting || isLoggingIn || isRegistering}
+            disabled={isSubmitting}
           >
-            {isSubmitting || isLoggingIn || isRegistering
-              ? "Processing..."
-              : isRegister
-                ? "Register"
-                : "Login"}
+            {isSubmitting ? "Processing..." : isRegister ? "Register" : "Login"}
           </Button>
         </form>
 

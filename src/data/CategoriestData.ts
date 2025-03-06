@@ -90,7 +90,7 @@ export const products: Product[] = [
     imageUrl: "https://static.vecteezy.com/system/resources/previews/045/931/894/non_2x/fresh-organic-carrots-with-green-tops-free-png.png",
     category: "Groceries",
     subCategory: "Vegetables",
-    inStock: true,
+    inStock: false,
     description: "Fresh organic carrots.",
     rating: 4.5,
     reviews: 120,

@@ -1,5 +1,6 @@
-"use client"
+"use client";
 
+import { useEffect, useState } from "react";
 import {
   Navbar as NextUINavbar,
   NavbarContent,
@@ -18,16 +19,36 @@ import clsx from "clsx";
 import { CartIcon, Logo } from "../icons";
 import { ThemeSwitch } from "../theme-switch";
 import CategoriesDropdownContainer from "../navbar/dropdown";
+import SearchBar from "../SearchBar";
+
 
 import { siteConfig } from "@/src/config/site";
-import { useState } from "react";
-import SearchBar from "../SearchBar";
+
+import ProfileModal from "./ProfileModal";
+import { getCurrentUser, logout } from "@/src/services/AuthService";
+import { IUser } from "@/src/types";
 
 export const Navbar = () => {
   const [searchQuery, setSearchQuery] = useState("");
-  const handleSearch = (query: string) => {
-    setSearchQuery(query);
-    console.log("Search query:", query); 
+
+
+  const [user, setUser] = useState<IUser | null>(null);
+  console.log(user);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      const currentUser = await getCurrentUser();
+      
+      setUser(currentUser);
+    };
+
+    fetchUser();
+  }, []);
+
+  const handleLogout = async () => {
+    await logout();
+    setUser(null);
+    window.location.reload();
   };
 
   return (
@@ -71,23 +92,29 @@ export const Navbar = () => {
         <NavbarItem>
           <SearchBar
             value={searchQuery}
-            onChange={handleSearch}
+            onChange={setSearchQuery}
             className="hidden lg:block w-[300px]"
             placeholder="Search in X-mart..."
           />
         </NavbarItem>
 
-        <NavbarItem className="hidden md:flex">
-          <Button
-            isExternal
-            as={Link}
-            className="text-sm font-normal text-default-600 bg-default-100"
-            href="/profile"
-            variant="flat"
-          >
-            Sign Up
-          </Button>
-        </NavbarItem>
+        {user ? (
+          <NavbarItem className="relative">
+            <ProfileModal user={user} onLogout={handleLogout} />
+          </NavbarItem>
+        ) : (
+          <NavbarItem>
+            <Button
+              as={Link}
+              className="text-sm font-normal text-default-600 bg-default-100"
+              href="/auth/login"
+              variant="flat"
+            >
+              Login
+            </Button>
+          </NavbarItem>
+        )}
+
         <NavbarItem className="relative">
           <CartIcon className="w-6 h-6 text-gray-700 dark:text-gray-300" />
           <span className="absolute -top-2 -right-2 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-white text-xs font-bold">
@@ -109,7 +136,7 @@ export const Navbar = () => {
         <div className="p-4">
           <SearchBar
             value={searchQuery}
-            onChange={handleSearch}
+            onChange={setSearchQuery}
             className="w-full"
           />
         </div>
@@ -124,7 +151,7 @@ export const Navbar = () => {
                       ? "danger"
                       : "foreground"
                 }
-                href="#"
+                href={item.href}
                 size="lg"
               >
                 {item.label}
