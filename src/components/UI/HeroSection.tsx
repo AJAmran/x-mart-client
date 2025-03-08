@@ -4,7 +4,7 @@ import { Image } from "@nextui-org/image";
 
 export default function HeroSection() {
   return (
-    <div className="container mx-auto gap-4 grid grid-cols-12 grid-rows-2 px-8 -mt-10">
+    <div className="gap-4 grid grid-cols-12 grid-rows-2 mt-10">
       {/* Category Card */}
       <Card className="col-span-12 sm:col-span-4 h-[300px]">
         <CardHeader className="absolute z-10 top-1 flex-col !items-start">

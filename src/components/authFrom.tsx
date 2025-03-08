@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 import { useForm, SubmitHandler, FieldErrors } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Card } from "@nextui-org/card";
@@ -9,6 +9,7 @@ import { Button } from "@nextui-org/button";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 import {
   registerValidationSchema,
@@ -16,7 +17,7 @@ import {
   type RegisterFormData,
   type LoginFormData,
 } from "@/src/validations/validationSchema";
-import { registerUser, loginUser, logout } from "@/src/services/AuthService";
+import { useUserRegistration, useUserLogin } from "@/src/hooks/auth.hook";
 
 type AuthFormProps = {
   type: "login" | "register";
@@ -25,6 +26,7 @@ type AuthFormProps = {
 const AuthForm: React.FC<AuthFormProps> = ({ type }) => {
   const isRegister = type === "register";
   const router = useRouter();
+  const [error, setError] = useState<string | null>(null);
 
   const {
     register,
@@ -37,26 +39,33 @@ const AuthForm: React.FC<AuthFormProps> = ({ type }) => {
     mode: "onBlur",
   });
 
+  const { mutateAsync: registerMutation } = useUserRegistration();
+  const { mutateAsync: loginMutation } = useUserLogin();
+
   const onSubmit: SubmitHandler<RegisterFormData | LoginFormData> = useCallback(
     async (data) => {
       try {
+        setError(null);
+
         if (isRegister) {
-          const response = await registerUser(data as RegisterFormData);
+          const response = await registerMutation(data as RegisterFormData);
           if (response.success) {
-            await logout();
+            toast.success("Registration successful! Please log in.");
             router.push("/auth/login");
           }
         } else {
-          const response = await loginUser(data as LoginFormData);
+          const response = await loginMutation(data as LoginFormData);
           if (response.success) {
+            toast.success("Login successful!");
             router.push("/");
           }
         }
-      } catch (error) {
-        console.error("Authentication error:", error);
+      } catch (error: any) {
+        setError(error.message || "An error occurred. Please try again.");
+        toast.error(error.message || "An error occurred. Please try again.");
       }
     },
-    [isRegister, router]
+    [isRegister, registerMutation, loginMutation, router]
   );
 
   return (
@@ -70,6 +79,8 @@ const AuthForm: React.FC<AuthFormProps> = ({ type }) => {
         <h2 className="text-3xl font-bold text-center drop-shadow-lg mb-6">
           {isRegister ? "Create a New Account" : "Login to Your Account"}
         </h2>
+
+        {error && <div className="text-red-500 text-center mb-4">{error}</div>}
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           {isRegister && (

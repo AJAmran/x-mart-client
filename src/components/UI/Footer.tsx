@@ -8,7 +8,7 @@ import { Input } from "@nextui-org/input";
 const Footer = () => {
   return (
     <footer className="bg-gray-100 dark:bg-gray-900 py-12 shadow-md">
-      <div className="container mx-auto px-6 md:px-10 lg:px-20">
+      <div className="container mx-auto px-6 md:px-10">
         {/* Footer Top Section */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* About Section */}

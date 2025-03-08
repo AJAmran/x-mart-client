@@ -30,12 +30,12 @@ const ProfileModal = ({ user, onLogout }: ProfileModalProps) => {
       >
         <Image
           src={user.profilePhoto || "/default-avatar.png"}
-          alt="Profile"
+          alt={user.name}
           width={32}
           height={32}
-          className="rounded-full"
+          className="rounded-full border-2 border-yellow-300"
         />
-        <span className="hidden md:block font-medium">{user.name}</span>
+
       </Button>
 
       {isOpen && (

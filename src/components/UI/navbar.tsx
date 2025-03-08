@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   Navbar as NextUINavbar,
   NavbarContent,
@@ -21,39 +21,26 @@ import { ThemeSwitch } from "../theme-switch";
 import CategoriesDropdownContainer from "../navbar/dropdown";
 import SearchBar from "../SearchBar";
 
-
 import { siteConfig } from "@/src/config/site";
-
 import ProfileModal from "./ProfileModal";
-import { getCurrentUser, logout } from "@/src/services/AuthService";
-import { IUser } from "@/src/types";
+import { logout } from "@/src/services/AuthService";
+import { useUser } from "@/src/app/context/user.provider";
+
 
 export const Navbar = () => {
   const [searchQuery, setSearchQuery] = useState("");
 
-
-  const [user, setUser] = useState<IUser | null>(null);
-  console.log(user);
-
-  useEffect(() => {
-    const fetchUser = async () => {
-      const currentUser = await getCurrentUser();
-      
-      setUser(currentUser);
-    };
-
-    fetchUser();
-  }, []);
+  // Use the useUser hook to get the current user and loading state
+  const { user, isLoading } = useUser();
 
   const handleLogout = async () => {
     await logout();
-    setUser(null);
-    window.location.reload();
+    window.location.reload(); 
   };
 
   return (
     <NextUINavbar
-      maxWidth="xl"
+      maxWidth="2xl"
       position="sticky"
       className="border-b dark:border-gray-900"
     >
@@ -98,7 +85,13 @@ export const Navbar = () => {
           />
         </NavbarItem>
 
-        {user ? (
+        {isLoading ? (
+          <NavbarItem>
+            <Button isLoading color="primary" variant="flat">
+              Loading...
+            </Button>
+          </NavbarItem>
+        ) : user ? (
           <NavbarItem className="relative">
             <ProfileModal user={user} onLogout={handleLogout} />
           </NavbarItem>

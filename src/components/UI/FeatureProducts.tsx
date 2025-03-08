@@ -12,7 +12,7 @@ export default function FeatureProduct() {
   const limitedProducts = products.slice(0, 8);
 
   return (
-    <section className="py-8 px-4 lg:px-12">
+    <section className="py-8">
       <div className="text-center mb-12">
         <h1 className="text-lg md:text-xl lg:text-3xl font-bold tracking-tight">
           Featured Products

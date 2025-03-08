@@ -45,7 +45,7 @@ export default function ProductCard({
 
   return (
     <Card
-      shadow="sm" // ❌ Removed `isPressable` to avoid button inside button issue
+      shadow="sm"
       className={clsx(
         "hover:shadow-xl transition-shadow duration-300 rounded-lg border border-gray-200 relative overflow-hidden",
         layout === "horizontal" && "flex flex-row items-center"
