@@ -11,6 +11,7 @@
 	"dependencies": {
 		"@heroui/progress": "^2.2.7",
 		"@heroui/table": "^2.2.9",
+		"@heroui/tooltip": "^2.2.13",
 		"@hookform/resolvers": "^3.10.0",
 		"@nextui-org/badge": "^2.2.4",
 		"@nextui-org/button": "2.2.3",
@@ -38,6 +39,7 @@
 		"intl-messageformat": "^10.5.0",
 		"js-cookie": "^3.0.5",
 		"jwt-decode": "^4.0.0",
+		"lucide-react": "^0.479.0",
 		"next": "15.0.4",
 		"next-themes": "^0.4.4",
 		"react": "18.3.1",
