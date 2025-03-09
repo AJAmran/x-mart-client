@@ -17,6 +17,25 @@ export interface IUser {
   __v?: number;
 }
 
+export type TProduct = {
+  _id: string;
+  name: string;
+  description: string;
+  price: number;
+  category: string;
+  status: "ACTIVE" | "INACTIVE";
+  stock: number;
+  images: string[];
+  discount?: {
+    type: "percentage" | "fixed";
+    value: number;
+    startDate?: Date;
+    endDate?: Date;
+  };
+  createdAt: Date;
+  updatedAt: Date;
+};
+
 // types/Product.ts
 export interface Product {
   id: string;
@@ -35,7 +54,7 @@ export interface Product {
   variants?: Variant[];
   options?: Option[];
   tags?: string[];
-createdAt: Date;
+  createdAt: Date;
   updatedAt: Date;
 }
 
