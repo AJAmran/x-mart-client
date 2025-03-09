@@ -28,16 +28,17 @@ export const getAllProducts = async (
     sortOrder?: "asc" | "desc";
   }
 ) => {
-  const response = await axiosInstance.get("/products", {
-    params: {
-      ...filters,
-      page: options.page || 1,
-      limit: options.limit || 10,
-      sortBy: options.sortBy || "createdAt",
-      sortOrder: options.sortOrder || "desc",
-    },
-  });
+  const params = {
+    ...filters,
+    category: filters.category?.toUpperCase(), // Convert to uppercase
+    status: filters.status?.toUpperCase(), // Convert to uppercase
+    page: options.page || 1,
+    limit: options.limit || 10,
+    sortBy: options.sortBy || "createdAt",
+    sortOrder: options.sortOrder || "desc",
+  };
 
+  const response = await axiosInstance.get("/products", { params });
   return response.data;
 };
 
@@ -71,13 +72,18 @@ export const updateStock = async (id: string, stock: number) => {
   return response.data;
 };
 
-// Apply discount
-export const applyDiscount = async (id: string, discount: any) => {
+type TDiscount = {
+  type: "percentage" | "fixed";
+  value: number;
+  startDate?: Date;
+  endDate?: Date;
+};
+
+export const applyDiscount = async (id: string, discount: TDiscount) => {
   const response = await axiosInstance.post(
     `/products/${id}/apply-discount`,
     discount
   );
-
   return response.data;
 };
 

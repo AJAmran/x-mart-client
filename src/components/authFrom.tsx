@@ -18,6 +18,7 @@ import {
   type LoginFormData,
 } from "@/src/validations/validationSchema";
 import { useUserRegistration, useUserLogin } from "@/src/hooks/auth.hook";
+import { useUser } from "../app/context/user.provider";
 
 type AuthFormProps = {
   type: "login" | "register";
@@ -27,6 +28,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ type }) => {
   const isRegister = type === "register";
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
+  const { setIsLoading } = useUser();
 
   const {
     register,
@@ -40,7 +42,9 @@ const AuthForm: React.FC<AuthFormProps> = ({ type }) => {
   });
 
   const { mutateAsync: registerMutation } = useUserRegistration();
-  const { mutateAsync: loginMutation } = useUserLogin();
+  const { mutateAsync: loginMutation } = useUserLogin(() => {
+    setIsLoading(true); // Trigger a re-fetch of the current user
+  });
 
   const onSubmit: SubmitHandler<RegisterFormData | LoginFormData> = useCallback(
     async (data) => {
