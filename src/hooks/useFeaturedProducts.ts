@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { getAllProducts } from "@/src/services/ProductServices";
 import { TProduct } from "@/src/types";
 
-// Hook to fetch featured products (products with active discounts)
+// Hook to fetch featured products (products with discounts)
 export const useFeaturedProducts = () => {
   return useQuery<TProduct[], Error>({
     queryKey: ["featured-products"],
@@ -10,26 +10,28 @@ export const useFeaturedProducts = () => {
       // Fetch all products
       const response = await getAllProducts(
         {}, // No filters
-        { page: 1, limit: 100, sortBy: "createdAt", sortOrder: "desc" } // Adjust pagination as needed
+        { page: 1, limit: 100, sortBy: "createdAt", sortOrder: "desc" } 
       );
-      // Filter products with active discounts
-      const featuredProducts = response.data.filter((product: TProduct) => {
-        if (!product.discount) return false; // Skip products without discounts
 
-        const now = new Date();
-        const startDate = product.discount.startDate
-          ? new Date(product.discount.startDate)
-          : null;
-        const endDate = product.discount.endDate
-          ? new Date(product.discount.endDate)
-          : null;
+      // Log the API response for debugging
+      console.log("API Response:", response);
 
-        // Check if the discount is active
-        const isDiscountActive =
-          (!startDate || now >= startDate) && (!endDate || now <= endDate);
+      // Access the products array from response.data
+      const products = response?.data || [];
 
-        return isDiscountActive;
+      // Ensure products is an array
+      if (!Array.isArray(products)) {
+        console.error("Expected an array of products, but got:", products);
+        return [];
+      }
+
+      // Filter products with discounts
+      const featuredProducts = products.filter((product: TProduct) => {
+        return !!product.discount; 
       });
+
+      // Log the filtered products for debugging
+      console.log("Featured Products:", featuredProducts);
 
       return featuredProducts;
     },
