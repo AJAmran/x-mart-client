@@ -13,8 +13,8 @@ import {
   updateStock,
   removeDiscount,
 } from "@/src/services/ProductServices";
+import { useMemo } from "react";
 
-// Fetch all products with filters, sorting, and pagination
 export const useProducts = (
   filters: {
     searchTerm?: string;
@@ -32,9 +32,12 @@ export const useProducts = (
     sortOrder?: "asc" | "desc";
   }
 ) => {
+  const stableFilters = useMemo(() => filters, [JSON.stringify(filters)]);
+  const stableOptions = useMemo(() => options, [JSON.stringify(options)]);
+
   return useQuery({
-    queryKey: ["products", filters, options],
-    queryFn: () => getAllProducts(filters, options),
+    queryKey: ["products", stableFilters, stableOptions],
+    queryFn: () => getAllProducts(stableFilters, stableOptions),
   });
 };
 

@@ -9,7 +9,11 @@
 		"lint": "eslint . --ext .ts,.tsx -c .eslintrc.json --fix"
 	},
 	"dependencies": {
+		"@heroui/checkbox": "^2.3.15",
+		"@heroui/pagination": "^2.2.14",
 		"@heroui/progress": "^2.2.7",
+		"@heroui/select": "^2.4.16",
+		"@heroui/slider": "^2.4.13",
 		"@heroui/table": "^2.2.9",
 		"@heroui/tooltip": "^2.2.13",
 		"@hookform/resolvers": "^3.10.0",
