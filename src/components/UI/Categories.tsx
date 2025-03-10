@@ -5,8 +5,16 @@ import Image from "next/image";
 import { Card, CardBody, CardHeader } from "@nextui-org/card";
 import { categoriesData } from "@/src/data/CategoriestData";
 import { Link } from "@nextui-org/link";
+import { useRouter } from "next/navigation";
 
 const Categories: React.FC = () => {
+  const router = useRouter();
+
+  const handleCategoryClick = (category: string) => {
+    // Navigate to the shop page with the selected category as a query parameter
+    router.push(`/shop?category=${category}`);
+  };
+
   return (
     <section className="py-8">
       {/* Title Section */}
@@ -20,11 +28,7 @@ const Categories: React.FC = () => {
       </div>
 
       {/* Categories Grid */}
-      <Link
-        href="/shop"
-        aria-current="page"
-        className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-6"
-      >
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
         {categoriesData.map((category) => (
           <Card
             key={category.id}
@@ -32,6 +36,7 @@ const Categories: React.FC = () => {
             radius="lg"
             isHoverable
             isPressable
+            onPress={() => handleCategoryClick(category.name.toUpperCase())}
           >
             {/* Card Header with Image */}
             <CardHeader className="flex justify-center items-center p-6">
@@ -50,7 +55,7 @@ const Categories: React.FC = () => {
             </CardBody>
           </Card>
         ))}
-      </Link>
+      </div>
     </section>
   );
 };

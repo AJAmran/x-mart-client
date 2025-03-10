@@ -1,10 +1,16 @@
 import type { StaticImageData } from "next/image";
-import groceriesicon from "@/src/assets/categories icons/grocery.png";
-import vegetablesicons from "@/src/assets/categories icons/vegetable.png";
-import fruitsicon from "@/src/assets/categories icons/fruits.png";
-import dairyicons from "@/src/assets/categories icons/dairy.png";
-import beveragesicons from "@/src/assets/categories icons/drink.png";
-import meat_fish from "@/src/assets/categories icons/protein.png";
+import groceryIcon from "@/src/assets/categories icons/grochery.png";
+import vegetableIcon from "@/src/assets/categories icons/vegitable.png";
+import fishIcon from "@/src/assets/categories icons/fish.png";
+import dairyIcon from "@/src/assets/categories icons/dairy.png";
+import frozenIcon from "@/src/assets/categories icons/frozen.png";
+import fruitIcon from "@/src/assets/categories icons/fruit.png";
+import householdIcon from "@/src/assets/categories icons/household.png";
+import meatIcon from "@/src/assets/categories icons/meat.png";
+import personalCareIcon from "@/src/assets/categories icons/personal_care.png";
+import stationaryIcon from "@/src/assets/categories icons/stationary.png";
+
+
 import { Product } from "../types";
 
 export type Subcategory = {
@@ -15,15 +21,69 @@ export type Subcategory = {
 export type Category = {
   id: string;
   name: string;
-  image: StaticImageData; // Updated to match the type of imported images
+  image: StaticImageData;
   subcategories: Subcategory[];
 };
 
 export const categoriesData: Category[] = [
   {
-    id: "groceries",
-    name: "Groceries",
-    image: groceriesicon,
+    id: "fish",
+    name: "Fish",
+    image: fishIcon,
+    subcategories: [
+      { id: "fresh-fish", name: "Fresh Fish" },
+      { id: "dried-fish", name: "Dried Fish" },
+    ],
+  },
+  {
+    id: "meat",
+    name: "Meat",
+    image: meatIcon,
+    subcategories: [
+      { id: "beef", name: "Beef" },
+      { id: "chicken", name: "Chicken" },
+    ],
+  },
+  {
+    id: "fruits",
+    name: "Fruits",
+    image: fruitIcon,
+    subcategories: [
+      { id: "seasonal-fruits", name: "Seasonal Fruits" },
+      { id: "dry-fruits", name: "Dry Fruits" },
+    ],
+  },
+  {
+    id: "vegetables",
+    name: "Vegetables",
+    image: vegetableIcon,
+    subcategories: [
+      { id: "leafy", name: "Leafy Vegetables" },
+      { id: "root", name: "Root Vegetables" },
+    ],
+  },
+  {
+    id: "dairy",
+    name: "Dairy",
+    image: dairyIcon,
+    subcategories: [
+      { id: "milk", name: "Milk" },
+      { id: "cheese", name: "Cheese" },
+    ],
+  },
+  {
+    id: "frozen",
+    name: "Frozen",
+    image: frozenIcon,
+    subcategories: [
+      { id: "frozen-snacks", name: "Frozen Snacks" },
+      { id: "ice-cream", name: "Ice Cream" },
+    ],
+  },
+  {
+    id: "grocery",
+    name: "Grocery",
+    image: groceryIcon,
     subcategories: [
       { id: "rice-flour", name: "Rice & Flour" },
       { id: "oil-spices", name: "Oil & Spices" },
@@ -32,48 +92,30 @@ export const categoriesData: Category[] = [
     ],
   },
   {
-    id: "vegetables",
-    name: "Vegetables",
-    image: vegetablesicons,
+    id: "personal-care",
+    name: "Personal Care",
+    image: personalCareIcon,
     subcategories: [
-      { id: "leafy", name: "Leafy Vegetables" },
-      { id: "root", name: "Root Vegetables" },
+      { id: "skin-care", name: "Skin Care" },
+      { id: "hair-care", name: "Hair Care" },
     ],
   },
   {
-    id: "fruits",
-    name: "Fruits",
-    image: fruitsicon,
+    id: "household",
+    name: "House Hold",
+    image: householdIcon,
     subcategories: [
-      { id: "seasonal-fruits", name: "Seasonal Fruits" },
-      { id: "dry-fruits", name: "Dry Fruits" },
+      { id: "cleaning", name: "Cleaning Supplies" },
+      { id: "home-essentials", name: "Home Essentials" },
     ],
   },
   {
-    id: "dairy",
-    name: "Dairy Products",
-    image: dairyicons,
+    id: "stationery",
+    name: "Stationery",
+    image: stationaryIcon,
     subcategories: [
-      { id: "milk", name: "Milk" },
-      { id: "cheese", name: "Cheese" },
-    ],
-  },
-  {
-    id: "beverages",
-    name: "Beverages",
-    image: beveragesicons,
-    subcategories: [
-      { id: "tea-coffee", name: "Tea & Coffee" },
-      { id: "juices", name: "Juices" },
-    ],
-  },
-  {
-    id: "meat-fish",
-    name: "Meat & Fish",
-    image: meat_fish,
-    subcategories: [
-      { id: "fresh-meat", name: "Fresh Meat" },
-      { id: "seafood", name: "Seafood" },
+      { id: "office-supplies", name: "Office Supplies" },
+      { id: "school-supplies", name: "School Supplies" },
     ],
   },
 ];

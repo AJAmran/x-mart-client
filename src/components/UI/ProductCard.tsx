@@ -8,7 +8,7 @@ import { useState } from "react";
 import { TProduct } from "@/src/types";
 import { toast } from "sonner";
 import { ShoppingCart, Eye } from "lucide-react";
-import { Link } from "@nextui-org/link";
+import Link from "next/link"; // Import Link from next/link
 
 type ProductCardProps = {
   product: TProduct;
@@ -58,7 +58,7 @@ const ProductCard = ({ product, onPress }: ProductCardProps) => {
         {/* Price Section */}
         <div className="flex items-center gap-2 mt-3">
           <span className="text-xl font-bold text-green-600">
-          ৳{discountedPrice}
+            ৳{discountedPrice}
           </span>
           {(product?.discount?.value ?? 0) > 0 && (
             <span className="text-md line-through text-gray-500">
@@ -76,8 +76,9 @@ const ProductCard = ({ product, onPress }: ProductCardProps) => {
       {/* Action Buttons */}
       <CardFooter className="p-4 flex justify-between gap-2">
         {/* Link for product details */}
-        <Link href={`/product/${product?._id}`} className="flex-1">
+        <Link href={`/product/${product?._id}`} passHref legacyBehavior>
           <Button
+            as="a" // Render the Button as an anchor tag
             variant="flat"
             className="flex-1"
             startContent={<Eye size={18} />}

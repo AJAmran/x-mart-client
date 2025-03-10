@@ -10,6 +10,7 @@ import { toast } from "sonner";
 import { useProductById, useProducts } from "@/src/hooks/useProducts";
 import ProductCard from "@/src/components/UI/ProductCard"; // Import your ProductCard
 import { TProduct } from "@/src/types";
+import CardSkeletons from "@/src/components/CardSkelton";
 
 const ProductDetailsPage = () => {
   const { id } = useParams();
@@ -140,16 +141,21 @@ const ProductDetailsPage = () => {
       </div>
 
       {/* Relevant Products Section */}
+      {/* Relevant Products Section */}
       <div className="mt-12">
         <h2 className="text-2xl font-bold mb-6">You Might Also Like</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {relevantProducts.map((product: TProduct) => (
-            <ProductCard
-              key={product._id}
-              product={product}
-              onPress={() => (window.location.href = `/product/${product._id}`)}
-            />
-          ))}
+          {relevantProductsResponse?.isLoading
+            ? Array.from({ length: 4 }).map((_, i) => <CardSkeletons key={i} />)
+            : relevantProducts.map((product: TProduct) => (
+                <ProductCard
+                  key={product._id}
+                  product={product}
+                  onPress={() =>
+                    (window.location.href = `/product/${product._id}`)
+                  }
+                />
+              ))}
         </div>
       </div>
     </div>
