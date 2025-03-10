@@ -115,7 +115,7 @@ const ShopPage = () => {
                             }`}
                           />
                         </span>
-                        <span className="text-sm font-medium text-gray-700">
+                        <span className="text-sm font-medium ">
                           {cat}
                         </span>
                       </label>
@@ -138,7 +138,7 @@ const ShopPage = () => {
                     }
                   }}
                 />
-                <div className="flex justify-between text-sm text-gray-600 mt-2">
+                <div className="flex justify-between text-sm  mt-2">
                   <span>৳{filters.minPrice}</span>
                   <span>৳{filters.maxPrice}</span>
                 </div>

@@ -1,8 +1,10 @@
 "use client";
 
 import ProductCard from "@/src/components/UI/ProductCard";
-import { useFeaturedProducts } from "@/src/hooks/useFeaturedProducts"; 
-import { TProduct } from "@/src/types"; 
+import { useFeaturedProducts } from "@/src/hooks/useFeaturedProducts";
+import { TProduct } from "@/src/types";
+import CardSkeletons from "../CardSkelton";
+
 
 export default function FeatureProduct() {
   // Use the useFeaturedProducts hook to fetch featured products
@@ -23,6 +25,13 @@ export default function FeatureProduct() {
           <p className="mt-2 text-sm lg:text-base">
             Loading featured products...
           </p>
+        </div>
+
+        {/* Skeleton Loading Grid */}
+        <div className="container mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          {Array.from({ length: 4 }).map((_, index) => (
+            <CardSkeletons key={index} />
+          ))}
         </div>
       </section>
     );
@@ -71,12 +80,13 @@ export default function FeatureProduct() {
         </p>
       </div>
 
+      {/* Product Grid */}
       <div className="container mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         {featuredProducts.map((product: TProduct) => (
           <ProductCard
-            key={product._id} 
+            key={product._id}
             product={product}
-            onPress={() => handleProductClick(product._id)} 
+            onPress={() => handleProductClick(product._id)}
           />
         ))}
       </div>
