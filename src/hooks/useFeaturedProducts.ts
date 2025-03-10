@@ -10,11 +10,8 @@ export const useFeaturedProducts = () => {
       // Fetch all products
       const response = await getAllProducts(
         {}, // No filters
-        { page: 1, limit: 100, sortBy: "createdAt", sortOrder: "desc" } 
+        { page: 1, limit: 100, sortBy: "createdAt", sortOrder: "desc" }
       );
-
-      // Log the API response for debugging
-      console.log("API Response:", response);
 
       // Access the products array from response.data
       const products = response?.data || [];
@@ -27,11 +24,8 @@ export const useFeaturedProducts = () => {
 
       // Filter products with discounts
       const featuredProducts = products.filter((product: TProduct) => {
-        return !!product.discount; 
+        return !!product.discount;
       });
-
-      // Log the filtered products for debugging
-      console.log("Featured Products:", featuredProducts);
 
       return featuredProducts;
     },

@@ -1,10 +1,14 @@
-import React from "react";
+"use client";
+import React, { useState, useEffect } from "react";
+import { Input } from "@nextui-org/input";
+import { Search as SearchIcon, X } from "lucide-react";
 
 interface SearchBarProps {
   value: string;
   onChange: (value: string) => void;
-  className?: string; 
+  className?: string;
   placeholder?: string;
+  debounceDelay?: number; // Delay in milliseconds for debouncing
 }
 
 const SearchBar: React.FC<SearchBarProps> = ({
@@ -12,15 +16,56 @@ const SearchBar: React.FC<SearchBarProps> = ({
   onChange,
   className,
   placeholder = "Search products...",
+  debounceDelay = 300, // Default debounce delay
 }) => {
+  const [inputValue, setInputValue] = useState(value);
+
+  // Debounce the onChange function
+  useEffect(() => {
+    const debounceTimer = setTimeout(() => {
+      onChange(inputValue);
+    }, debounceDelay);
+
+    return () => clearTimeout(debounceTimer);
+  }, [inputValue, debounceDelay, onChange]);
+
+  // Handle input change
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setInputValue(e.target.value);
+  };
+
+  // Clear the search input
+  const handleClear = () => {
+    setInputValue("");
+    onChange("");
+  };
+
   return (
-    <input
-      type="text"
-      placeholder={placeholder}
-      value={value}
-      onChange={(e) => onChange(e.target.value)}
-      className={`px-4 py-2 border rounded-lg focus:outline-none focus:ring focus:ring-blue-300 ${className}`}
-    />
+    <div className={`relative ${className}`}>
+      <Input
+        type="text"
+        placeholder={placeholder}
+        value={inputValue}
+        onChange={handleChange}
+        startContent={<SearchIcon size={20} className="text-gray-400" />}
+        endContent={
+          inputValue && (
+            <button
+              onClick={handleClear}
+              className="p-1 rounded-full hover:bg-gray-100 transition-colors"
+            >
+              <X size={16} className="text-gray-400" />
+            </button>
+          )
+        }
+        classNames={{
+          base: "w-full max-w-md",
+          input: "text-sm",
+          inputWrapper:
+            "border border-gray-300 hover:border-gray-400 focus-within:border-blue-500 focus-within:ring-1 focus-within:ring-blue-500",
+        }}
+      />
+    </div>
   );
 };
 

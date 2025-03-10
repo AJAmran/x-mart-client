@@ -13,6 +13,7 @@
 		"@heroui/pagination": "^2.2.14",
 		"@heroui/progress": "^2.2.7",
 		"@heroui/select": "^2.4.16",
+		"@heroui/skeleton": "^2.2.10",
 		"@heroui/slider": "^2.4.13",
 		"@heroui/table": "^2.2.9",
 		"@heroui/tooltip": "^2.2.13",

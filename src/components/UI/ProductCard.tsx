@@ -58,11 +58,11 @@ const ProductCard = ({ product, onPress }: ProductCardProps) => {
         {/* Price Section */}
         <div className="flex items-center gap-2 mt-3">
           <span className="text-xl font-bold text-green-600">
-            ${discountedPrice}
+          ৳{discountedPrice}
           </span>
           {(product?.discount?.value ?? 0) > 0 && (
             <span className="text-md line-through text-gray-500">
-              ${product.price}
+              ৳{product.price}
             </span>
           )}
           {(product?.discount?.value ?? 0) > 0 && (

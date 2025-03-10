@@ -1,8 +1,8 @@
 "use client";
 
 import ProductCard from "@/src/components/UI/ProductCard";
-import { useFeaturedProducts } from "@/src/hooks/useFeaturedProducts"; // Import the custom hook
-import { TProduct } from "@/src/types"; // Import the TProduct type
+import { useFeaturedProducts } from "@/src/hooks/useFeaturedProducts"; 
+import { TProduct } from "@/src/types"; 
 
 export default function FeatureProduct() {
   // Use the useFeaturedProducts hook to fetch featured products
@@ -74,9 +74,9 @@ export default function FeatureProduct() {
       <div className="container mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         {featuredProducts.map((product: TProduct) => (
           <ProductCard
-            key={product._id} // Use _id from the backend
+            key={product._id} 
             product={product}
-            onPress={() => handleProductClick(product._id)} // Pass the product ID
+            onPress={() => handleProductClick(product._id)} 
           />
         ))}
       </div>

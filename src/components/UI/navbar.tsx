@@ -26,7 +26,6 @@ import ProfileModal from "./ProfileModal";
 import { logout } from "@/src/services/AuthService";
 import { useUser } from "@/src/app/context/user.provider";
 
-
 export const Navbar = () => {
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -35,7 +34,7 @@ export const Navbar = () => {
 
   const handleLogout = async () => {
     await logout();
-    window.location.reload(); 
+    window.location.reload();
   };
 
   return (

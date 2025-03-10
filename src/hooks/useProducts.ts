@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { useMemo } from "react";
 
 import { TProduct } from "../types";
 
@@ -13,7 +14,7 @@ import {
   updateStock,
   removeDiscount,
 } from "@/src/services/ProductServices";
-import { useMemo } from "react";
+
 
 export const useProducts = (
   filters: {
