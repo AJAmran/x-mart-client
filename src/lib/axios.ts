@@ -14,7 +14,7 @@ axiosInstance.interceptors.request.use(
     const accessToken = cookieStore.get("accessToken")?.value;
 
     if (accessToken) {
-      config.headers.Authorization = accessToken;
+      config.headers.Authorization = `Bearer ${accessToken}`;
     }
 
     return config;
@@ -36,7 +36,7 @@ axiosInstance.interceptors.response.use(
       const res = await getNewAccessToken();
       const accessToken = res.data.accessToken;
 
-      config.headers["Authorization"] = accessToken;
+      config.headers["Authorization"] = `Bearer ${accessToken}`;
       const cookieStore = await cookies();
       cookieStore.set("accessToken", accessToken);
 

@@ -10,19 +10,12 @@ import meatIcon from "@/src/assets/categories icons/meat.png";
 import personalCareIcon from "@/src/assets/categories icons/personal_care.png";
 import stationaryIcon from "@/src/assets/categories icons/stationary.png";
 
-
 import { Product } from "../types";
-
-export type Subcategory = {
-  id: string;
-  name: string;
-};
 
 export type Category = {
   id: string;
   name: string;
   image: StaticImageData;
-  subcategories: Subcategory[];
 };
 
 export const categoriesData: Category[] = [
@@ -30,98 +23,62 @@ export const categoriesData: Category[] = [
     id: "fish",
     name: "Fish",
     image: fishIcon,
-    subcategories: [
-      { id: "fresh-fish", name: "Fresh Fish" },
-      { id: "dried-fish", name: "Dried Fish" },
-    ],
   },
   {
     id: "meat",
     name: "Meat",
     image: meatIcon,
-    subcategories: [
-      { id: "beef", name: "Beef" },
-      { id: "chicken", name: "Chicken" },
-    ],
+   
   },
   {
     id: "fruits",
     name: "Fruits",
     image: fruitIcon,
-    subcategories: [
-      { id: "seasonal-fruits", name: "Seasonal Fruits" },
-      { id: "dry-fruits", name: "Dry Fruits" },
-    ],
+   
   },
   {
     id: "vegetables",
     name: "Vegetables",
     image: vegetableIcon,
-    subcategories: [
-      { id: "leafy", name: "Leafy Vegetables" },
-      { id: "root", name: "Root Vegetables" },
-    ],
+    
   },
   {
     id: "dairy",
     name: "Dairy",
     image: dairyIcon,
-    subcategories: [
-      { id: "milk", name: "Milk" },
-      { id: "cheese", name: "Cheese" },
-    ],
+    
   },
   {
     id: "frozen",
     name: "Frozen",
     image: frozenIcon,
-    subcategories: [
-      { id: "frozen-snacks", name: "Frozen Snacks" },
-      { id: "ice-cream", name: "Ice Cream" },
-    ],
+    
   },
   {
     id: "grocery",
     name: "Grocery",
     image: groceryIcon,
-    subcategories: [
-      { id: "rice-flour", name: "Rice & Flour" },
-      { id: "oil-spices", name: "Oil & Spices" },
-      { id: "pulses", name: "Pulses" },
-      { id: "snacks", name: "Snacks" },
-    ],
+   
   },
   {
     id: "personal-care",
     name: "Personal Care",
     image: personalCareIcon,
-    subcategories: [
-      { id: "skin-care", name: "Skin Care" },
-      { id: "hair-care", name: "Hair Care" },
-    ],
+   
   },
   {
     id: "household",
     name: "House Hold",
     image: householdIcon,
-    subcategories: [
-      { id: "cleaning", name: "Cleaning Supplies" },
-      { id: "home-essentials", name: "Home Essentials" },
-    ],
+   
   },
   {
     id: "stationery",
     name: "Stationery",
     image: stationaryIcon,
-    subcategories: [
-      { id: "office-supplies", name: "Office Supplies" },
-      { id: "school-supplies", name: "School Supplies" },
-    ],
+   
   },
 ];
-
-
-
 
 export const products: Product[] = [
   {
@@ -129,7 +86,8 @@ export const products: Product[] = [
     name: "Organic Carrot - 1kg",
     price: 275, // Converted to BDT
     discount: 10, // 10% discount
-    imageUrl: "https://static.vecteezy.com/system/resources/previews/045/931/894/non_2x/fresh-organic-carrots-with-green-tops-free-png.png",
+    imageUrl:
+      "https://static.vecteezy.com/system/resources/previews/045/931/894/non_2x/fresh-organic-carrots-with-green-tops-free-png.png",
     category: "Groceries",
     subCategory: "Vegetables",
     inStock: false,
@@ -144,7 +102,8 @@ export const products: Product[] = [
     name: "Tomato - 1kg",
     price: 198, // Converted to BDT
     discount: 5, // 5% discount
-    imageUrl: "https://vendor.shaqexpress.com/storage/16747/conversions/eHgvaW2eamMvUyEJBxKmLUkPrbCfsl-metaMTM3MTYxNjM1MTE1MC1yZW1vdmViZy1wcmV2aWV3LnYxICgxKS5wbmc=--small.png",
+    imageUrl:
+      "https://vendor.shaqexpress.com/storage/16747/conversions/eHgvaW2eamMvUyEJBxKmLUkPrbCfsl-metaMTM3MTYxNjM1MTE1MC1yZW1vdmViZy1wcmV2aWV3LnYxICgxKS5wbmc=--small.png",
     category: "Groceries",
     subCategory: "Vegetables",
     inStock: true,
@@ -159,7 +118,8 @@ export const products: Product[] = [
     name: "Banana - 1 bunch",
     price: 132, // Converted to BDT
     discount: 0, // No discount
-    imageUrl: "https://cdn.tridge.com/attachment-file/b9/d3/08/b9d30896c15d86ee95f2803c86e0a0448528037e/banana__bigImage.png",
+    imageUrl:
+      "https://cdn.tridge.com/attachment-file/b9/d3/08/b9d30896c15d86ee95f2803c86e0a0448528037e/banana__bigImage.png",
     category: "Groceries",
     subCategory: "Fruits",
     inStock: true,
@@ -174,7 +134,8 @@ export const products: Product[] = [
     name: "Apple - 1kg",
     price: 220, // Converted to BDT
     discount: 5, // 5% discount
-    imageUrl: "https://png.pngtree.com/png-vector/20240205/ourmid/pngtree-group-of-red-apple-fruits-png-image_11625188.png",
+    imageUrl:
+      "https://png.pngtree.com/png-vector/20240205/ourmid/pngtree-group-of-red-apple-fruits-png-image_11625188.png",
     category: "Groceries",
     subCategory: "Fruits",
     inStock: true,
@@ -189,7 +150,8 @@ export const products: Product[] = [
     name: "Whole Milk - 1L",
     price: 165, // Converted to BDT
     discount: 10, // 10% discount
-    imageUrl: "https://paulsdairy.com/sites/default/files/2PARI3290_Paul_Int_UHT_1L_FullCream_HARV_1407_8113442_ART_Eng3D.png",
+    imageUrl:
+      "https://paulsdairy.com/sites/default/files/2PARI3290_Paul_Int_UHT_1L_FullCream_HARV_1407_8113442_ART_Eng3D.png",
     category: "Groceries",
     subCategory: "Dairy Products",
     inStock: true,
@@ -204,7 +166,8 @@ export const products: Product[] = [
     name: "Cheddar Cheese - 250g",
     price: 440, // Converted to BDT
     discount: 15, // 15% discount
-    imageUrl: "https://dtgxwmigmg3gc.cloudfront.net/imagery/assets/derivations/icon/512/512/true/eyJpZCI6ImRkOTY1MzY2MWRjOGE1NWJjMTY4NTU5ZmZhZDljMmM1Iiwic3RvcmFnZSI6InB1YmxpY19zdG9yZSJ9?signature=9da537cacfa4c0c514c24835a5d85416c672c6c5ca8c3703a0341b9416d99d48",
+    imageUrl:
+      "https://dtgxwmigmg3gc.cloudfront.net/imagery/assets/derivations/icon/512/512/true/eyJpZCI6ImRkOTY1MzY2MWRjOGE1NWJjMTY4NTU5ZmZhZDljMmM1Iiwic3RvcmFnZSI6InB1YmxpY19zdG9yZSJ9?signature=9da537cacfa4c0c514c24835a5d85416c672c6c5ca8c3703a0341b9416d99d48",
     category: "Groceries",
     subCategory: "Dairy Products",
     inStock: true,
@@ -219,7 +182,8 @@ export const products: Product[] = [
     name: "Green Tea - 50g",
     price: 330, // Converted to BDT
     discount: 5, // 5% discount
-    imageUrl: "https://wallpapers.com/images/featured/green-tea-png-dz5xftzwuc96jo77.jpg",
+    imageUrl:
+      "https://wallpapers.com/images/featured/green-tea-png-dz5xftzwuc96jo77.jpg",
     category: "Groceries",
     subCategory: "Beverages",
     inStock: true,
@@ -234,7 +198,8 @@ export const products: Product[] = [
     name: "Coffee Beans - 250g",
     price: 550, // Converted to BDT
     discount: 20, // 20% discount
-    imageUrl: "https://cdn.gardengrocer.com/attachments/photos/big/1614.png?4374",
+    imageUrl:
+      "https://cdn.gardengrocer.com/attachments/photos/big/1614.png?4374",
     category: "Groceries",
     subCategory: "Beverages",
     inStock: true,
@@ -249,7 +214,8 @@ export const products: Product[] = [
     name: "Chicken Breast - 500g",
     price: 660, // Converted to BDT
     discount: 15, // 15% discount
-    imageUrl: "https://png.pngtree.com/png-vector/20240421/ourmid/pngtree-vector-art-of-three-raw-chicken-breasts-on-a-plate-accompanied-png-image_12303628.png",
+    imageUrl:
+      "https://png.pngtree.com/png-vector/20240421/ourmid/pngtree-vector-art-of-three-raw-chicken-breasts-on-a-plate-accompanied-png-image_12303628.png",
     category: "Groceries",
     subCategory: "Meat & Fish",
     inStock: true,
@@ -264,7 +230,8 @@ export const products: Product[] = [
     name: "Salmon Fillet - 200g",
     price: 935, // Converted to BDT
     discount: 20, // 20% discount
-    imageUrl: "https://png.pngtree.com/png-vector/20240125/ourmid/pngtree-sliced-raw-salmon-fillet-png-file-png-image_11490817.png",
+    imageUrl:
+      "https://png.pngtree.com/png-vector/20240125/ourmid/pngtree-sliced-raw-salmon-fillet-png-file-png-image_11490817.png",
     category: "Groceries",
     subCategory: "Meat & Fish",
     inStock: true,
@@ -279,7 +246,8 @@ export const products: Product[] = [
     name: "Lettuce - 1 head",
     price: 110, // Converted to BDT
     discount: 5, // 5% discount
-    imageUrl: "https://www.pngall.com/wp-content/uploads/15/Lettuce-PNG-HD-Image.png",
+    imageUrl:
+      "https://www.pngall.com/wp-content/uploads/15/Lettuce-PNG-HD-Image.png",
     category: "Groceries",
     subCategory: "Vegetables",
     inStock: true,
@@ -294,7 +262,8 @@ export const products: Product[] = [
     name: "Strawberries - 250g",
     price: 385, // Converted to BDT
     discount: 10, // 10% discount
-    imageUrl: "https://dtgxwmigmg3gc.cloudfront.net/imagery/assets/derivations/icon/512/512/true/eyJpZCI6ImMyMzc2ZDE2NDIzMGM4OGMyOWY4NDdlOWFmZjA1M2FhIiwic3RvcmFnZSI6InB1YmxpY19zdG9yZSJ9?signature=31ac2ac73787e5e92cdef87756fec7902c895b3c24c9d9d61e3a5b2f544408dc",
+    imageUrl:
+      "https://dtgxwmigmg3gc.cloudfront.net/imagery/assets/derivations/icon/512/512/true/eyJpZCI6ImMyMzc2ZDE2NDIzMGM4OGMyOWY4NDdlOWFmZjA1M2FhIiwic3RvcmFnZSI6InB1YmxpY19zdG9yZSJ9?signature=31ac2ac73787e5e92cdef87756fec7902c895b3c24c9d9d61e3a5b2f544408dc",
     category: "Groceries",
     subCategory: "Fruits",
     inStock: true,
@@ -305,4 +274,3 @@ export const products: Product[] = [
     updatedAt: new Date(),
   },
 ];
-
