@@ -15,6 +15,7 @@ import { Link } from "@nextui-org/link";
 import { link as linkStyles } from "@nextui-org/theme";
 import NextLink from "next/link";
 import clsx from "clsx";
+import { useRouter } from "next/navigation"; // Import useRouter
 
 import { CartIcon, Logo } from "../icons";
 import { ThemeSwitch } from "../theme-switch";
@@ -28,6 +29,7 @@ import { useUser } from "@/src/app/context/user.provider";
 
 export const Navbar = () => {
   const [searchQuery, setSearchQuery] = useState("");
+  const router = useRouter(); // Initialize useRouter
 
   // Use the useUser hook to get the current user and loading state
   const { user, isLoading } = useUser();
@@ -35,6 +37,11 @@ export const Navbar = () => {
   const handleLogout = async () => {
     await logout();
     window.location.reload();
+  };
+
+  // Handle search submission
+  const handleSearch = (query: string) => {
+    router.push(`/shop?search=${query}`);
   };
 
   return (
@@ -79,6 +86,7 @@ export const Navbar = () => {
           <SearchBar
             value={searchQuery}
             onChange={setSearchQuery}
+            onSearch={handleSearch} // Pass the search handler
             className="hidden lg:block w-[300px]"
             placeholder="Search in X-mart..."
           />
@@ -129,6 +137,7 @@ export const Navbar = () => {
           <SearchBar
             value={searchQuery}
             onChange={setSearchQuery}
+            onSearch={handleSearch} // Pass the search handler
             className="w-full"
           />
         </div>

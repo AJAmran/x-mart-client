@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import { Suspense } from "react";
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { useSearchParams } from "next/navigation";
@@ -86,6 +86,7 @@ const ShopPage = () => {
                 }
               />
 
+              {/* Category Filter */}
               <div>
                 <h3 className="text-lg font-semibold mb-4">Category</h3>
                 <div className="grid grid-cols-1 gap-4">
@@ -115,9 +116,7 @@ const ShopPage = () => {
                             }`}
                           />
                         </span>
-                        <span className="text-sm font-medium ">
-                          {cat}
-                        </span>
+                        <span className="text-sm font-medium">{cat}</span>
                       </label>
                     </div>
                   ))}
@@ -138,7 +137,7 @@ const ShopPage = () => {
                     }
                   }}
                 />
-                <div className="flex justify-between text-sm  mt-2">
+                <div className="flex justify-between text-sm mt-2">
                   <span>৳{filters.minPrice}</span>
                   <span>৳{filters.maxPrice}</span>
                 </div>
