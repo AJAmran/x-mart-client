@@ -13,6 +13,7 @@ import { useProducts } from "@/src/hooks/useProducts";
 import ProductCard from "@/src/components/UI/ProductCard";
 import { TProduct } from "@/src/types";
 import CardSkeletons from "@/src/components/CardSkelton";
+import { categoriesData } from "@/src/data/CategoriestData";
 
 const ShopPage = () => {
   const searchParams = useSearchParams();
@@ -76,6 +77,24 @@ const ShopPage = () => {
         <div className="col-span-1">
           <Card className="p-4 shadow-sm">
             <CardBody className="space-y-6">
+              {/* Sorting */}
+              <div>
+                <h3 className="text-lg font-semibold mb-2">Sort By</h3>
+                <Select
+                  label="Sort By"
+                  placeholder="Sort By"
+                  selectedKeys={new Set([`${sortBy}:${sortOrder}`])}
+                  onSelectionChange={(keys) => {
+                    const selectedKey = Array.from(keys)[0];
+                    handleSortChange(selectedKey as string);
+                  }}
+                >
+                  <SelectItem key="price:desc">Price High to Low</SelectItem>
+                  <SelectItem key="price:asc">Price Low to High</SelectItem>
+                  <SelectItem key="createdAt:desc">Newest First</SelectItem>
+                </Select>
+              </div>
+
               {/* Search Input */}
               <Input
                 label="Search"
@@ -85,43 +104,6 @@ const ShopPage = () => {
                   handleFilterChange("searchTerm", e.target.value)
                 }
               />
-
-              {/* Category Filter */}
-              <div>
-                <h3 className="text-lg font-semibold mb-4">Category</h3>
-                <div className="grid grid-cols-1 gap-4">
-                  {["ELECTRONICS", "CLOTHING", "BOOKS"].map((cat) => (
-                    <div key={cat} className="flex items-center space-x-3">
-                      {/* Custom Checkbox */}
-                      <label
-                        className="flex items-center cursor-pointer space-x-2"
-                        htmlFor={`category-${cat}`}
-                      >
-                        <input
-                          type="checkbox"
-                          id={`category-${cat}`}
-                          checked={filters.category === cat}
-                          onChange={() =>
-                            handleFilterChange(
-                              "category",
-                              filters.category === cat ? "" : cat
-                            )
-                          }
-                          className="hidden"
-                        />
-                        <span className="w-5 h-5 flex items-center justify-center border-2 border-gray-300 rounded-sm">
-                          <span
-                            className={`w-3 h-3 bg-primary-500 rounded-sm transition-all ${
-                              filters.category === cat ? "block" : "hidden"
-                            }`}
-                          />
-                        </span>
-                        <span className="text-sm font-medium">{cat}</span>
-                      </label>
-                    </div>
-                  ))}
-                </div>
-              </div>
 
               {/* Price Range Filter */}
               <div>
@@ -143,22 +125,50 @@ const ShopPage = () => {
                 </div>
               </div>
 
-              {/* Sorting */}
+              {/* Category Filter */}
               <div>
-                <h3 className="text-lg font-semibold mb-2">Sort By</h3>
-                <Select
-                  label="Sort By"
-                  placeholder="Sort By"
-                  selectedKeys={new Set([`${sortBy}:${sortOrder}`])}
-                  onSelectionChange={(keys) => {
-                    const selectedKey = Array.from(keys)[0];
-                    handleSortChange(selectedKey as string);
-                  }}
-                >
-                  <SelectItem key="price:desc">Price High to Low</SelectItem>
-                  <SelectItem key="price:asc">Price Low to High</SelectItem>
-                  <SelectItem key="createdAt:desc">Newest First</SelectItem>
-                </Select>
+                <h3 className="text-lg font-semibold mb-4">Category</h3>
+                <div className="grid grid-cols-1 gap-4">
+                  {categoriesData.map((category) => (
+                    <div
+                      key={category.id}
+                      className="flex items-center space-x-3"
+                    >
+                      {/* Custom Checkbox */}
+                      <label
+                        className="flex items-center cursor-pointer space-x-2"
+                        htmlFor={`category-${category.id}`}
+                      >
+                        <input
+                          type="checkbox"
+                          id={`category-${category.id}`}
+                          checked={filters.category === category.id}
+                          onChange={() =>
+                            handleFilterChange(
+                              "category",
+                              filters.category === category.id
+                                ? ""
+                                : category.id
+                            )
+                          }
+                          className="hidden"
+                        />
+                        <span className="w-5 h-5 flex items-center justify-center border-2 border-gray-300 rounded-sm">
+                          <span
+                            className={`w-3 h-3 bg-primary-500 rounded-sm transition-all ${
+                              filters.category === category.id
+                                ? "block"
+                                : "hidden"
+                            }`}
+                          />
+                        </span>
+                        <span className="text-sm font-medium">
+                          {category.name}
+                        </span>
+                      </label>
+                    </div>
+                  ))}
+                </div>
               </div>
 
               {/* Reset Filters Button */}

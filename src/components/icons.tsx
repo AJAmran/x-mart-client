@@ -398,3 +398,8 @@ export const FunnelIcon: React.FC<IconSvgProps> = ({
     />
   </svg>
 );
+
+
+export const EditIcon = () => <span>✏️</span>;
+export const DeleteIcon = () => <span>🗑️</span>;
+export const DiscountIcon = () => <span>🎫</span>;

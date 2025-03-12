@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 // Reusable discount schema
-const discountSchema = z.object({
+export const discountSchema = z.object({
   type: z.enum(["percentage", "fixed"]),
   value: z.number().min(0, "Discount value must be a positive number"),
   startDate: z.date().optional(),
