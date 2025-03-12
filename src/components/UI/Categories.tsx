@@ -36,7 +36,7 @@ const Categories: React.FC = () => {
             radius="lg"
             isHoverable
             isPressable
-            onPress={() => handleCategoryClick(category.name.toUpperCase())}
+            onPress={() => handleCategoryClick(category.id.toUpperCase())}
           >
             {/* Card Header with Image */}
             <CardHeader className="flex justify-center items-center p-6">

@@ -1,6 +1,6 @@
-"use client";
-
+"use client"
 import { FC, useState } from "react";
+
 import {
   Box,
   Users,
@@ -9,9 +9,10 @@ import {
   Package,
   Settings,
   LogOut,
+  ChevronDown,
+  ChevronUp,
 } from "lucide-react";
 import { Link } from "@nextui-org/link";
-import { Accordion, AccordionItem } from "@heroui/accordion";
 import { ThemeSwitch } from "../theme-switch";
 
 const Sidebar: FC = () => {
@@ -52,47 +53,45 @@ const Sidebar: FC = () => {
 
           {/* Product Management */}
           <li>
-            <Accordion>
-              <AccordionItem
-                title={
-                  <div
-                    className="flex items-center space-x-3 p-3 rounded-lg transition-all hover:bg-primary hover:shadow-md cursor-pointer"
-                    onClick={() => toggleSubmenu("product")}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter" || e.key === " ") {
-                        toggleSubmenu("product");
-                      }
-                    }}
-                    role="button"
-                    tabIndex={0}
-                  >
-                    <Box className="w-5 h-5 text-mutedText" />
-                    <span className="text-base font-medium">
-                      Product Management
-                    </span>
-                  </div>
+            <div
+              className="flex items-center space-x-3 p-3 rounded-lg transition-all hover:bg-primary hover:shadow-md cursor-pointer"
+              onClick={() => toggleSubmenu("product-management")}
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === "Space") {
+                  toggleSubmenu("product-management");
                 }
-              >
-                <ul className="pl-8 space-y-2">
-                  <li>
-                    <Link
-                      className="flex items-center space-x-3 p-2 rounded-lg transition-all hover:bg-primary hover:shadow-md"
-                      href="/dashboard/product-management/add-product"
-                    >
-                      <span className="text-sm">Add Product</span>
-                    </Link>
-                  </li>
-                  <li>
-                    <Link
-                      className="flex items-center space-x-3 p-2 rounded-lg transition-all hover:bg-primary hover:shadow-md"
-                      href="/dashboard/product-management/product-list"
-                    >
-                      <span className="text-sm">Product List</span>
-                    </Link>
-                  </li>
-                </ul>
-              </AccordionItem>
-            </Accordion>
+              }}
+            >
+              <Box className="w-5 h-5 text-mutedText" />
+              <span className="text-base font-medium">Product Management</span>
+              {openSubmenu === "product-management" ? (
+                <ChevronUp className="w-5 h-5 text-mutedText" />
+              ) : (
+                <ChevronDown className="w-5 h-5 text-mutedText" />
+              )}
+            </div>
+            {openSubmenu === "product-management" && (
+              <ul className="pl-8 space-y-2">
+                <li>
+                  <Link
+                    className="flex items-center space-x-3 p-2 rounded-lg transition-all hover:bg-primary hover:shadow-md"
+                    href="/dashboard/product-management/add-product"
+                  >
+                    <span className="text-sm">Add Product</span>
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    className="flex items-center space-x-3 p-2 rounded-lg transition-all hover:bg-primary hover:shadow-md"
+                    href="/dashboard/product-management/product-list"
+                  >
+                    <span className="text-sm">Product List</span>
+                  </Link>
+                </li>
+              </ul>
+            )}
           </li>
 
           {/* Order Management */}
@@ -108,47 +107,45 @@ const Sidebar: FC = () => {
 
           {/* Sales & Analytics */}
           <li>
-            <Accordion>
-              <AccordionItem
-                title={
-                  <div
-                    className="flex items-center space-x-3 p-3 rounded-lg transition-all hover:bg-primary hover:shadow-md cursor-pointer"
-                    onClick={() => toggleSubmenu("sales")}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter" || e.key === " ") {
-                        toggleSubmenu("sales");
-                      }
-                    }}
-                    role="button"
-                    tabIndex={0}
-                  >
-                    <LineChart className="w-5 h-5 text-mutedText" />
-                    <span className="text-base font-medium">
-                      Sales & Analytics
-                    </span>
-                  </div>
+            <div
+              className="flex items-center space-x-3 p-3 rounded-lg transition-all hover:bg-primary hover:shadow-md cursor-pointer"
+              onClick={() => toggleSubmenu("sales-analytics")}
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === "Space") {
+                  toggleSubmenu("sales-analytics");
                 }
-              >
-                <ul className="pl-8 space-y-2">
-                  <li>
-                    <Link
-                      className="flex items-center space-x-3 p-2 rounded-lg transition-all hover:bg-primary hover:shadow-md"
-                      href="/dashboard/sales-analytics/reports"
-                    >
-                      <span className="text-sm">Reports</span>
-                    </Link>
-                  </li>
-                  <li>
-                    <Link
-                      className="flex items-center space-x-3 p-2 rounded-lg transition-all hover:bg-primary hover:shadow-md"
-                      href="/dashboard/sales-analytics/insights"
-                    >
-                      <span className="text-sm">Insights</span>
-                    </Link>
-                  </li>
-                </ul>
-              </AccordionItem>
-            </Accordion>
+              }}
+            >
+              <LineChart className="w-5 h-5 text-mutedText" />
+              <span className="text-base font-medium">Sales & Analytics</span>
+              {openSubmenu === "sales-analytics" ? (
+                <ChevronUp className="w-5 h-5 text-mutedText" />
+              ) : (
+                <ChevronDown className="w-5 h-5 text-mutedText" />
+              )}
+            </div>
+            {openSubmenu === "sales-analytics" && (
+              <ul className="pl-8 space-y-2">
+                <li>
+                  <Link
+                    className="flex items-center space-x-3 p-2 rounded-lg transition-all hover:bg-primary hover:shadow-md"
+                    href="/dashboard/sales-analytics/reports"
+                  >
+                    <span className="text-sm">Reports</span>
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    className="flex items-center space-x-3 p-2 rounded-lg transition-all hover:bg-primary hover:shadow-md"
+                    href="/dashboard/sales-analytics/insights"
+                  >
+                    <span className="text-sm">Insights</span>
+                  </Link>
+                </li>
+              </ul>
+            )}
           </li>
 
           {/* Inventory Management */}

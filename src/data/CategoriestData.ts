@@ -61,7 +61,7 @@ export const categoriesData: Category[] = [
    
   },
   {
-    id: "personal-care",
+    id: "personalcare",
     name: "Personal Care",
     image: personalCareIcon,
    

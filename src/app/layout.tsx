@@ -7,6 +7,7 @@ import { fontSans } from "@/src/config/fonts";
 import { Providers } from "@/src/lib/providers";
 import { Navbar } from "../components/UI/navbar";
 import Footer from "../components/UI/Footer";
+import { Toaster } from "sonner";
 
 export const metadata: Metadata = {
   title: {
@@ -43,6 +44,7 @@ export default function RootLayout({
         <Providers themeProps={{ attribute: "class", defaultTheme: "dark" }}>
           {children}
         </Providers>
+        <Toaster />
       </body>
     </html>
   );

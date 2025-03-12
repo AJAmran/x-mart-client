@@ -29,7 +29,7 @@ const CategoriesDropdown: React.FC<CategoriesDropdownProps> = ({
     <div className="relative group">
       {/* Main Categories Button */}
       <Button
-        className="text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 px-4 py-2 rounded-lg transition-colors"
+        className="text-base font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 px-4 py-2 rounded-lg transition-colors"
         variant="light"
       >
         {buttonText}

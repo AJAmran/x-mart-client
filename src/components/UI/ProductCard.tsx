@@ -8,7 +8,7 @@ import { useState } from "react";
 import { TProduct } from "@/src/types";
 import { toast } from "sonner";
 import { ShoppingCart, Eye } from "lucide-react";
-import Link from "next/link"; // Import Link from next/link
+import Link from "next/link"; 
 
 type ProductCardProps = {
   product: TProduct;
@@ -36,7 +36,7 @@ const ProductCard = ({ product, onPress }: ProductCardProps) => {
       className="w-full max-w-sm border rounded-xl overflow-hidden hover:shadow-lg transition-shadow"
     >
       {/* Image Section with Discount Badge */}
-      <div className="relative flex justify-center items-center bg-gray-100 dark:bg-gray-800 p-4">
+      <div className="relative flex justify-center items-center bg-white p-4">
         <Image
           src={product.images?.[0] || "/placeholder.jpg"}
           alt={product.name}

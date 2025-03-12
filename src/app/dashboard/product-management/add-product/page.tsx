@@ -11,12 +11,11 @@ import { Select, SelectItem } from "@nextui-org/select";
 import { Button } from "@nextui-org/button";
 import { categoriesData } from "@/src/data/CategoriestData";
 
-
 const AddProductForm = () => {
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isSubmitting },
     reset,
   } = useForm<TProduct>({
     resolver: zodResolver(productSchema),
@@ -24,26 +23,28 @@ const AddProductForm = () => {
 
   const { mutate: createProduct, isPending } = useCreateProduct();
 
-  const onSubmit: SubmitHandler<TProduct> = (data) => {
-    // Transform the category to uppercase before sending to the backend
-    const updatedData = {
-      ...data,
-      category: data.category.toUpperCase(), // Convert category to uppercase
-    };
-
-    createProduct(updatedData, {
-      onSuccess: () => {
-        toast.success("Product created successfully!");
-        reset();
-      },
-      onError: (error) => {
-        toast.error(error.message || "Failed to create product");
-      },
-    });
+  const onSubmit: SubmitHandler<TProduct> = async (data) => {
+    try {
+      const updatedData = {
+        ...data,
+        category: data.category.toUpperCase(),
+      };
+      console.log(updatedData);
+      createProduct(updatedData);
+      reset();
+    } catch (error) {
+      toast.error("Something went wrong! Please try again.");
+    }
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+    <form
+      onSubmit={handleSubmit(onSubmit)}
+      className="space-y-6 p-6 bg-white shadow-lg rounded-md max-w-xl"
+    >
+      <h2 className="text-2xl font-semibold text-gray-700">Add New Product</h2>
+
+      {/* Product Name */}
       <Input
         {...register("name")}
         label="Product Name"
@@ -51,6 +52,8 @@ const AddProductForm = () => {
         isInvalid={!!errors.name}
         errorMessage={errors.name?.message}
       />
+
+      {/* Description */}
       <Textarea
         {...register("description")}
         label="Description"
@@ -58,6 +61,8 @@ const AddProductForm = () => {
         isInvalid={!!errors.description}
         errorMessage={errors.description?.message}
       />
+
+      {/* Price */}
       <Input
         {...register("price", { valueAsNumber: true })}
         type="number"
@@ -66,6 +71,8 @@ const AddProductForm = () => {
         isInvalid={!!errors.price}
         errorMessage={errors.price?.message}
       />
+
+      {/* Category */}
       <Select
         {...register("category")}
         label="Category"
@@ -79,6 +86,8 @@ const AddProductForm = () => {
           </SelectItem>
         ))}
       </Select>
+
+      {/* Stock */}
       <Input
         {...register("stock", { valueAsNumber: true })}
         type="number"
@@ -87,6 +96,8 @@ const AddProductForm = () => {
         isInvalid={!!errors.stock}
         errorMessage={errors.stock?.message}
       />
+
+      {/* Image URL */}
       <Input
         {...register("images.0")}
         label="Image URL"
@@ -94,8 +105,15 @@ const AddProductForm = () => {
         isInvalid={!!errors.images}
         errorMessage={errors.images?.message}
       />
-      <Button type="submit" color="primary" isLoading={isPending}>
-        {isPending ? "Creating..." : "Create Product"}
+
+      {/* Submit Button */}
+      <Button
+        type="submit"
+        color="primary"
+        isLoading={isPending || isSubmitting}
+        disabled={isPending || isSubmitting}
+      >
+        {isPending || isSubmitting ? "Creating..." : "Create Product"}
       </Button>
     </form>
   );
