@@ -30,8 +30,12 @@ export default function EditProductModal({ product }: { product: TProduct }) {
       discount: {
         type: product.discount?.type || "percentage",
         value: product.discount?.value || 0,
-        startDate: product.discount?.startDate,
-        endDate: product.discount?.endDate,
+        startDate: product.discount?.startDate
+          ? new Date(product.discount.startDate)
+          : undefined, // Ensure it's a Date
+        endDate: product.discount?.endDate
+          ? new Date(product.discount.endDate)
+          : undefined, // Ensure it's a Date
       },
     },
   });
@@ -43,15 +47,19 @@ export default function EditProductModal({ product }: { product: TProduct }) {
       discount: {
         type: product.discount?.type || "percentage",
         value: product.discount?.value || 0,
-        startDate: product.discount?.startDate,
-        endDate: product.discount?.endDate,
+        startDate: product.discount?.startDate
+          ? new Date(product.discount.startDate)
+          : undefined,
+        endDate: product.discount?.endDate
+          ? new Date(product.discount.endDate)
+          : undefined,
       },
     });
   }, [product, reset]);
 
   const onSubmit = async (data: Partial<TProduct>) => {
     await updateProductMutation.mutateAsync({ id: product._id, data });
-    onOpenChange(false);
+    onOpenChange();
   };
 
   return (
@@ -166,8 +174,16 @@ export default function EditProductModal({ product }: { product: TProduct }) {
                   <Input
                     label="Start Date"
                     type="date"
-                    value={field.value}
-                    onChange={field.onChange}
+                    value={
+                      field.value
+                        ? new Date(field.value).toISOString().split("T")[0]
+                        : ""
+                    }
+                    onChange={(e) =>
+                      field.onChange(
+                        e.target.value ? new Date(e.target.value) : undefined
+                      )
+                    }
                   />
                 )}
               />
@@ -180,8 +196,16 @@ export default function EditProductModal({ product }: { product: TProduct }) {
                   <Input
                     label="End Date"
                     type="date"
-                    value={field.value}
-                    onChange={field.onChange}
+                    value={
+                      field.value
+                        ? new Date(field.value).toISOString().split("T")[0]
+                        : ""
+                    }
+                    onChange={(e) =>
+                      field.onChange(
+                        e.target.value ? new Date(e.target.value) : undefined
+                      )
+                    }
                   />
                 )}
               />

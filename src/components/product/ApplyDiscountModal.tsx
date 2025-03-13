@@ -8,7 +8,14 @@ import { discountSchema } from "@/src/validations/productSchema";
 import { Button } from "@nextui-org/button";
 import { Select, SelectItem } from "@nextui-org/select";
 import { Input } from "@nextui-org/input";
-import { Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, useDisclosure } from "@heroui/modal";
+import {
+  Modal,
+  ModalBody,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  useDisclosure,
+} from "@heroui/modal";
 import { DiscountIcon } from "../icons";
 import { useEffect } from "react";
 
@@ -25,10 +32,14 @@ export default function ApplyDiscountModal({
   const { control, handleSubmit, reset } = useForm({
     resolver: zodResolver(discountSchema),
     defaultValues: {
-      type: product.discount?.type || "percentage", // Pre-fill with existing discount type or default to "percentage"
-      value: product.discount?.value || 0, // Pre-fill with existing discount value or default to 0
-      startDate: product.discount?.startDate || "", // Pre-fill with existing start date or default to empty
-      endDate: product.discount?.endDate || "", // Pre-fill with existing end date or default to empty
+      type: product.discount?.type || "percentage",
+      value: product.discount?.value || 0,
+      startDate: product.discount?.startDate
+        ? new Date(product.discount.startDate).toISOString().split("T")[0]
+        : "",
+      endDate: product.discount?.endDate
+        ? new Date(product.discount.endDate).toISOString().split("T")[0]
+        : "",
     },
   });
 
@@ -37,8 +48,12 @@ export default function ApplyDiscountModal({
     reset({
       type: product.discount?.type || "percentage",
       value: product.discount?.value || 0,
-      startDate: product.discount?.startDate || "",
-      endDate: product.discount?.endDate || "",
+      startDate: product.discount?.startDate
+        ? new Date(product.discount.startDate).toISOString().split("T")[0]
+        : "",
+      endDate: product.discount?.endDate
+        ? new Date(product.discount.endDate).toISOString().split("T")[0]
+        : "",
     });
   }, [product, reset]);
 
@@ -47,7 +62,7 @@ export default function ApplyDiscountModal({
       id: product._id,
       discount: data,
     });
-    onOpenChange(false);
+    onOpenChange();
   };
 
   return (
