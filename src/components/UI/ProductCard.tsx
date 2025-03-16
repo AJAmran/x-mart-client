@@ -8,7 +8,8 @@ import { useState } from "react";
 import { TProduct } from "@/src/types";
 import { toast } from "sonner";
 import { ShoppingCart, Eye } from "lucide-react";
-import Link from "next/link"; 
+import Link from "next/link";
+import { useCart } from "@/src/hooks/useCart";
 
 type ProductCardProps = {
   product: TProduct;
@@ -17,12 +18,20 @@ type ProductCardProps = {
 
 const ProductCard = ({ product, onPress }: ProductCardProps) => {
   const [isLoading, setIsLoading] = useState(false);
+  const { addItem } = useCart();
 
   const handleAddToCart = () => {
     setIsLoading(true);
+    const cartItem = {
+      productId: product._id,
+      quantity: 1,
+      price: product.price,
+      name: product.name,
+      image: product.images?.[0] || "/placeholder.jpg",
+    };
+    addItem(cartItem);
     setTimeout(() => {
       setIsLoading(false);
-      toast.success(`${product.name} added to cart!`);
     }, 1000);
   };
 

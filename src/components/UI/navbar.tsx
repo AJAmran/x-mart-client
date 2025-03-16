@@ -15,9 +15,9 @@ import { Link } from "@nextui-org/link";
 import { link as linkStyles } from "@nextui-org/theme";
 import NextLink from "next/link";
 import clsx from "clsx";
-import { useRouter } from "next/navigation"; // Import useRouter
+import { useRouter } from "next/navigation"; 
 
-import { CartIcon, Logo } from "../icons";
+import { Logo } from "../icons";
 import { ThemeSwitch } from "../theme-switch";
 import CategoriesDropdownContainer from "../navbar/dropdown";
 import SearchBar from "../SearchBar";
@@ -26,10 +26,11 @@ import { siteConfig } from "@/src/config/site";
 import ProfileModal from "./ProfileModal";
 import { logout } from "@/src/services/AuthService";
 import { useUser } from "@/src/app/context/user.provider";
+import { CartModal } from "../cart/CartModal";
 
 export const Navbar = () => {
   const [searchQuery, setSearchQuery] = useState("");
-  const router = useRouter(); // Initialize useRouter
+  const router = useRouter(); 
 
   // Use the useUser hook to get the current user and loading state
   const { user, isLoading } = useUser();
@@ -116,10 +117,7 @@ export const Navbar = () => {
         )}
 
         <NavbarItem className="relative">
-          <CartIcon className="w-6 h-6 text-gray-700 dark:text-gray-300" />
-          <span className="absolute -top-2 -right-2 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-white text-xs font-bold">
-            4
-          </span>
+          <CartModal />
         </NavbarItem>
 
         <NavbarItem className="hidden sm:flex gap-2">

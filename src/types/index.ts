@@ -71,3 +71,21 @@ export interface Option {
   options: string[];
   price?: number;
 }
+
+
+
+// interfaces/cartInterface.ts
+export type TCartItem = {
+  productId: string;
+  quantity: number;
+  price: number;
+  name: string;
+  image: string;
+};
+
+export type TCart = {
+  userId?: string;
+  items: TCartItem[];
+  totalPrice: number;
+  totalItems: number;
+};
