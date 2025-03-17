@@ -28,7 +28,7 @@ export const CartItem = ({ item }: CartItemProps) => {
           <h4 className="font-bold">{item.name}</h4>
           <p className="text-sm text-gray-500">Unit Price: ${item.price}</p>
           <p className="text-sm text-gray-500">
-            Total: ${(item.price * item.quantity).toFixed(2)}
+            Total: ৳{(item.price * item.quantity).toFixed(2)}
           </p>
         </div>
       </div>
