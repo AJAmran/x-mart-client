@@ -72,8 +72,6 @@ export interface Option {
   price?: number;
 }
 
-
-
 // interfaces/cartInterface.ts
 export type TCartItem = {
   productId: string;
@@ -84,7 +82,6 @@ export type TCartItem = {
 };
 
 export type TCart = {
-  userId?: string;
   items: TCartItem[];
   totalPrice: number;
   totalItems: number;

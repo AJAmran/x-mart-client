@@ -1,26 +1,39 @@
+// components/CartItem.tsx
 "use client";
 
 import { Button } from "@nextui-org/button";
-
+import { Image } from "@nextui-org/image";
 import { useCart } from "@/src/hooks/useCart";
 import { TCartItem } from "@/src/types";
 
 interface CartItemProps {
-    item: TCartItem; // Define the type of the item prop
-  }
-  
+  item: TCartItem; // Explicitly type the `item` prop
+}
 
-  export const CartItem: React.FC<CartItemProps> = ({ item }) => {
+export const CartItem = ({ item }: CartItemProps) => {
   const { updateQuantity, removeItem } = useCart();
-
-  console.log("Cart item data:", item); // Add this log
 
   return (
     <div className="flex justify-between items-center p-4 border-b dark:border-gray-700">
-      <div>
-        <h4 className="font-bold">{item.name}</h4>
-        <p className="text-sm text-gray-500">${item.price}</p>
+      {/* Product Image and Details */}
+      <div className="flex items-center gap-4">
+        <Image
+          src={item.image || "/placeholder.jpg"}
+          alt={item.name}
+          width={80}
+          height={80}
+          className="w-20 h-20 object-cover rounded-lg"
+        />
+        <div>
+          <h4 className="font-bold">{item.name}</h4>
+          <p className="text-sm text-gray-500">Unit Price: ${item.price}</p>
+          <p className="text-sm text-gray-500">
+            Total: ${(item.price * item.quantity).toFixed(2)}
+          </p>
+        </div>
       </div>
+
+      {/* Quantity Controls and Remove Button */}
       <div className="flex items-center gap-2">
         <Button
           size="sm"
