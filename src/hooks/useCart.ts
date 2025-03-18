@@ -1,4 +1,3 @@
-
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { TCart, TCartItem } from "../types";
@@ -47,19 +46,23 @@ export const useCart = () => {
 
   // Add item to cart
   const addItem = (item: TCartItem) => {
-    const existingItem = cart?.items.find(
+    if (!cart) return;
+
+    const existingItem = cart.items.find(
       (i) => i.productId === item.productId
     );
     let updatedItems: TCartItem[];
 
     if (existingItem) {
-      updatedItems = (cart?.items ?? []).map((i) =>
+      // If the item already exists, update its quantity
+      updatedItems = cart.items.map((i) =>
         i.productId === item.productId
           ? { ...i, quantity: i.quantity + item.quantity }
           : i
       );
     } else {
-      updatedItems = [...(cart?.items || []), item];
+      // If the item doesn't exist, add it to the cart
+      updatedItems = [...cart.items, item];
     }
 
     updateCartMutation.mutate(updatedItems);
@@ -68,7 +71,9 @@ export const useCart = () => {
 
   // Remove item from cart
   const removeItem = (productId: string) => {
-    const updatedItems = (cart?.items || []).filter(
+    if (!cart) return;
+
+    const updatedItems = cart.items.filter(
       (item) => item.productId !== productId
     );
     updateCartMutation.mutate(updatedItems);
@@ -77,7 +82,8 @@ export const useCart = () => {
 
   // Update item quantity in cart
   const updateQuantity = (productId: string, quantity: number) => {
-    const updatedItems = (cart?.items || []).map((item) =>
+    if (!cart) return;
+    const updatedItems = cart.items.map((item) =>
       item.productId === productId ? { ...item, quantity } : item
     );
     updateCartMutation.mutate(updatedItems);

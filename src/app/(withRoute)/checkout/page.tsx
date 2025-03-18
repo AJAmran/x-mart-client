@@ -4,22 +4,37 @@ import { useCart } from "@/src/hooks/useCart";
 import { Button } from "@nextui-org/button";
 import { Card, CardBody, CardHeader } from "@nextui-org/card";
 import { Input } from "@nextui-org/input";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import { useUser } from "../../context/user.provider";
 
 const CheckoutPage = () => {
   const { cart, clearCart, updateQuantity, removeItem } = useCart();
+  const { user } = useUser(); // Get user info
   const [shippingInfo, setShippingInfo] = useState({
-    name: "",
+    name: user?.name || "",
+    email: user?.email || "",
     address: "",
     city: "",
     state: "",
     zip: "",
     country: "",
-    phone: "", // Added phone number for cash on delivery
+    phone: user?.mobileNumber || "",
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
+
+  // Update shipping info when user data changes
+  useEffect(() => {
+    if (user) {
+      setShippingInfo((prev) => ({
+        ...prev,
+        name: user.name || "",
+        email: user.email || "",
+        phone: user.mobileNumber || "",
+      }));
+    }
+  }, [user]);
 
   const handleShippingChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -34,14 +49,18 @@ const CheckoutPage = () => {
     const newErrors: Record<string, string> = {};
 
     if (!shippingInfo.name) newErrors.name = "Name is required.";
+    if (!shippingInfo.email) newErrors.email = "Email is required.";
+    else if (!/\S+@\S+\.\S+/.test(shippingInfo.email)) {
+      newErrors.email = "Invalid email address.";
+    }
     if (!shippingInfo.address) newErrors.address = "Address is required.";
     if (!shippingInfo.city) newErrors.city = "City is required.";
     if (!shippingInfo.state) newErrors.state = "State is required.";
     if (!shippingInfo.zip) newErrors.zip = "ZIP code is required.";
     if (!shippingInfo.country) newErrors.country = "Country is required.";
     if (!shippingInfo.phone) newErrors.phone = "Phone number is required.";
-    else if (!/^\d{10}$/.test(shippingInfo.phone)) {
-      newErrors.phone = "Phone number must be 10 digits.";
+    else if (!/^\d{11}$/.test(shippingInfo.phone)) {
+      newErrors.phone = "Phone number must be 11 digits.";
     }
 
     setErrors(newErrors);
@@ -85,7 +104,7 @@ const CheckoutPage = () => {
                       <div>
                         <h4 className="font-bold">{item.name}</h4>
                         <p className="text-sm text-gray-500">
-                          ${item.price.toFixed(2)}
+                          ৳{item.price.toFixed(2)}
                         </p>
                       </div>
                     </div>
@@ -122,7 +141,7 @@ const CheckoutPage = () => {
                 <div className="flex justify-between items-center pt-4 border-t dark:border-gray-700">
                   <h4 className="font-bold">Total</h4>
                   <p className="text-lg font-bold">
-                    ${cart.totalPrice.toFixed(2)}
+                    ৳{cart.totalPrice.toFixed(2)}
                   </p>
                 </div>
               </>
@@ -146,6 +165,15 @@ const CheckoutPage = () => {
                 onChange={handleShippingChange}
                 isInvalid={!!errors.name}
                 errorMessage={errors.name}
+                required
+              />
+              <Input
+                label="Email"
+                name="email"
+                value={shippingInfo.email}
+                onChange={handleShippingChange}
+                isInvalid={!!errors.email}
+                errorMessage={errors.email}
                 required
               />
               <Input

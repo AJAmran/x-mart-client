@@ -46,7 +46,7 @@ export const CartModal = () => {
                     <div className="flex justify-between items-center pt-4 border-t dark:border-gray-700">
                       <h4 className="font-bold">Total</h4>
                       <p className="text-lg font-bold">
-                        ${cart.totalPrice.toFixed(2)}
+                        ৳{cart.totalPrice.toFixed(2)}
                       </p>
                     </div>
                   </>
