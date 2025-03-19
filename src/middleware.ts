@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { NextRequest } from "next/server";
+
 import { getCurrentUser } from "./services/AuthService";
 
 // Public routes that don't require authentication
@@ -9,7 +10,8 @@ const PUBLIC_ROUTES = ["/auth/login", "/auth/register"];
 const ROLE_BASED_ROUTES = {
   USER: [/^\/profile/, /^\/dashboard\/user-management/],
   ADMIN: [
-    /^\/dashboard\/admin/,
+    /^\/dashboard\/user-management/,
+    /^\/dashboard\/user-management/,
     /^\/dashboard\/product-management/,
     /^\/dashboard\/order-management/,
     /^\/dashboard\/sales-analytics/,
@@ -30,6 +32,7 @@ export async function middleware(request: NextRequest) {
       return NextResponse.next();
     }
     // Redirect to login for protected routes
+
     return NextResponse.redirect(
       new URL(`/auth/login?redirect=${pathname}`, request.url)
     );
@@ -61,10 +64,10 @@ export async function middleware(request: NextRequest) {
 // Define the routes to apply the middleware
 export const config = {
   matcher: [
-    "/dashboard/:path*", // Protect all dashboard routes
-    "/profile/:path*", // Protect profile routes
-    "/checkout", // Protect the checkout page
-    "/auth/login", // Apply middleware to login page
-    "/auth/register", // Apply middleware to register page
+    "/dashboard/:path*",
+    "/profile/:path*", 
+    "/checkout", 
+    "/auth/login", 
+    "/auth/register", 
   ],
 };
