@@ -2,6 +2,7 @@
 
 import { Button } from "@nextui-org/button";
 import { Image } from "@nextui-org/image";
+
 import { useCart } from "@/src/hooks/useCart";
 import { TCartItem } from "@/src/types";
 

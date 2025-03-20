@@ -8,7 +8,7 @@ import { Input } from "@nextui-org/input";
 import { Button } from "@nextui-org/button";
 import { motion } from "framer-motion";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation"; // Add useSearchParams
 import { toast } from "sonner";
 
 import {
@@ -18,6 +18,7 @@ import {
   type LoginFormData,
 } from "@/src/validations/validationSchema";
 import { useUserRegistration, useUserLogin } from "@/src/hooks/auth.hook";
+
 import { useUser } from "../app/context/user.provider";
 
 type AuthFormProps = {
@@ -27,6 +28,7 @@ type AuthFormProps = {
 const AuthForm: React.FC<AuthFormProps> = ({ type }) => {
   const isRegister = type === "register";
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [error, setError] = useState<string | null>(null);
   const { setIsLoading } = useUser();
 
@@ -43,7 +45,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ type }) => {
 
   const { mutateAsync: registerMutation } = useUserRegistration();
   const { mutateAsync: loginMutation } = useUserLogin(() => {
-    setIsLoading(true); // Trigger a re-fetch of the current user
+    setIsLoading(true);
   });
 
   const onSubmit: SubmitHandler<RegisterFormData | LoginFormData> = useCallback(
@@ -53,15 +55,23 @@ const AuthForm: React.FC<AuthFormProps> = ({ type }) => {
 
         if (isRegister) {
           const response = await registerMutation(data as RegisterFormData);
+
           if (response.success) {
             toast.success("Registration successful! Please log in.");
+
             router.push("/auth/login");
           }
         } else {
           const response = await loginMutation(data as LoginFormData);
+
           if (response.success) {
             toast.success("Login successful!");
-            router.push("/");
+
+            // Get the redirect URL from query parameters
+            const redirectUrl = searchParams.get("redirect");
+
+            // Redirect to the original protected route or home page
+            router.push(redirectUrl || "/");
           }
         }
       } catch (error: any) {
@@ -69,7 +79,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ type }) => {
         toast.error(error.message || "An error occurred. Please try again.");
       }
     },
-    [isRegister, registerMutation, loginMutation, router]
+    [isRegister, registerMutation, loginMutation, router, searchParams] 
   );
 
   return (
