@@ -1,4 +1,3 @@
-// components/CartModal.tsx
 "use client";
 
 import {

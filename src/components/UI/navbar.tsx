@@ -15,7 +15,7 @@ import { Link } from "@nextui-org/link";
 import { link as linkStyles } from "@nextui-org/theme";
 import NextLink from "next/link";
 import clsx from "clsx";
-import { useRouter } from "next/navigation"; 
+import { useRouter } from "next/navigation";
 
 import { Logo } from "../icons";
 import { ThemeSwitch } from "../theme-switch";
@@ -30,7 +30,7 @@ import { CartModal } from "../cart/CartModal";
 
 export const Navbar = () => {
   const [searchQuery, setSearchQuery] = useState("");
-  const router = useRouter(); 
+  const router = useRouter();
 
   // Use the useUser hook to get the current user and loading state
   const { user, isLoading } = useUser();
@@ -50,6 +50,8 @@ export const Navbar = () => {
       maxWidth="2xl"
       position="sticky"
       className="border-b dark:border-gray-900"
+      isBordered
+      isBlurred
     >
       <NavbarContent className="basis-1/5 sm:basis-full" justify="start">
         <NavbarBrand as="li" className="gap-3 max-w-fit">
@@ -80,16 +82,16 @@ export const Navbar = () => {
       </NavbarContent>
 
       <NavbarContent
-        className="hidden sm:flex basis-1/5 sm:basis-full"
+        className="hidden lg:flex basis-1/5 sm:basis-full"
         justify="end"
       >
         <NavbarItem>
           <SearchBar
-            value={searchQuery}
-            onChange={setSearchQuery}
-            onSearch={handleSearch} // Pass the search handler
             className="hidden lg:block w-[300px]"
             placeholder="Search in X-mart..."
+            onChange={setSearchQuery}
+            onSearch={handleSearch} 
+            value={searchQuery}
           />
         </NavbarItem>
 
@@ -125,7 +127,8 @@ export const Navbar = () => {
         </NavbarItem>
       </NavbarContent>
 
-      <NavbarContent className="sm:hidden basis-1 pl-4" justify="end">
+      {/* Show hamburger menu on tablets (md) and smaller screens */}
+      <NavbarContent className="lg:hidden basis-1 pl-4" justify="end">
         <ThemeSwitch />
         <NavbarMenuToggle />
       </NavbarContent>
@@ -135,7 +138,7 @@ export const Navbar = () => {
           <SearchBar
             value={searchQuery}
             onChange={setSearchQuery}
-            onSearch={handleSearch} // Pass the search handler
+            onSearch={handleSearch} 
             className="w-full"
           />
         </div>

@@ -1,4 +1,3 @@
-// components/CartItem.tsx
 "use client";
 
 import { Button } from "@nextui-org/button";
@@ -7,7 +6,7 @@ import { useCart } from "@/src/hooks/useCart";
 import { TCartItem } from "@/src/types";
 
 interface CartItemProps {
-  item: TCartItem; // Explicitly type the `item` prop
+  item: TCartItem;
 }
 
 export const CartItem = ({ item }: CartItemProps) => {
