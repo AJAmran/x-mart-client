@@ -86,3 +86,14 @@ export type TCart = {
   totalPrice: number;
   totalItems: number;
 };
+
+export interface TShippingInfo {
+  name: string;
+  email: string;
+  addressLine1: string;
+  addressLine2: string;
+  city: string;
+  postalCode: string;
+  division: string;
+  phone: string;
+}
