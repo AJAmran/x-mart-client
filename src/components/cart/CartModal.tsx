@@ -1,4 +1,3 @@
-// components/CartModal.tsx
 "use client";
 
 import {
@@ -37,7 +36,7 @@ export const CartModal = () => {
               <ModalHeader className="flex flex-col gap-1">
                 Your Cart
               </ModalHeader>
-              <ModalBody>
+              <ModalBody className="max-h-[60vh] overflow-y-auto">
                 {cart.items.length > 0 ? (
                   <>
                     {cart.items.map((item) => (

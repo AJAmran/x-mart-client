@@ -1,12 +1,14 @@
 "use client";
-
-import { useCart } from "@/src/hooks/useCart";
+import { toast } from "sonner";
+import { useEffect, useState } from "react";
 import { Button } from "@nextui-org/button";
 import { Card, CardBody, CardHeader } from "@nextui-org/card";
 import { Input } from "@nextui-org/input";
-import { useEffect, useState } from "react";
-import { toast } from "sonner";
+import { Image } from "@nextui-org/image";
+
 import { useUser } from "../../context/user.provider";
+
+import { useCart } from "@/src/hooks/useCart";
 
 const CheckoutPage = () => {
   const { cart, clearCart, updateQuantity, removeItem } = useCart();
@@ -38,6 +40,7 @@ const CheckoutPage = () => {
 
   const handleShippingChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
+
     setShippingInfo((prev) => ({ ...prev, [name]: value }));
     // Clear error when user starts typing
     if (errors[name]) {
@@ -64,12 +67,14 @@ const CheckoutPage = () => {
     }
 
     setErrors(newErrors);
+
     return Object.keys(newErrors).length === 0;
   };
 
   const handlePlaceOrder = () => {
     if (!validateForm()) {
       toast.error("Please fix the errors in the form.");
+
       return;
     }
 
@@ -96,10 +101,10 @@ const CheckoutPage = () => {
                     className="flex justify-between items-center mb-4"
                   >
                     <div className="flex items-center gap-4">
-                      <img
-                        src={item.image || "/placeholder.jpg"}
+                      <Image
                         alt={item.name}
                         className="w-16 h-16 object-cover rounded-lg"
+                        src={item.image || "/placeholder.jpg"}
                       />
                       <div>
                         <h4 className="font-bold">{item.name}</h4>
@@ -235,9 +240,9 @@ const CheckoutPage = () => {
 
           {/* Place Order Button */}
           <Button
+            className="w-full"
             color="success"
             size="lg"
-            className="w-full"
             onPress={handlePlaceOrder}
             isDisabled={cart.items.length === 0}
           >
