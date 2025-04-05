@@ -211,14 +211,16 @@ const ShopPage = () => {
           </div>
 
           {/* Pagination */}
-          <div className="flex justify-center mt-8">
-            <Pagination
-              total={data?.meta?.totalPages || 1}
-              page={page}
-              onChange={setPage}
-              className="mt-6"
-            />
-          </div>
+          {data?.meta && (
+            <div className="flex justify-center mt-8">
+              <Pagination
+                total={data.meta.totalPages}
+                page={page}
+                onChange={setPage}
+                className="mt-6"
+              />
+            </div>
+          )}
         </div>
       </div>
     </div>

@@ -9,7 +9,6 @@ import {
 } from "@/src/hooks/useProducts";
 import { TProduct } from "@/src/types";
 import { Pagination } from "@heroui/pagination";
-import { Select, SelectItem } from "@heroui/select";
 import { Skeleton } from "@heroui/skeleton";
 import { Tooltip } from "@heroui/tooltip";
 import { Button } from "@nextui-org/button";
@@ -23,9 +22,9 @@ export default function ProductListPage() {
     searchTerm: "",
     category: "",
     minPrice: 0,
-    maxPrice: 1000,
+    maxPrice: 1000000,
     minStock: 0,
-    maxStock: 100,
+    maxStock: 10000,
     status: "",
   });
 
@@ -42,7 +41,12 @@ export default function ProductListPage() {
     sortOrder: "desc", // Ensure this is either "asc" or "desc"
   });
 
-  const { data: productsResponse, isLoading } = useProducts(filters, options);
+  const {
+    data: productsResponse,
+    isLoading,
+    isError,
+    error,
+  } = useProducts(filters, options);
   const deleteProductMutation = useDeleteProduct();
   const removeDiscountMutation = useRemoveDiscount();
 
@@ -95,6 +99,7 @@ export default function ProductListPage() {
             <table className="min-w-full bg-white border border-gray-200">
               <thead>
                 <tr className="bg-gray-100">
+                  <th className="px-4 py-2 text-left">Sl.</th>
                   <th className="px-4 py-2 text-left">Name</th>
                   <th className="px-4 py-2 text-left">Price</th>
                   <th className="px-4 py-2 text-left">Stock</th>
@@ -107,6 +112,9 @@ export default function ProductListPage() {
                   // Loading state
                   Array.from({ length: options.limit }).map((_, index) => (
                     <tr key={index}>
+                      <td className="px-4 py-2">
+                        <Skeleton className="h-4 w-32 rounded-lg" />
+                      </td>
                       <td className="px-4 py-2">
                         <Skeleton className="h-4 w-32 rounded-lg" />
                       </td>
@@ -126,8 +134,12 @@ export default function ProductListPage() {
                   ))
                 ) : products.length > 0 ? (
                   // Render actual data
-                  products.map((product: TProduct) => (
+                  products.map((product: TProduct, index: number) => (
                     <tr key={product._id} className="border-b border-gray-200">
+                      <td className="px-4 py-2">
+                        {/* Calculate SL number based on pagination */}
+                        {(options.page - 1) * options.limit + index + 1}
+                      </td>
                       <td className="px-4 py-2">{product.name}</td>
                       <td className="px-4 py-2">${product.price}</td>
                       <td className="px-4 py-2">{product.stock}</td>
@@ -167,11 +179,17 @@ export default function ProductListPage() {
           </div>
 
           {/* Pagination */}
-          <Pagination
-            total={totalPages}
-            page={options.page}
-            onChange={(page) => setOptions({ ...options, page })}
-          />
+          <div className="flex justify-center mt-4">
+            {isLoading ? (
+              <Skeleton className="h-10 w-64 rounded-lg" />
+            ) : totalPages > 1 ? (
+              <Pagination
+                total={totalPages}
+                page={options.page}
+                onChange={(page) => setOptions({ ...options, page })}
+              />
+            ) : null}
+          </div>
         </div>
       </CardBody>
     </Card>
