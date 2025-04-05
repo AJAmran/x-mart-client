@@ -10,7 +10,7 @@ export default function HeroSection() {
       {/* Category Card */}
       <Link
         className="col-span-12 sm:col-span-4 h-[300px]"
-        href="/shop?category=FRESH_PRODUCE"
+        href="/shop?category=VEGETABLES"
       >
         <Card className="w-full h-full">
           <CardHeader className="absolute z-10 top-1 flex-col !items-start">
@@ -55,7 +55,7 @@ export default function HeroSection() {
 
       {/* New Arrivals */}
       <Link
-        href="/shop?category=KITCHEN_GADGETS" 
+        href="/shop?category=HOUSEHOLD" 
         className="col-span-12 sm:col-span-4 h-[300px]"
       >
         <Card className="w-full h-full">

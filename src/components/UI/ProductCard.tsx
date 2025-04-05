@@ -3,10 +3,8 @@
 import { Card, CardBody, CardFooter } from "@nextui-org/card";
 import { Button } from "@nextui-org/button";
 import { Image } from "@nextui-org/image";
-import { Badge } from "@nextui-org/badge";
 import { useState } from "react";
 import { TProduct } from "@/src/types";
-import { toast } from "sonner";
 import { ShoppingCart, Eye } from "lucide-react";
 import Link from "next/link";
 import { useCart } from "@/src/hooks/useCart";
