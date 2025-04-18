@@ -22,7 +22,7 @@ export const useUserLogin = (onSuccess?: () => void) => {
     mutationFn: async (userData) => await loginUser(userData),
     onSuccess: () => {
       toast.success("User login successful.");
-      onSuccess?.(); // Trigger the onSuccess callback
+      onSuccess?.(); 
     },
     onError: (error) => {
       toast.error(error.message);
