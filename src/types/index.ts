@@ -97,3 +97,10 @@ export interface TShippingInfo {
   division: string;
   phone: string;
 }
+
+export type UsersResponse = {
+  data: IUser[];
+  total: number;
+  totalPages: number;
+  currentPage: number;
+};

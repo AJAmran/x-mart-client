@@ -1,6 +1,5 @@
 import Sidebar from "@/src/components/UI/Sidebar";
 import React from "react";
-import { Toaster } from "sonner";
 
 const DashboardLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   return (
@@ -36,7 +35,7 @@ const DashboardLayout: React.FC<{ children: React.ReactNode }> = ({ children }) 
           <div className="max-w-7xl mx-auto">{children}</div>
         </main>
       </div>
-      <Toaster position="top-right" richColors />
+      
     </div>
   );
 };
