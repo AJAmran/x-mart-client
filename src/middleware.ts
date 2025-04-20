@@ -8,15 +8,8 @@ const PUBLIC_ROUTES = ["/auth/login", "/auth/register"];
 
 // Role-based route access
 const ROLE_BASED_ROUTES = {
-  USER: [/^\/profile/, /^\/dashboard\/user-management/],
-  ADMIN: [
-    /^\/dashboard\/user-management/,
-    /^\/dashboard\/user-management/,
-    /^\/dashboard\/product-management/,
-    /^\/dashboard\/order-management/,
-    /^\/dashboard\/sales-analytics/,
-    /^\/dashboard\/inventory-management/,
-  ],
+  USER: [/^\/profile(\/.*)?$/],
+  ADMIN: [/^\/profile(\/.*)?$/, /^\/dashboard(\/.*)?$/],
 };
 
 export async function middleware(request: NextRequest) {
@@ -65,9 +58,9 @@ export async function middleware(request: NextRequest) {
 export const config = {
   matcher: [
     "/dashboard/:path*",
-    "/profile/:path*", 
-    "/checkout", 
-    "/auth/login", 
-    "/auth/register", 
+    "/profile/:path*",
+    "/checkout",
+    "/auth/login",
+    "/auth/register",
   ],
 };

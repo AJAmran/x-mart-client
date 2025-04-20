@@ -18,8 +18,8 @@ import {
   type LoginFormData,
 } from "@/src/validations/validationSchema";
 import { useUserRegistration, useUserLogin } from "@/src/hooks/auth.hook";
+import { useUser } from "../context/user.provider";
 
-import { useUser } from "../app/context/user.provider";
 
 type AuthFormProps = {
   type: "login" | "register";

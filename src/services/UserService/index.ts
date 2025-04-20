@@ -30,14 +30,6 @@ export const getUserById = async (id: string) => {
   }
 };
 
-export const createUser = async (userData: any) => {
-  try {
-    const { data } = await axiosInstance.post("/auth/register", userData);
-    return data;
-  } catch (error: any) {
-    throw new Error(error.response?.data?.message || "Failed to create user");
-  }
-};
 
 export const updateUser = async (id: string, userData: any) => {
   try {
