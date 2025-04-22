@@ -103,7 +103,7 @@ export const Navbar = () => {
           </NavbarItem>
         ) : user ? (
           <NavbarItem className="relative">
-            <ProfileModal user={user} onLogout={handleLogout} />
+            <ProfileModal user={user} />
           </NavbarItem>
         ) : (
           <NavbarItem>

@@ -42,7 +42,11 @@ axiosInstance.interceptors.response.use(
 
       return axiosInstance(config);
     } else {
-      return Promise.reject(error);
+      const errorMessage =
+        error.response?.data?.message ||
+        error.message ||
+        "An unexpected error occurred";
+      return Promise.reject(new Error(errorMessage));
     }
   }
 );

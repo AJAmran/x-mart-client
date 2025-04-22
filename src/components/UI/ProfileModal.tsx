@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { Button } from "@nextui-org/button";
 import { motion } from "framer-motion";
 
@@ -9,16 +10,21 @@ interface User {
   profilePhoto?: string;
   name: string;
   email: string;
-  mobileNumber: string;
+  mobileNumber?: string;
 }
 
 interface ProfileModalProps {
   user: User;
-  onLogout: () => void;
 }
 
-const ProfileModal = ({ user, onLogout }: ProfileModalProps) => {
+const ProfileModal = ({ user }: ProfileModalProps) => {
   const [isOpen, setIsOpen] = useState(false);
+  const router = useRouter();
+
+  const handleViewProfile = () => {
+    setIsOpen(false); // Close the modal
+    router.push("/profile"); // Navigate to profile page
+  };
 
   return (
     <div className="relative">
@@ -35,7 +41,6 @@ const ProfileModal = ({ user, onLogout }: ProfileModalProps) => {
           height={32}
           className="rounded-full border-2 border-yellow-300"
         />
-
       </Button>
 
       {isOpen && (
@@ -50,23 +55,22 @@ const ProfileModal = ({ user, onLogout }: ProfileModalProps) => {
           <div className="flex flex-col items-center p-4">
             <Image
               src={user.profilePhoto || "/default-avatar.png"}
-              alt="Profile"
+              alt={user.name}
               width={80}
               height={80}
               className="rounded-full border border-gray-300"
             />
             <p className="text-lg font-semibold mt-2">{user.name}</p>
             <p className="text-sm text-gray-500">{user.email}</p>
-            <p className="text-sm text-gray-500">{user.mobileNumber}</p>
           </div>
           <div className="border-t border-gray-200 dark:border-gray-700">
             <Button
               variant="flat"
-              color="danger"
+              color="primary"
               className="w-full py-2 text-center"
-              onClick={onLogout}
+              onClick={handleViewProfile}
             >
-              Logout
+              View Profile
             </Button>
           </div>
         </motion.div>

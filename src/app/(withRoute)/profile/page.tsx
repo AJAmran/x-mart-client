@@ -1,31 +1,108 @@
-import { Metadata } from "next";
-import { Card, CardBody } from "@nextui-org/card";
+"use client";
+
+import { Suspense, useEffect } from "react";
+import Image from "next/image";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { Card, CardBody, CardHeader } from "@nextui-org/card";
+import { Button } from "@nextui-org/button";
 import { Divider } from "@nextui-org/divider";
+import { Spinner } from "@nextui-org/spinner";
 
+import { useUser } from "@/src/context/user.provider";
+import { logout } from "@/src/services/AuthService";
 
-export const metadata: Metadata = {
-  title: "Profile Management",
-  description: "Manage your account profile and security settings",
+const ProfilePage = () => {
+  const { user, isLoading, setIsLoading } = useUser();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!isLoading && !user) {
+      router.push("/auth/login");
+    }
+  }, [user, isLoading, router]);
+
+  const handleLogout = async () => {
+    try {
+      setIsLoading(true);
+      await logout();
+      router.push("/auth/login");
+    } catch (error: any) {
+      throw error(error.message || "Failed to log out.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  if (isLoading || !user) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <Spinner size="lg" label="Loading profile..." />
+      </div>
+    );
+  }
+
+  return (
+    <Suspense fallback={<Spinner size="lg" label="Loading profile..." />}>
+      <div className="flex items-center justify-center min-h-screen">
+        <Card className="w-full max-w-lg p-6 rounded-2xl shadow-xl">
+          <CardHeader className="flex flex-col items-center">
+            <Image
+              src={user.profilePhoto || "/default-avatar.png"}
+              alt={user.name}
+              width={120}
+              height={120}
+              className="rounded-full border-2 border-primary mb-4"
+            />
+            <h2 className="text-2xl font-bold text-center">{user.name}</h2>
+            <p className="text-sm text-gray-500">{user.role}</p>
+          </CardHeader>
+          <Divider className="my-4" />
+          <CardBody className="space-y-4">
+            <div className="flex flex-col">
+              <span className="text-sm font-semibold text-gray-600 dark:text-gray-400">
+                Email
+              </span>
+              <p className="text-gray-800 dark:text-gray-200">{user.email}</p>
+            </div>
+            <div className="flex flex-col">
+              <span className="text-sm font-semibold text-gray-600 dark:text-gray-400">
+                Mobile Number
+              </span>
+              <p className="text-gray-800 dark:text-gray-200">
+                {user.mobileNumber || "Not provided"}
+              </p>
+            </div>
+            <div className="flex flex-col">
+              <span className="text-sm font-semibold text-gray-600 dark:text-gray-400">
+                Status
+              </span>
+              <p className="text-gray-800 dark:text-gray-200">
+                {user.status || "Active"}
+              </p>
+            </div>
+          </CardBody>
+          <Divider className="my-4" />
+          <div className="flex flex-col gap-4 px-4 pb-4">
+            <Link href="/auth/change-password">
+              <Button color="primary" className="w-full" variant="flat">
+                Change Password
+              </Button>
+            </Link>
+            <Button
+              color="danger"
+              variant="flat"
+              className="w-full"
+              onClick={handleLogout}
+              isLoading={isLoading}
+            >
+              Logout
+            </Button>
+          </div>
+        </Card>
+      </div>
+    </Suspense>
+  );
 };
 
-export default function ProfilePage() {
-  return (
-    <div className="max-w-4xl mx-auto p-4 space-y-6">
-      <h1 className="text-3xl font-bold">Profile Settings</h1>
-
-      <Card className="p-4">
-        <CardBody className="space-y-6">
-          <div>
-            <h2 className="text-xl font-semibold mb-4">Profile Information</h2>
-          </div>
-
-          <Divider />
-
-          <div>
-            <h2 className="text-xl font-semibold mb-4">Security</h2>
-          </div>
-        </CardBody>
-      </Card>
-    </div>
-  );
-}
+export default ProfilePage;

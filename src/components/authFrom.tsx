@@ -20,7 +20,6 @@ import {
 import { useUserRegistration, useUserLogin } from "@/src/hooks/auth.hook";
 import { useUser } from "../context/user.provider";
 
-
 type AuthFormProps = {
   type: "login" | "register";
 };
@@ -57,16 +56,12 @@ const AuthForm: React.FC<AuthFormProps> = ({ type }) => {
           const response = await registerMutation(data as RegisterFormData);
 
           if (response.success) {
-            toast.success("Registration successful! Please log in.");
-
             router.push("/auth/login");
           }
         } else {
           const response = await loginMutation(data as LoginFormData);
 
           if (response.success) {
-            toast.success("Login successful!");
-
             // Get the redirect URL from query parameters
             const redirectUrl = searchParams.get("redirect");
 
@@ -75,11 +70,10 @@ const AuthForm: React.FC<AuthFormProps> = ({ type }) => {
           }
         }
       } catch (error: any) {
-        setError(error.message || "An error occurred. Please try again.");
-        toast.error(error.message || "An error occurred. Please try again.");
+        setError(error.message);
       }
     },
-    [isRegister, registerMutation, loginMutation, router, searchParams] 
+    [isRegister, registerMutation, loginMutation, router, searchParams]
   );
 
   return (
