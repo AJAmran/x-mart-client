@@ -5,7 +5,6 @@ import { toast } from "sonner";
 import {
   getAllUsers,
   getUserById,
-  createUser,
   updateUser,
   deleteUser,
   updateUserStatus,
@@ -31,20 +30,6 @@ export const useUser = (id: string) => {
   });
 };
 
-export const useCreateUser = () => {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: createUser,
-    onSuccess: () => {
-      toast.success("User created successfully");
-      queryClient.invalidateQueries({ queryKey: ["users"] });
-    },
-    onError: (error: Error) => {
-      toast.error(error.message);
-    },
-  });
-};
 
 export const useUpdateUser = () => {
   const queryClient = useQueryClient();

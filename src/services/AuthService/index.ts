@@ -11,16 +11,12 @@ export const registerUser = async (userData: FieldValues) => {
     const { data } = await axiosInstance.post("/auth/register", userData);
 
     if (data.success) {
-      const cookieStore = await cookies();
-      
-      cookieStore.set("accessToken", data?.data?.accessToken);
-      
-      cookieStore.set("refreshToken", data?.data?.refreshToken);
+      await logout();
     }
 
     return data;
   } catch (error: any) {
-    throw new Error(error);
+    throw new Error(error.message);
   }
 };
 
@@ -37,13 +33,28 @@ export const loginUser = async (userData: FieldValues) => {
 
     return data;
   } catch (error: any) {
-    throw new Error(error);
+    throw new Error(error.message);
+  }
+};
+
+export const changePassword = async (passwordData: {
+  oldPassword: string;
+  newPassword: string;
+}) => {
+  try {
+    const { data } = await axiosInstance.post(
+      "/auth/change-password",
+      passwordData
+    );
+    return data;
+  } catch (error: any) {
+    throw new Error(error.message);
   }
 };
 
 export const logout = async () => {
   const cookieStore = await cookies();
-  
+
   cookieStore.delete("accessToken");
   cookieStore.delete("refreshToken");
 };

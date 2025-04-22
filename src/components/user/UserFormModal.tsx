@@ -14,17 +14,12 @@ import {
 } from "@heroui/modal";
 import { Input } from "@nextui-org/input";
 import { Button } from "@nextui-org/button";
-import { useCreateUser, useUpdateUser } from "@/src/hooks/useUser";
-import { USER_ROLE } from "@/src/constants";
+import { useUpdateUser } from "@/src/hooks/useUser";
 
 const userSchema = z.object({
   name: z.string().min(1, "Name is required"),
   email: z.string().email("Invalid email address"),
   mobileNumber: z.string().min(1, "Mobile number is required"),
-  password: z
-    .string()
-    .min(6, "Password must be at least 6 characters")
-    .optional(),
   profilePhoto: z.string().optional(),
 });
 
@@ -33,7 +28,7 @@ type UserFormValues = z.infer<typeof userSchema>;
 interface UserFormModalProps {
   isOpen: boolean;
   onClose: () => void;
-  user?: any;
+  user: any; // Made user required since we're only editing now
 }
 
 const UserFormModal: React.FC<UserFormModalProps> = ({
@@ -56,12 +51,11 @@ const UserFormModal: React.FC<UserFormModalProps> = ({
     },
   });
 
-  const createUser = useCreateUser();
   const updateUser = useUpdateUser();
 
   // Reset form when user prop changes
   useEffect(() => {
-    console.log("User prop received:", user); // Debug log
+    console.log("User prop received:", user);
     if (user) {
       const defaultValues = {
         name: user.name || "",
@@ -69,51 +63,27 @@ const UserFormModal: React.FC<UserFormModalProps> = ({
         mobileNumber: user.mobileNumber || "",
         profilePhoto: user.profilePhoto || "",
       };
-      console.log("Resetting form with defaultValues:", defaultValues); // Debug log
+      console.log("Resetting form with defaultValues:", defaultValues);
       reset(defaultValues);
-    } else {
-      reset({
-        name: "",
-        email: "",
-        mobileNumber: "",
-        profilePhoto: "",
-      });
     }
   }, [user, reset]);
 
   const onSubmit = async (data: UserFormValues) => {
     try {
-      if (user) {
-        // Only send editable fields for update
-        const updateData = {
-          name: data.name,
-          email: data.email,
-          mobileNumber: data.mobileNumber,
-          profilePhoto: data.profilePhoto,
-        };
-        console.log("Updating user with data:", updateData); // Debug log
-        await updateUser.mutateAsync({ id: user._id, userData: updateData });
-        toast.success("User updated successfully");
-      } else {
-        if (!data.password) {
-          toast.error("Password is required for new users");
-          return;
-        }
-        // Include role and status for new users, as they may be required
-        const createData = {
-          ...data,
-          role: USER_ROLE.USER,
-          status: "ACTIVE",
-        };
-        console.log("Creating user with data:", createData); // Debug log
-        await createUser.mutateAsync(createData);
-        toast.success("User created successfully");
-      }
-      reset();
+      // Only send editable fields for update
+      const updateData = {
+        name: data.name,
+        email: data.email,
+        mobileNumber: data.mobileNumber,
+        profilePhoto: data.profilePhoto,
+      };
+      console.log("Updating user with data:", updateData);
+      await updateUser.mutateAsync({ id: user._id, userData: updateData });
+      toast.success("User updated successfully");
       onClose();
     } catch (error: any) {
       console.error("Error submitting form:", error);
-      toast.error(error.message || "Failed to submit form");
+      toast.error(error.message || "Failed to update user");
     }
   };
 
@@ -122,7 +92,7 @@ const UserFormModal: React.FC<UserFormModalProps> = ({
       <ModalContent>
         {(onClose) => (
           <>
-            <ModalHeader>{user ? "Edit User" : "Create New User"}</ModalHeader>
+            <ModalHeader>Edit User</ModalHeader>
             <ModalBody>
               <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
                 <Input
@@ -137,7 +107,7 @@ const UserFormModal: React.FC<UserFormModalProps> = ({
                   {...register("email")}
                   errorMessage={errors.email?.message}
                   isInvalid={!!errors.email}
-                  disabled={!!user} // Disable email for existing users, as it may be immutable
+                  disabled={true} // Email is typically immutable for existing users
                 />
                 <Input
                   label="Mobile Number"
@@ -145,15 +115,6 @@ const UserFormModal: React.FC<UserFormModalProps> = ({
                   errorMessage={errors.mobileNumber?.message}
                   isInvalid={!!errors.mobileNumber}
                 />
-                {!user && (
-                  <Input
-                    label="Password"
-                    type="password"
-                    {...register("password")}
-                    errorMessage={errors.password?.message}
-                    isInvalid={!!errors.password}
-                  />
-                )}
                 <Input
                   label="Profile Photo URL"
                   {...register("profilePhoto")}
@@ -169,9 +130,9 @@ const UserFormModal: React.FC<UserFormModalProps> = ({
               <Button
                 color="primary"
                 onClick={handleSubmit(onSubmit)}
-                isLoading={createUser.isPending || updateUser.isPending}
+                isLoading={updateUser.isPending}
               >
-                {user ? "Update" : "Create"}
+                Update
               </Button>
             </ModalFooter>
           </>

@@ -25,7 +25,7 @@ import SearchBar from "../SearchBar";
 import { siteConfig } from "@/src/config/site";
 import ProfileModal from "./ProfileModal";
 import { logout } from "@/src/services/AuthService";
-import { useUser } from "@/src/app/context/user.provider";
+import { useUser } from "@/src/context/user.provider";
 import { CartModal } from "../cart/CartModal";
 
 export const Navbar = () => {
@@ -103,7 +103,7 @@ export const Navbar = () => {
           </NavbarItem>
         ) : user ? (
           <NavbarItem className="relative">
-            <ProfileModal user={user} onLogout={handleLogout} />
+            <ProfileModal user={user} />
           </NavbarItem>
         ) : (
           <NavbarItem>

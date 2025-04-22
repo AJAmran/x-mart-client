@@ -3,7 +3,7 @@ import { toast } from "sonner";
 import { useEffect, useState } from "react";
 import { Button } from "@nextui-org/button";
 
-import { useUser } from "../../context/user.provider";
+import { useUser } from "../../../context/user.provider";
 
 import { useCart } from "@/src/hooks/useCart";
 import OrderSummary from "@/src/components/Order/OrderSummary";

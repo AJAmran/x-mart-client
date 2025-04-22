@@ -77,15 +77,6 @@ const UserManagementPage = () => {
       {/* Title & Actions */}
       <div className="flex flex-col md:flex-row justify-between gap-4">
         <h1 className="text-2xl font-bold">User Management</h1>
-        <div className="flex gap-2">
-          <Button
-            color="primary"
-            startContent={<PlusIcon size={18} />}
-            onClick={() => handleOpenForm()}
-          >
-            Add User
-          </Button>
-        </div>
       </div>
 
       {/* Filters & Exports */}
