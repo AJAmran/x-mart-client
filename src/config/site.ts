@@ -30,5 +30,13 @@ export const siteConfig = {
       label: "Blog",
       href: "/blog",
     },
+    {
+      label: "Orders",
+      href: "/orders",
+    },
+    {
+      label: "Logout",
+      href: "#",
+    },
   ],
 };

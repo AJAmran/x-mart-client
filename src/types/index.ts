@@ -104,3 +104,37 @@ export type UsersResponse = {
   totalPages: number;
   currentPage: number;
 };
+
+export enum ORDER_STATUS {
+  PENDING = "PENDING",
+  PROCESSING = "PROCESSING",
+  SHIPPED = "SHIPPED",
+  DELIVERED = "DELIVERED",
+  CANCELLED = "CANCELLED",
+}
+
+export type TOrderItem = {
+  productId: string;
+  quantity: number;
+  price: number;
+  name: string;
+  image: string;
+};
+
+
+export type TOrder = {
+  _id: string;
+  userId: string;
+  items: TOrderItem[];
+  shippingInfo: TShippingInfo;
+  totalPrice: number;
+  status: keyof typeof ORDER_STATUS;
+  paymentMethod: "CASH_ON_DELIVERY" | "ONLINE";
+  createdAt: string;
+  updatedAt: string;
+  trackingHistory: {
+    status: keyof typeof ORDER_STATUS;
+    updatedAt: string;
+    note?: string;
+  }[];
+};

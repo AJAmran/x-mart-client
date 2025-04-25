@@ -2,16 +2,17 @@
 import { toast } from "sonner";
 import { useEffect, useState } from "react";
 import { Button } from "@nextui-org/button";
-
 import { useUser } from "../../../context/user.provider";
-
 import { useCart } from "@/src/hooks/useCart";
+
 import OrderSummary from "@/src/components/Order/OrderSummary";
 import ShippingInformation from "@/src/components/Order/ShippingInformation";
+import { useCreateOrder } from "@/src/hooks/useOrder";
 
 const CheckoutPage = () => {
   const { cart, clearCart, updateQuantity, removeItem } = useCart();
   const { user } = useUser();
+  const { mutate: createOrder, isPending } = useCreateOrder();
   const [shippingInfo, setShippingInfo] = useState({
     name: user?.name || "",
     email: user?.email || "",
@@ -22,10 +23,8 @@ const CheckoutPage = () => {
     division: "",
     phone: user?.mobileNumber || "",
   });
-
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  // Update shipping info when user data changes
   useEffect(() => {
     if (user) {
       setShippingInfo((prev) => ({
@@ -39,9 +38,7 @@ const CheckoutPage = () => {
 
   const handleShippingChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-
     setShippingInfo((prev) => ({ ...prev, [name]: value }));
-    // Clear error when user starts typing
     if (errors[name]) {
       setErrors((prev) => ({ ...prev, [name]: "" }));
     }
@@ -49,7 +46,6 @@ const CheckoutPage = () => {
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
-
     if (!shippingInfo.name) newErrors.name = "Name is required.";
     if (!shippingInfo.email) newErrors.email = "Email is required.";
     else if (!/\S+@\S+\.\S+/.test(shippingInfo.email)) {
@@ -70,7 +66,6 @@ const CheckoutPage = () => {
     }
 
     setErrors(newErrors);
-
     return Object.keys(newErrors).length === 0;
   };
 
@@ -80,37 +75,41 @@ const CheckoutPage = () => {
       return;
     }
 
-    // Simulate order placement
-    toast.success("Order placed successfully! You will pay on delivery.");
-    clearCart();
+    const orderData = {
+      items: cart.items,
+      shippingInfo,
+      paymentMethod: "CASH_ON_DELIVERY" as "CASH_ON_DELIVERY",
+    };
+
+    createOrder(orderData, {
+      onSuccess: () => {
+        clearCart();
+      },
+    });
   };
 
   return (
     <div className="container mx-auto p-4">
       <h1 className="text-3xl font-bold mb-6">Checkout</h1>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        {/* Order Summary */}
         <OrderSummary
           cart={cart}
           updateQuantity={updateQuantity}
           removeItem={removeItem}
         />
-
-        {/* Shipping Information */}
         <div className="space-y-8">
           <ShippingInformation
             shippingInfo={shippingInfo}
             errors={errors}
             handleShippingChange={handleShippingChange}
           />
-
-          {/* Place Order Button */}
           <Button
             className="w-full"
             color="success"
             size="lg"
             onPress={handlePlaceOrder}
-            isDisabled={cart.items.length === 0}
+            isDisabled={cart.items.length === 0 || isPending}
+            isLoading={isPending}
           >
             Place Order (Cash on Delivery)
           </Button>
