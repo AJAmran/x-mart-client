@@ -5,8 +5,6 @@ import clsx from "clsx";
 import { siteConfig } from "@/src/config/site";
 import { fontSans } from "@/src/config/fonts";
 import { Providers } from "@/src/lib/providers";
-import { Navbar } from "../components/UI/navbar";
-import Footer from "../components/UI/Footer";
 import { Toaster } from "sonner";
 
 export const metadata: Metadata = {

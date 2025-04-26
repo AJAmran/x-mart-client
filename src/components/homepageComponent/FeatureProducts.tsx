@@ -5,8 +5,8 @@ import { motion } from "framer-motion";
 import ProductCard from "@/src/components/UI/ProductCard";
 import { useFeaturedProducts } from "@/src/hooks/useFeaturedProducts";
 import { TProduct } from "@/src/types";
-import CardSkeletons from "../CardSkelton";
 import { Button } from "@nextui-org/button";
+import CardSkeletons from "../CardSkelton";
 
 export default function FeatureProduct() {
   const router = useRouter();
@@ -20,10 +20,9 @@ export default function FeatureProduct() {
     router.push("/shop");
   };
 
-  // Show loading state
   if (isLoading) {
     return (
-      <section className="py-8">
+      <section className="py-8" aria-label="Loading Featured Products">
         <div className="text-center mb-12">
           <h1 className="text-lg md:text-xl lg:text-3xl font-bold tracking-tight">
             Featured Products
@@ -41,10 +40,9 @@ export default function FeatureProduct() {
     );
   }
 
-  // Show error state
   if (isError) {
     return (
-      <section className="py-8">
+      <section className="py-8" aria-label="Featured Products Error">
         <div className="text-center mb-12">
           <h1 className="text-lg md:text-xl lg:text-3xl font-bold tracking-tight">
             Featured Products
@@ -52,15 +50,23 @@ export default function FeatureProduct() {
           <p className="mt-2 text-sm lg:text-base text-red-500">
             Failed to load featured products. Please try again later.
           </p>
+          <Button
+            color="primary"
+            variant="light"
+            onClick={() => window.location.reload()}
+            className="mt-4"
+            aria-label="Retry loading featured products"
+          >
+            Retry
+          </Button>
         </div>
       </section>
     );
   }
 
-  // Show empty state if no featured products are available
   if (!featuredProducts || featuredProducts.length === 0) {
     return (
-      <section className="py-8">
+      <section className="py-8" aria-label="No Featured Products">
         <div className="text-center mb-12">
           <h1 className="text-lg md:text-xl lg:text-3xl font-bold tracking-tight">
             Featured Products
@@ -68,16 +74,24 @@ export default function FeatureProduct() {
           <p className="mt-2 text-sm lg:text-base">
             No featured products available at the moment.
           </p>
+          <Button
+            color="primary"
+            variant="light"
+            onClick={handleSeeAll}
+            className="mt-4"
+            aria-label="View all products"
+          >
+            Shop Now
+          </Button>
         </div>
       </section>
     );
   }
 
-  // Limit to 12 products
   const displayedProducts = featuredProducts.slice(0, 12);
 
   return (
-    <section className="py-8">
+    <section className="py-8" aria-label="Featured Products">
       <div className="text-center mb-12">
         <h1 className="text-lg md:text-xl lg:text-3xl font-bold tracking-tight">
           Featured Products
@@ -86,19 +100,21 @@ export default function FeatureProduct() {
           Explore our top picks handpicked just for you.
         </p>
       </div>
-
-      {/* Product Grid */}
       <div className="container mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        {displayedProducts.map((product: TProduct) => (
-          <ProductCard
+        {displayedProducts.map((product: TProduct, index: number) => (
+          <motion.div
             key={product._id}
-            product={product}
-            onPress={() => handleProductClick(product._id)}
-          />
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3, delay: index * 0.1 }}
+          >
+            <ProductCard
+              product={product}
+              onPress={() => handleProductClick(product._id)}
+            />
+          </motion.div>
         ))}
       </div>
-
-      {/* See All Button */}
       <motion.div
         className="text-center mt-12"
         initial={{ opacity: 0, y: 20 }}
@@ -112,7 +128,6 @@ export default function FeatureProduct() {
           className="px-8 py-3 text-lg font-semibold rounded-full shadow-md hover:shadow-lg transition-all duration-300"
           onClick={handleSeeAll}
           aria-label="View all products in the shop"
-          role="button"
         >
           <motion.span
             whileHover={{ scale: 1.05 }}
