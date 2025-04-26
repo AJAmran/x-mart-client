@@ -2,38 +2,35 @@
 
 import { useState, useCallback } from "react";
 import {
-  Navbar as NextUINavbar,
   NavbarContent,
   NavbarMenu,
   NavbarMenuToggle,
-  NavbarBrand,
   NavbarItem,
-  NavbarMenuItem,
 } from "@nextui-org/navbar";
 import { Button } from "@nextui-org/button";
 import { Link } from "@nextui-org/link";
-import { link as linkStyles } from "@nextui-org/theme";
 import NextLink from "next/link";
-import clsx from "clsx";
 import { useRouter, usePathname } from "next/navigation";
 import { motion } from "framer-motion";
-import { Logo } from "../icons";
 import { ThemeSwitch } from "../theme-switch";
-import CategoriesDropdownContainer from "../navbar/dropdown";
 import SearchBar from "../SearchBar";
-import ProfileModal from "./ProfileModal";
+
 import { CartModal } from "../cart/CartModal";
-import { useUser } from "@/src/context/user.provider";
 import { logout } from "@/src/services/AuthService";
 import { siteConfig } from "@/src/config/site";
 import { ShoppingBagIcon } from "lucide-react";
+import { IUser } from "@/src/types";
+import ProfileModal from "../UI/ProfileModal";
 
-export const Navbar = () => {
+interface NavbarClientProps {
+  user: IUser | null;
+}
+
+export default function NavbarClient({ user }: NavbarClientProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const router = useRouter();
   const pathname = usePathname();
-  const { user, isLoading } = useUser();
 
   // Handle search submission
   const handleSearch = useCallback(
@@ -65,51 +62,7 @@ export const Navbar = () => {
   };
 
   return (
-    <NextUINavbar
-      maxWidth="2xl"
-      position="sticky"
-      className="border-b border-gray-200 dark:border-gray-800 bg-white/90 dark:bg-gray-900/90 backdrop-blur-lg shadow-sm transition-all duration-300"
-      isBordered
-      isBlurred
-      onMenuOpenChange={setIsMenuOpen}
-    >
-      {/* Brand and Navigation (Left Side) */}
-      <NavbarContent className="sm:flex gap-4" justify="start">
-        <NavbarBrand as="li" className="gap-2 max-w-fit">
-          <NextLink
-            className="flex items-center gap-2 hover:opacity-80 transition-opacity"
-            href="/"
-            aria-label="X-mart Home"
-          >
-            <Logo className="w-8 h-8 text-primary" />
-            <p className="font-extrabold text-xl tracking-tight text-gray-900 dark:text-white">
-              X-mart
-            </p>
-          </NextLink>
-        </NavbarBrand>
-        <ul className="hidden lg:flex gap-6 items-center">
-          {siteConfig.navItems.map((item) => (
-            <NavbarItem key={item.href}>
-              <NextLink
-                className={clsx(
-                  linkStyles({ color: "foreground" }),
-                  "relative px-3 py-2 text-sm font-medium transition-colors hover:text-primary rounded-md",
-                  "data-[active=true]:text-primary data-[active=true]:font-semibold",
-                  "after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-0 after:h-[2px] after:bg-primary after:transition-all hover:after:w-full"
-                )}
-                href={item.href}
-                aria-current={pathname === item.href ? "page" : undefined}
-              >
-                {item.label}
-              </NextLink>
-            </NavbarItem>
-          ))}
-          <NavbarItem>
-            <CategoriesDropdownContainer />
-          </NavbarItem>
-        </ul>
-      </NavbarContent>
-
+    <>
       {/* Desktop Actions (Right Side) */}
       <NavbarContent className="hidden lg:flex gap-3" justify="end">
         <NavbarItem>
@@ -122,22 +75,11 @@ export const Navbar = () => {
             aria-label="Search products"
           />
         </NavbarItem>
-        {isLoading ? (
-          <NavbarItem>
-            <Button isLoading color="primary" variant="flat" size="sm">
-              Loading
-            </Button>
-          </NavbarItem>
-        ) : user ? (
+        {user ? (
           <>
             <NavbarItem>
               <NextLink
-                className={clsx(
-                  linkStyles({ color: "foreground" }),
-                  "flex items-center gap-1 relative px-3 py-2 text-sm font-medium transition-colors hover:text-primary rounded-md",
-                  "data-[active=true]:text-primary data-[active=true]:font-semibold",
-                  "after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-0 after:h-[2px] after:bg-primary after:transition-all hover:after:w-full"
-                )}
+                className="flex items-center gap-1 relative px-3 py-2 text-sm font-medium transition-colors hover:text-primary rounded-md data-[active=true]:text-primary data-[active=true]:font-semibold after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-0 after:h-[2px] after:bg-primary after:transition-all hover:after:w-full"
                 href="/orders"
                 aria-current={pathname === "/orders" ? "page" : undefined}
               >
@@ -179,7 +121,6 @@ export const Navbar = () => {
                 Login
               </Button>
             </NavbarItem>
-           
           </>
         )}
         <NavbarItem>
@@ -192,30 +133,24 @@ export const Navbar = () => {
 
       {/* Mobile Actions (Right Side) */}
       <NavbarContent className="flex lg:hidden gap-2" justify="end">
-        {isLoading ? (
-          <NavbarItem>
-            <Button isLoading color="primary" variant="flat" size="sm" />
-          </NavbarItem>
-        ) : user ? (
+        {user ? (
           <NavbarItem>
             <ProfileModal user={user} />
           </NavbarItem>
         ) : (
-          <>
-            <NavbarItem>
-              <Button
-                as={Link}
-                href="/auth/login"
-                color="primary"
-                variant="flat"
-                size="sm"
-                className="font-medium"
-                aria-label="Login"
-              >
-                Login
-              </Button>
-            </NavbarItem>
-          </>
+          <NavbarItem>
+            <Button
+              as={Link}
+              href="/auth/login"
+              color="primary"
+              variant="flat"
+              size="sm"
+              className="font-medium"
+              aria-label="Login"
+            >
+              Login
+            </Button>
+          </NavbarItem>
         )}
         <NavbarItem>
           <CartModal />
@@ -226,6 +161,7 @@ export const Navbar = () => {
         <NavbarMenuToggle
           aria-label={isMenuOpen ? "Close menu" : "Open menu"}
           className="text-gray-900 dark:text-white"
+          onChange={() => setIsMenuOpen(!isMenuOpen)}
         />
       </NavbarContent>
 
@@ -243,9 +179,9 @@ export const Navbar = () => {
         </div>
         <div className="mx-4 mt-2 flex flex-col gap-3">
           {siteConfig.navMenuItems
-            .filter((item) => item.label !== "Orders" || user) // Show Orders only if user is logged in
+            .filter((item) => item.label !== "Orders" || user)
             .map((item, index) => (
-              <NavbarMenuItem key={`${item.label}-${index}`}>
+              <NavbarItem key={`${item.label}-${index}`}>
                 <motion.div
                   custom={index}
                   variants={menuItemVariants}
@@ -256,13 +192,11 @@ export const Navbar = () => {
                     as={NextLink}
                     href={item.href}
                     size="lg"
-                    className={clsx(
-                      "flex items-center gap-2 w-full py-2 text-base font-medium rounded-md",
+                    className={`flex items-center gap-2 w-full py-2 text-base font-medium rounded-md transition-colors ${
                       item.label === "Logout"
                         ? "text-danger hover:bg-danger-50 dark:hover:bg-danger-900/20"
-                        : "text-foreground hover:bg-gray-100 dark:hover:bg-gray-800",
-                      "transition-colors"
-                    )}
+                        : "text-foreground hover:bg-gray-100 dark:hover:bg-gray-800"
+                    }`}
                     onClick={item.label === "Logout" ? handleLogout : undefined}
                     aria-current={pathname === item.href ? "page" : undefined}
                   >
@@ -272,22 +206,12 @@ export const Navbar = () => {
                     {item.label}
                   </Link>
                 </motion.div>
-              </NavbarMenuItem>
+              </NavbarItem>
             ))}
-          <NavbarMenuItem>
-            <motion.div
-              custom={siteConfig.navMenuItems.length}
-              variants={menuItemVariants}
-              initial="hidden"
-              animate="visible"
-            >
-              <CategoriesDropdownContainer />
-            </motion.div>
-          </NavbarMenuItem>
           {user && user.role === "ADMIN" && (
-            <NavbarMenuItem>
+            <NavbarItem>
               <motion.div
-                custom={siteConfig.navMenuItems.length + 1}
+                custom={siteConfig.navMenuItems.length}
                 variants={menuItemVariants}
                 initial="hidden"
                 animate="visible"
@@ -302,10 +226,10 @@ export const Navbar = () => {
                   Dashboard
                 </Link>
               </motion.div>
-            </NavbarMenuItem>
+            </NavbarItem>
           )}
         </div>
       </NavbarMenu>
-    </NextUINavbar>
+    </>
   );
-};
+}
