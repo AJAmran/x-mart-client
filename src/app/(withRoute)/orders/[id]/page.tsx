@@ -92,7 +92,7 @@ const OrderDetailsPage = ({ params }: { params: Promise<{ id: string }> }) => {
   );
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-6xl">
+    <div className="py-8">
       <div className="mb-6">
         <Button
           startContent={<ArrowLeft size={18} />}
