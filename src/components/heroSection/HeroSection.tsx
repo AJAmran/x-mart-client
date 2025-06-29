@@ -63,7 +63,7 @@ const HeroSection = () => {
     },
     {
       id: 2,
-      src: "https://cdn.mos.cms.futurecdn.net/jT68rXArA7cCZq8bVwFiLV.jpg",
+      src: "https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
       alt: "Electronics Special",
       title: "Tech That Inspires",
       subtitle: "Explore new gadgets with 30% off",
@@ -71,7 +71,7 @@ const HeroSection = () => {
     },
     {
       id: 3,
-      src: "https://image.josbank.com/is/image/JosBank/111616-spring-and-summer-trends",
+      src: "https://images.unsplash.com/photo-1489987707025-afc232f7ea0f?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
       alt: "Summer Fashion",
       title: "Summer Style Unveiled",
       subtitle: "Trendy collections starting at $19.99",
@@ -82,24 +82,27 @@ const HeroSection = () => {
   const promoCards: PromoCard[] = [
     {
       id: 1,
-      icon: <Flame className="w-6 h-6 sm:w-7 sm:h-7 text-white" />,
+      icon: <Flame className="w-6 h-6 sm:w-7 sm:h-7" />,
       title: "Hot Deals",
       description: "Exclusive offers on top products",
-      bgImage: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT6fTYfAPg8BYxZdlcTYEyYOGh9_gWM3NRz6Q&s",
+      bgImage:
+        "https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
     },
     {
       id: 2,
-      icon: <Clock className="w-6 h-6 sm:w-7 sm:h-7 text-white" />,
+      icon: <Clock className="w-6 h-6 sm:w-7 sm:h-7" />,
       title: "Flash Sale",
       description: "Hurry, limited time only!",
-      bgImage: "",
+      bgImage:
+        "https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
     },
     {
       id: 3,
-      icon: <Tag className="w-6 h-6 sm:w-7 sm:h-7 text-white" />,
+      icon: <Tag className="w-6 h-6 sm:w-7 sm:h-7" />,
       title: "Daily Discounts",
       description: "Fresh deals every day",
-      bgImage: "",
+      bgImage:
+        "https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
     },
   ];
 
@@ -110,9 +113,9 @@ const HeroSection = () => {
   }
 
   return (
-    <section className="relative w-full container mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+    <section className="relative w-full container mx-auto py-6 sm:py-8">
       <div className="flex flex-col lg:flex-row gap-4 sm:gap-6">
-        {/* Promo Cards (Left Column) */}
+        {/* Promo Cards (Left Column) - Images Only with Hover Content */}
         <div className="w-full lg:w-1/4 flex flex-col gap-3 sm:gap-4 min-h-full">
           {promoCards.map((card) => (
             <Card
@@ -124,21 +127,16 @@ const HeroSection = () => {
                 src={card.bgImage}
                 alt={card.title}
                 fill
-                className="object-cover group-hover:scale-110 transition-transform duration-500 ease-out"
+                className="object-cover"
                 sizes="(max-width: 768px) 100vw, 25vw"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent flex flex-col items-start justify-end p-4 sm:p-5 text-white">
-                <div className="flex items-center gap-2 mb-2">
-                  <div className="p-2 bg-primary/80 rounded-lg group-hover:bg-primary transition-colors duration-300">
-                    {card.icon}
-                  </div>
-                  <h3 className="text-base sm:text-lg font-semibold">
-                    {card.title}
-                  </h3>
+              {/* Content appears on hover */}
+              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/60 flex flex-col items-center justify-center p-4 text-white opacity-0 group-hover:opacity-100 transition-all duration-300">
+                <div className="mb-3 p-3 bg-primary rounded-full">
+                  {card.icon}
                 </div>
-                <p className="text-xs sm:text-sm opacity-90">
-                  {card.description}
-                </p>
+                <h3 className="text-lg font-semibold">{card.title}</h3>
+                <p className="text-sm mt-1">{card.description}</p>
               </div>
             </Card>
           ))}
