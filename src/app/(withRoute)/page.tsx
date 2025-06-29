@@ -1,11 +1,13 @@
 import { Suspense } from "react";
 import { Metadata } from "next";
-import HeroSection from "@/src/components/homepageComponent/HeroSection";
+
 import Categories from "@/src/components/homepageComponent/Categories";
 import HeroSkeleton from "@/src/components/homepageComponent/HeroSkeleton";
 import CategoriesSkeleton from "@/src/components/homepageComponent/CategoriesSkeleton";
 import FeatureProduct from "@/src/components/homepageComponent/FeatureProducts";
 import FeatureProductSkeleton from "@/src/components/homepageComponent/FeatureProductSkeleton";
+import HeroSection from "@/src/components/heroSection/HeroSection";
+
 
 
 // Metadata for SEO

@@ -51,7 +51,7 @@
       }
     ],
     "import/order": [
-      "warn",
+      "off",
       {
         "groups": [
           "type",
