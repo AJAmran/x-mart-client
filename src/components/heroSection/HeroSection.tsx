@@ -86,7 +86,7 @@ const HeroSection = () => {
       title: "Hot Deals",
       description: "Exclusive offers on top products",
       bgImage:
-        "https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+        "https://media.istockphoto.com/id/1387606895/vector/hot-deal-banner-special-and-limited-offer-sale-countdown-badge-promo-sticker-with-stopwatch.jpg?s=612x612&w=0&k=20&c=MpGFvD0N4cGiBXijEP76ZbwWKMY-WwrW4cNiyZLF3h8=",
     },
     {
       id: 2,
@@ -94,7 +94,7 @@ const HeroSection = () => {
       title: "Flash Sale",
       description: "Hurry, limited time only!",
       bgImage:
-        "https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+        "https://media.istockphoto.com/id/2153946880/vector/flash-sale-logo-vector-illustration.jpg?s=612x612&w=0&k=20&c=RHppMAaB2WYtRejPYHXSZifa_coC_UlxZ6t_PWzZFcY=",
     },
     {
       id: 3,
@@ -102,7 +102,7 @@ const HeroSection = () => {
       title: "Daily Discounts",
       description: "Fresh deals every day",
       bgImage:
-        "https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSw-dc-3u7oDtNzoUNYMB3UVbDvScuEGaulWg&s",
     },
   ];
 
