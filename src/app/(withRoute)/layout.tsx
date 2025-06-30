@@ -7,7 +7,7 @@ const layout = ({ children }: { children: React.ReactNode }) => {
   return (
     <div className="relative flex flex-col h-screen">
       <Navbar />
-      <main className="container mx-auto px-6 md:px-10 flex-grow">
+      <main className="container mx-auto flex-grow">
         {children}
       </main>
       <Footer />
