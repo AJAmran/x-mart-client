@@ -7,16 +7,17 @@ import CategoriesSkeleton from "@/src/components/homepageComponent/CategoriesSke
 import FeatureProduct from "@/src/components/homepageComponent/FeatureProducts";
 import FeatureProductSkeleton from "@/src/components/homepageComponent/FeatureProductSkeleton";
 import HeroSection from "@/src/components/heroSection/HeroSection";
-
-
+import CategoriesShowcase from "@/src/components/categories/CategoriesShowcase";
 
 // Metadata for SEO
 export const metadata: Metadata = {
   title: "X-mart | Your One-Stop Shop for Groceries & More",
-  description: "Discover fresh produce, trendy kitchen gadgets, and exclusive deals at X-mart. Shop now and enjoy free shipping on select items!",
+  description:
+    "Discover fresh produce, trendy kitchen gadgets, and exclusive deals at X-mart. Shop now and enjoy free shipping on select items!",
   openGraph: {
     title: "X-mart | Your One-Stop Shop",
-    description: "Explore a wide range of groceries, household items, and more with X-mart.",
+    description:
+      "Explore a wide range of groceries, household items, and more with X-mart.",
     images: ["https://i.ibb.co.com/kMQpNqy/Smart-Blender.jpg"],
     url: "https://your-site.com",
   },
@@ -38,6 +39,9 @@ export default function HomePage() {
       {/* Featured Products Section with Suspense */}
       <Suspense fallback={<FeatureProductSkeleton />}>
         <FeatureProduct />
+      </Suspense>
+      <Suspense fallback={<FeatureProductSkeleton />}>
+        <CategoriesShowcase />
       </Suspense>
     </main>
   );

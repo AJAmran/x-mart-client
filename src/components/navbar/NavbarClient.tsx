@@ -36,8 +36,8 @@ import {
   DropdownMenu,
   DropdownTrigger,
 } from "@nextui-org/dropdown";
-import { Button } from "@nextui-org/button";
 import { Select, SelectItem } from "@nextui-org/select";
+import { MyButton } from "../UI/MyButton";
 
 interface NavbarClientProps {
   user: IUser | null;
@@ -123,7 +123,7 @@ export default function NavbarClient({ user }: NavbarClientProps) {
               <NavbarItem className="hidden sm:flex">
                 <Dropdown>
                   <DropdownTrigger>
-                    <Button
+                    <MyButton
                       variant="ghost"
                       className="flex items-center gap-2 text-sm font-semibold text-gray-700 dark:text-gray-200 hover:bg-primary-100/50 dark:hover:bg-primary-900/30 rounded-full px-4 py-2"
                       endContent={<ChevronDownIcon className="w-4 h-4" />}
@@ -137,7 +137,7 @@ export default function NavbarClient({ user }: NavbarClientProps) {
                               )?.label || "Select Area"
                           )
                         : "Select Area"}
-                    </Button>
+                    </MyButton>
                   </DropdownTrigger>
                   <DropdownMenu
                     aria-label="Area selection"
@@ -155,7 +155,7 @@ export default function NavbarClient({ user }: NavbarClientProps) {
                           </p>
                           <div className="space-y-1">
                             {area.branches.map((branch) => (
-                              <Button
+                              <MyButton
                                 key={branch.value}
                                 variant="light"
                                 className={`w-full text-left text-sm font-medium rounded-lg py-1 px-2 ${
@@ -166,7 +166,7 @@ export default function NavbarClient({ user }: NavbarClientProps) {
                                 onClick={() => handleAreaSelect(branch.value)}
                               >
                                 {branch.label}
-                              </Button>
+                              </MyButton>
                             ))}
                           </div>
                         </div>
@@ -201,7 +201,7 @@ export default function NavbarClient({ user }: NavbarClientProps) {
                 {user ? (
                   <ProfileModal user={user} />
                 ) : (
-                  <Button
+                  <MyButton
                     as={Link}
                     href="/auth/login"
                     variant="flat"
@@ -211,11 +211,11 @@ export default function NavbarClient({ user }: NavbarClientProps) {
                   >
                     <UserIcon className="w-5 h-5" />
                     Sign In
-                  </Button>
+                  </MyButton>
                 )}
               </NavbarItem>
               <NavbarItem className="hidden sm:flex">
-                <Button
+                <MyButton
                   as={Link}
                   href="/wishlist"
                   variant="light"
@@ -224,7 +224,7 @@ export default function NavbarClient({ user }: NavbarClientProps) {
                 >
                   <HeartIcon className="w-5 h-5" />
                   <span className="hidden lg:inline">Wishlist</span>
-                </Button>
+                </MyButton>
               </NavbarItem>
               <NavbarItem>
                 <CartModal />
@@ -370,7 +370,7 @@ export default function NavbarClient({ user }: NavbarClientProps) {
                   </Link>
                 </>
               ) : (
-                <Button
+                <MyButton
                   as={Link}
                   href="/auth/login"
                   color="primary"
@@ -381,7 +381,7 @@ export default function NavbarClient({ user }: NavbarClientProps) {
                 >
                   <UserIcon className="w-5 h-5" />
                   Sign In
-                </Button>
+                </MyButton>
               )}
               <div className="flex items-center gap-3 w-full py-3">
                 <ThemeSwitch />

@@ -7,6 +7,7 @@ import { useFeaturedProducts } from "@/src/hooks/useFeaturedProducts";
 import { TProduct } from "@/src/types";
 import { Button } from "@nextui-org/button";
 import CardSkeletons from "../CardSkelton";
+import { MyButton } from "../UI/MyButton";
 
 export default function FeatureProduct() {
   const router = useRouter();
@@ -100,7 +101,7 @@ export default function FeatureProduct() {
           Explore our top picks handpicked just for you.
         </p>
       </div>
-      <div className="container mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+      <div className="container mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 px-4 sm:px-6 lg:px-8">
         {displayedProducts.map((product: TProduct, index: number) => (
           <motion.div
             key={product._id}
@@ -121,7 +122,7 @@ export default function FeatureProduct() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.2 }}
       >
-        <Button
+        <MyButton
           color="primary"
           variant="solid"
           size="lg"
@@ -136,7 +137,8 @@ export default function FeatureProduct() {
           >
             See All Products
           </motion.span>
-        </Button>
+        </MyButton>
+
       </motion.div>
     </section>
   );

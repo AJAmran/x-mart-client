@@ -1,4 +1,5 @@
 import { SVGProps } from "react";
+import { PRODUCT_AVAILABILITY, PRODUCT_CATEGORY, PRODUCT_OPERATION_TYPES, PRODUCT_STATUS } from "../constants";
 
 export type IconSvgProps = SVGProps<SVGSVGElement> & {
   size?: number;
@@ -17,46 +18,51 @@ export interface IUser {
   __v?: number;
 }
 
+export type TDiscount = {
+  type: "percentage" | "fixed";
+  value: number;
+  startDate?: Date;
+  endDate?: Date;
+  applicableBranches?: string[];
+};
+
+export type TInventory = {
+  stock: number;
+  lowStockThreshold: number;
+  branchId: string;
+};
+
 export type TProduct = {
-  _id: string;
+  _id?: string;
   name: string;
   description: string;
   price: number;
-  category: string;
-  status: "ACTIVE" | "INACTIVE";
-  stock: number;
+  costPrice?: number;
+  category: keyof typeof PRODUCT_CATEGORY;
+  subCategory?: string;
+  status: keyof typeof PRODUCT_STATUS;
+  inventories: TInventory[];
   images: string[];
-  discount?: {
-    type: "percentage" | "fixed";
-    value: number;
-    startDate?: Date;
-    endDate?: Date;
+  discount?: TDiscount;
+  availability: keyof typeof PRODUCT_AVAILABILITY;
+  availableBranches?: string[];
+  operationType: keyof typeof PRODUCT_OPERATION_TYPES;
+  tags?: string[];
+  weight?: number;
+  dimensions?: {
+    length: number;
+    width: number;
+    height: number;
   };
-  createdAt: Date;
-  updatedAt: Date;
+  manufacturer?: string;
+  supplier?: string;
+  barcode?: string;
+  sku: string;
+  createdAt?: Date;
+  updatedAt?: Date;
 };
 
-// types/Product.ts
-export interface Product {
-  id: string;
-  name: string;
-  price: number;
-  imageUrl: string;
-  category: string;
-  subCategory?: string;
-  brand?: string;
-  sku?: string;
-  discount?: number;
-  inStock?: boolean;
-  description?: string;
-  rating?: number;
-  reviews?: number;
-  variants?: Variant[];
-  options?: Option[];
-  tags?: string[];
-  createdAt: Date;
-  updatedAt: Date;
-}
+
 
 export interface Variant {
   id: string;

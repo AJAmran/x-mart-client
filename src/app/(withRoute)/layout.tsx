@@ -5,13 +5,11 @@ import React from "react";
 
 const layout = ({ children }: { children: React.ReactNode }) => {
   return (
-    <div className="relative flex flex-col h-screen">
+    <>
       <Navbar />
-      <main className="container mx-auto flex-grow">
-        {children}
-      </main>
+      {children}
       <Footer />
-    </div>
+    </>
   );
 };
 

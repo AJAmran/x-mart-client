@@ -16,5 +16,12 @@ export default {
     },
   },
   darkMode: 'class',
-  plugins: [nextui()],
+plugins: [
+  nextui(),
+  function ({ addVariant }) {
+    addVariant("products-gt-1", '[data-products="1"] &');
+    addVariant("sm:products-gt-2", '[data-products>="2"] &');
+    addVariant("lg:products-gt-3", '[data-products>="3"] &');
+  },
+],
 };

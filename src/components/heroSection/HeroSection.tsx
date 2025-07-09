@@ -1,10 +1,11 @@
+"use client";
+
 import React from "react";
 import { Flame, Clock, Tag } from "lucide-react";
 import Image from "next/image";
 import { Card } from "@nextui-org/card";
 import Carousel from "./Carousel";
 
-// Define interfaces for type safety
 interface PromoCard {
   id: number;
   icon: React.ReactNode;
@@ -13,11 +14,10 @@ interface PromoCard {
   bgImage: string;
 }
 
-// Server Component for static promo card data
 const promoCards: PromoCard[] = [
   {
     id: 1,
-    icon: <Flame className="w-6 h-6 sm:w-7 sm:h-7" />,
+    icon: <Flame className="w-5 h-5 sm:w-6 sm:h-6" />,
     title: "Hot Deals",
     description: "Exclusive offers on top products",
     bgImage:
@@ -25,7 +25,7 @@ const promoCards: PromoCard[] = [
   },
   {
     id: 2,
-    icon: <Clock className="w-6 h-6 sm:w-7 sm:h-7" />,
+    icon: <Clock className="w-5 h-5 sm:w-6 sm:h-6" />,
     title: "Flash Sale",
     description: "Hurry, limited time only!",
     bgImage:
@@ -33,7 +33,7 @@ const promoCards: PromoCard[] = [
   },
   {
     id: 3,
-    icon: <Tag className="w-6 h-6 sm:w-7 sm:h-7" />,
+    icon: <Tag className="w-5 h-5 sm:w-6 sm:h-6" />,
     title: "Daily Discounts",
     description: "Fresh deals every day",
     bgImage:
@@ -41,13 +41,12 @@ const promoCards: PromoCard[] = [
   },
 ];
 
-// Client Component for HeroSection
 const HeroSection: React.FC = () => {
   return (
     <section className="relative w-full py-4 sm:py-6 md:py-8 container mx-auto px-4 sm:px-6 lg:px-8">
       <div className="flex flex-col lg:flex-row gap-4 sm:gap-6">
-        {/* Promo Cards (Left Column) */}
-        <div className="w-full lg:w-1/4 flex flex-col gap-3 sm:gap-4 min-h-full">
+        {/* Promo Cards (Left Column - Hidden on mobile) */}
+        <div className="hidden lg:flex lg:w-1/4 flex-col gap-3 sm:gap-4 min-h-full">
           {promoCards.map((card) => (
             <Card
               key={card.id}
@@ -59,14 +58,14 @@ const HeroSection: React.FC = () => {
                 alt={card.title}
                 fill
                 className="object-cover"
-                sizes="(max-width: 768px) 100vw, 25vw"
+                sizes="(max-width: 1024px) 100vw, 25vw"
                 loading="lazy"
               />
               <div className="absolute inset-0 bg-black/0 group-hover:bg-black/60 flex flex-col items-center justify-center p-4 text-white opacity-0 group-hover:opacity-100 transition-all duration-300">
-                <div className="mb-3 p-3 bg-primary rounded-full">
+                <div className="mb-2 sm:mb-3 p-2 sm:p-3 bg-primary rounded-full">
                   {card.icon}
                 </div>
-                <h3 className="text-base sm:text-lg font-semibold">
+                <h3 className="text-sm sm:text-base font-semibold">
                   {card.title}
                 </h3>
                 <p className="text-xs sm:text-sm mt-1 text-center">
@@ -77,7 +76,7 @@ const HeroSection: React.FC = () => {
           ))}
         </div>
 
-        {/* Main Carousel (Right Side) */}
+        {/* Main Carousel (Full width on mobile, 3/4 on desktop) */}
         <div className="w-full lg:w-3/4">
           <Carousel />
         </div>

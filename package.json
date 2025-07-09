@@ -18,6 +18,7 @@
 		"@heroui/select": "^2.4.16",
 		"@heroui/skeleton": "^2.2.10",
 		"@heroui/slider": "^2.4.13",
+		"@heroui/spinner": "^2.2.19",
 		"@heroui/table": "^2.2.9",
 		"@heroui/tooltip": "^2.2.13",
 		"@hookform/resolvers": "^3.10.0",
