@@ -10,6 +10,12 @@ import { Input, Textarea } from "@nextui-org/input";
 import { Select, SelectItem } from "@nextui-org/select";
 import { Button } from "@nextui-org/button";
 import { categoriesData } from "@/src/data/CategoriestData";
+import { PRODUCT_CATEGORY } from "@/src/constants";
+
+// Create a form-specific type that includes the stock field
+type ProductFormData = Omit<TProduct, "inventories"> & {
+  stock: number;
+};
 
 const AddProductForm = () => {
   const {
@@ -17,21 +23,41 @@ const AddProductForm = () => {
     handleSubmit,
     formState: { errors, isSubmitting },
     reset,
-  } = useForm<TProduct>({
+  } = useForm<ProductFormData>({
     resolver: zodResolver(productSchema),
   });
 
   const { mutate: createProduct, isPending } = useCreateProduct();
 
-  const onSubmit: SubmitHandler<TProduct> = async (data) => {
+  const onSubmit: SubmitHandler<ProductFormData> = async (data) => {
     try {
-      const updatedData = {
+      // Transform data to match TProduct type
+      const productData: TProduct = {
         ...data,
-        category: data.category.toUpperCase(),
+        category: data.category.toLowerCase() as keyof typeof PRODUCT_CATEGORY,
+        inventories: [
+          {
+            stock: Number(data.stock),
+            lowStockThreshold: 5, // Set your default threshold
+            branchId: "main-branch", // Set your default branch ID
+          },
+        ],
+        images: data.images?.[0] ? [data.images[0]] : [],
+        status: "ACTIVE", // Match your PRODUCT_STATUS enum
+        availability: "ALL_BRANCHES", // Set default availability
+        operationType: "REGULAR", // Set default operation type
+        sku: `SKU-${Date.now()}`, // Generate a default SKU or make this a required field
       };
-      console.log(updatedData);
-      createProduct(updatedData);
-      reset();
+
+      createProduct(productData, {
+        onSuccess: () => {
+          toast.success("Product created successfully");
+          reset();
+        },
+        onError: (error) => {
+          toast.error(error.message || "Failed to create product");
+        },
+      });
     } catch (error) {
       toast.error("Something went wrong! Please try again.");
     }
@@ -70,6 +96,8 @@ const AddProductForm = () => {
         placeholder="Enter product price"
         isInvalid={!!errors.price}
         errorMessage={errors.price?.message}
+        min="0"
+        step="0.01"
       />
 
       {/* Category */}
@@ -81,7 +109,10 @@ const AddProductForm = () => {
         errorMessage={errors.category?.message}
       >
         {categoriesData.map((category) => (
-          <SelectItem key={category.id} value={category.id}>
+          <SelectItem
+            key={category.id}
+            value={category.id}
+          >
             {category.name}
           </SelectItem>
         ))}
@@ -95,6 +126,7 @@ const AddProductForm = () => {
         placeholder="Enter product stock"
         isInvalid={!!errors.stock}
         errorMessage={errors.stock?.message}
+        min="0"
       />
 
       {/* Image URL */}
@@ -103,7 +135,7 @@ const AddProductForm = () => {
         label="Image URL"
         placeholder="Enter product image URL"
         isInvalid={!!errors.images}
-        errorMessage={errors.images?.message}
+        errorMessage={errors.images?.[0]?.message || errors.images?.message}
       />
 
       {/* Submit Button */}
@@ -112,6 +144,7 @@ const AddProductForm = () => {
         color="primary"
         isLoading={isPending || isSubmitting}
         disabled={isPending || isSubmitting}
+        fullWidth
       >
         {isPending || isSubmitting ? "Creating..." : "Create Product"}
       </Button>

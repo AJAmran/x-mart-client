@@ -33,7 +33,7 @@ export type TInventory = {
 };
 
 export type TProduct = {
-  _id?: string;
+  _id: string;
   name: string;
   description: string;
   price: number;
@@ -62,6 +62,23 @@ export type TProduct = {
   updatedAt?: Date;
 };
 
+
+export type ProductFilters = {
+  searchTerm?: string;
+  category?: string;
+  status?: keyof typeof PRODUCT_STATUS;
+  minPrice?: number;
+  maxPrice?: number;
+  minStock?: number;
+  maxStock?: number;
+};
+
+export type ProductOptions = {
+  page?: number;
+  limit?: number;
+  sortBy?: "name" | "price" | "createdAt" | "stock";
+  sortOrder?: "asc" | "desc";
+};
 
 
 export interface Variant {

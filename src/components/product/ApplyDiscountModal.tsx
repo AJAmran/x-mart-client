@@ -18,6 +18,11 @@ import {
 } from "@heroui/modal";
 import { DiscountIcon } from "../icons";
 import { useEffect } from "react";
+import { z } from "zod";
+import { toast } from "sonner";
+
+// Create a type for the form data based on the discount schema
+type DiscountFormData = z.infer<typeof discountSchema>;
 
 export default function ApplyDiscountModal({
   product,
@@ -29,17 +34,18 @@ export default function ApplyDiscountModal({
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const applyDiscountMutation = useApplyDiscount();
 
-  const { control, handleSubmit, reset } = useForm({
+  const { control, handleSubmit, reset } = useForm<DiscountFormData>({
     resolver: zodResolver(discountSchema),
     defaultValues: {
       type: product.discount?.type || "percentage",
       value: product.discount?.value || 0,
-      startDate: product.discount?.startDate
-        ? new Date(product.discount.startDate).toISOString().split("T")[0]
-        : "",
-      endDate: product.discount?.endDate
-        ? new Date(product.discount.endDate).toISOString().split("T")[0]
-        : "",
+      startDate: product.discount?.startDate 
+        ? new Date(product.discount.startDate) 
+        : undefined,
+      endDate: product.discount?.endDate 
+        ? new Date(product.discount.endDate) 
+        : undefined,
+      applicableBranches: product.discount?.applicableBranches || [],
     },
   });
 
@@ -48,21 +54,34 @@ export default function ApplyDiscountModal({
     reset({
       type: product.discount?.type || "percentage",
       value: product.discount?.value || 0,
-      startDate: product.discount?.startDate
-        ? new Date(product.discount.startDate).toISOString().split("T")[0]
-        : "",
-      endDate: product.discount?.endDate
-        ? new Date(product.discount.endDate).toISOString().split("T")[0]
-        : "",
+      startDate: product.discount?.startDate 
+        ? new Date(product.discount.startDate) 
+        : undefined,
+      endDate: product.discount?.endDate 
+        ? new Date(product.discount.endDate) 
+        : undefined,
+      applicableBranches: product.discount?.applicableBranches || [],
     });
   }, [product, reset]);
 
-  const onSubmit = async (data: any) => {
-    await applyDiscountMutation.mutateAsync({
-      id: product._id,
-      discount: data,
-    });
-    onOpenChange();
+  const onSubmit = async (data: DiscountFormData) => {
+    try {
+      await applyDiscountMutation.mutateAsync({
+        id: product._id,
+        discount: {
+          ...data,
+          // Ensure dates are properly formatted if they exist
+          startDate: data.startDate ? new Date(data.startDate) : undefined,
+          endDate: data.endDate ? new Date(data.endDate) : undefined,
+        },
+      });
+      toast.success(
+        product.discount ? "Discount updated successfully" : "Discount applied successfully"
+      );
+      onOpenChange();
+    } catch (error) {
+      toast.error("Failed to apply discount");
+    }
   };
 
   return (
@@ -105,8 +124,9 @@ export default function ApplyDiscountModal({
                   <Input
                     label="Discount Value"
                     type="number"
-                    value={field.value?.toString()}
+                    value={field.value.toString()}
                     onChange={(e) => field.onChange(Number(e.target.value))}
+                    min={0}
                   />
                 )}
               />
@@ -119,8 +139,8 @@ export default function ApplyDiscountModal({
                   <Input
                     label="Start Date"
                     type="date"
-                    value={field.value}
-                    onChange={field.onChange}
+                    value={field.value ? field.value.toISOString().split('T')[0] : ''}
+                    onChange={(e) => field.onChange(e.target.value ? new Date(e.target.value) : undefined)}
                   />
                 )}
               />
@@ -133,18 +153,25 @@ export default function ApplyDiscountModal({
                   <Input
                     label="End Date"
                     type="date"
-                    value={field.value}
-                    onChange={field.onChange}
+                    value={field.value ? field.value.toISOString().split('T')[0] : ''}
+                    onChange={(e) => field.onChange(e.target.value ? new Date(e.target.value) : undefined)}
+                    min={control._formValues.startDate ? 
+                      new Date(control._formValues.startDate).toISOString().split('T')[0] : 
+                      undefined}
                   />
                 )}
               />
             </ModalBody>
             <ModalFooter>
-              <Button type="submit">
+              <Button type="submit" isLoading={applyDiscountMutation.isPending}>
                 {product.discount ? "Update" : "Apply"}
               </Button>
               {product.discount && (
-                <Button color="danger" onPress={onRemoveDiscount}>
+                <Button 
+                  color="danger" 
+                  onPress={onRemoveDiscount}
+                  isLoading={applyDiscountMutation.isPending}
+                >
                   Remove Discount
                 </Button>
               )}

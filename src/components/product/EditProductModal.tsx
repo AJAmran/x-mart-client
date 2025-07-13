@@ -27,23 +27,28 @@ export default function EditProductModal({ product }: { product: TProduct }) {
     resolver: zodResolver(updateProductSchema),
     defaultValues: {
       ...product,
+      inventories: product.inventories || [
+        { stock: 0, branchId: "main-branch" },
+      ], // Ensure inventories exists
       discount: {
         type: product.discount?.type || "percentage",
         value: product.discount?.value || 0,
         startDate: product.discount?.startDate
           ? new Date(product.discount.startDate)
-          : undefined, // Ensure it's a Date
+          : undefined,
         endDate: product.discount?.endDate
           ? new Date(product.discount.endDate)
-          : undefined, // Ensure it's a Date
+          : undefined,
       },
     },
   });
 
-  // Reset form when the product changes
   useEffect(() => {
     reset({
       ...product,
+      inventories: product.inventories || [
+        { stock: 0, branchId: "main-branch" },
+      ],
       discount: {
         type: product.discount?.type || "percentage",
         value: product.discount?.value || 0,
@@ -67,13 +72,7 @@ export default function EditProductModal({ product }: { product: TProduct }) {
       <Button isIconOnly onPress={onOpen}>
         <EditIcon />
       </Button>
-      <Modal
-        isOpen={isOpen}
-        onOpenChange={onOpenChange}
-        scrollBehavior="inside" // Make the modal content scrollable
-        size="lg" // Set a larger size for the modal
-        className="max-h-[90vh]" // Limit the modal height to 90% of the viewport height
-      >
+      <Modal isOpen={isOpen} onOpenChange={onOpenChange} size="lg">
         <ModalContent>
           <form onSubmit={handleSubmit(onSubmit)}>
             <ModalHeader>Edit Product</ModalHeader>
@@ -118,9 +117,9 @@ export default function EditProductModal({ product }: { product: TProduct }) {
                 )}
               />
 
-              {/* Stock Field */}
+              {/* Stock Field - Now using inventories[0].stock */}
               <Controller
-                name="stock"
+                name="inventories.0.stock"
                 control={control}
                 render={({ field }) => (
                   <Input
@@ -128,6 +127,7 @@ export default function EditProductModal({ product }: { product: TProduct }) {
                     type="number"
                     value={field.value?.toString()}
                     onChange={(e) => field.onChange(Number(e.target.value))}
+                    min={0}
                   />
                 )}
               />
@@ -139,7 +139,7 @@ export default function EditProductModal({ product }: { product: TProduct }) {
                 render={({ field }) => (
                   <Select
                     label="Discount Type"
-                    selectedKeys={[field.value]}
+                    selectedKeys={[field.value || ""]}
                     onChange={field.onChange}
                   >
                     <SelectItem key="percentage" value="percentage">
@@ -162,6 +162,7 @@ export default function EditProductModal({ product }: { product: TProduct }) {
                     type="number"
                     value={field.value?.toString()}
                     onChange={(e) => field.onChange(Number(e.target.value))}
+                    min={0}
                   />
                 )}
               />
@@ -206,12 +207,21 @@ export default function EditProductModal({ product }: { product: TProduct }) {
                         e.target.value ? new Date(e.target.value) : undefined
                       )
                     }
+                    min={
+                      control._formValues.discount?.startDate
+                        ? new Date(control._formValues.discount.startDate)
+                            .toISOString()
+                            .split("T")[0]
+                        : undefined
+                    }
                   />
                 )}
               />
             </ModalBody>
             <ModalFooter>
-              <Button type="submit">Save</Button>
+              <Button type="submit" isLoading={updateProductMutation.isPending}>
+                Save
+              </Button>
             </ModalFooter>
           </form>
         </ModalContent>

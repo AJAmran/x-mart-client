@@ -20,9 +20,32 @@ import * as XLSX from "xlsx";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import { toast } from "sonner";
+import { PRODUCT_CATEGORY } from "@/src/constants";
+
+// Define types for filters and options
+type ProductFilters = {
+  searchTerm: string;
+  category: string;
+  minPrice: number;
+  maxPrice: number;
+  minStock: number;
+  maxStock: number;
+  status: string;
+};
+
+type ProductOptions = {
+  page: number;
+  limit: number;
+  sortBy: string;
+  sortOrder: "asc" | "desc";
+};
+
+// Utility to normalize category to uppercase
+const normalizeCategory = (category: string): string =>
+  category ? category.toUpperCase() : "";
 
 export default function ProductListPage() {
-  const [filters, setFilters] = useState({
+  const [filters, setFilters] = useState<ProductFilters>({
     searchTerm: "",
     category: "",
     minPrice: 0,
@@ -32,12 +55,7 @@ export default function ProductListPage() {
     status: "",
   });
 
-  const [options, setOptions] = useState<{
-    page: number;
-    limit: number;
-    sortBy: string;
-    sortOrder: "asc" | "desc";
-  }>({
+  const [options, setOptions] = useState<ProductOptions>({
     page: 1,
     limit: 10,
     sortBy: "createdAt",
@@ -50,19 +68,25 @@ export default function ProductListPage() {
     isLoading,
     isError,
     error,
-  } = useProducts(filters, options);
+  } = useProducts(
+    { ...filters, category: normalizeCategory(filters.category) },
+    options
+  );
 
   // Query for all products (for downloads)
   const {
     data: allProductsResponse,
     isLoading: isAllProductsLoading,
     isError: isAllProductsError,
-  } = useProducts(filters, {
-    page: 1,
-    limit: 10000, // Large limit to fetch all products
-    sortBy: "createdAt",
-    sortOrder: "desc",
-  });
+  } = useProducts(
+    { ...filters, category: normalizeCategory(filters.category) },
+    {
+      page: 1,
+      limit: 10000,
+      sortBy: "createdAt",
+      sortOrder: "desc",
+    }
+  );
 
   const deleteProductMutation = useDeleteProduct();
   const removeDiscountMutation = useRemoveDiscount();
@@ -76,18 +100,20 @@ export default function ProductListPage() {
   const handleDeleteProduct = async (id: string) => {
     try {
       await deleteProductMutation.mutateAsync(id);
-    } catch (err) {
+      toast.success("Product deleted successfully");
+    } catch (err: any) {
       console.error("Failed to delete product:", err);
-      toast.error("Failed to delete product");
+      toast.error(err.message || "Failed to delete product");
     }
   };
 
   const handleRemoveDiscount = async (id: string) => {
     try {
       await removeDiscountMutation.mutateAsync(id);
-    } catch (err) {
+      toast.success("Discount removed successfully");
+    } catch (err: any) {
       console.error("Failed to remove discount:", err);
-      toast.error("Failed to remove discount");
+      toast.error(err.message || "Failed to remove discount");
     }
   };
 
@@ -98,7 +124,11 @@ export default function ProductListPage() {
         toast.warning("Please wait, data is still loading...");
         return;
       }
-      if (isAllProductsError || allProducts.length === 0) {
+      if (
+        isAllProductsError ||
+        !allProductsResponse ||
+        allProducts.length === 0
+      ) {
         toast.error("No products available to download");
         return;
       }
@@ -108,14 +138,18 @@ export default function ProductListPage() {
           "Sl.": index + 1,
           Name: product.name,
           Price: product.price,
-          Stock: product.stock,
-          Status: product.status,
-          Category: product.category,
-          Description: product.description,
+          Stock: product.inventories?.[0]?.stock ?? 0, // Updated to use inventories
+          Status: product.status ?? "N/A",
+          Category: product.category ?? "N/A",
+          Description: product.description ?? "N/A",
           "Discount Type": product.discount?.type || "N/A",
           "Discount Value": product.discount?.value || "N/A",
-          "Created At": new Date(product.createdAt).toLocaleDateString(),
-          "Updated At": new Date(product.updatedAt).toLocaleDateString(),
+          "Created At": product.createdAt
+            ? new Date(product.createdAt).toLocaleDateString()
+            : "N/A",
+          "Updated At": product.updatedAt
+            ? new Date(product.updatedAt).toLocaleDateString()
+            : "N/A",
         })
       );
 
@@ -127,7 +161,7 @@ export default function ProductListPage() {
         `products_report_${new Date().toISOString().split("T")[0]}.xlsx`
       );
       toast.success("Excel report downloaded successfully");
-    } catch (err) {
+    } catch (err: any) {
       console.error("Failed to download Excel:", err);
       toast.error("Failed to download Excel report");
     }
@@ -140,7 +174,11 @@ export default function ProductListPage() {
         toast.warning("Please wait, data is still loading...");
         return;
       }
-      if (isAllProductsError || allProducts.length === 0) {
+      if (
+        isAllProductsError ||
+        !allProductsResponse ||
+        allProducts.length === 0
+      ) {
         toast.error("No products available to download");
         return;
       }
@@ -155,9 +193,9 @@ export default function ProductListPage() {
         index + 1,
         product.name,
         `$${product.price}`,
-        product.stock,
-        product.status,
-        product.category,
+        product.inventories?.[0]?.stock ?? 0, // Updated to use inventories
+        product.status ?? "N/A",
+        product.category ?? "N/A",
       ]);
 
       autoTable(doc, {
@@ -171,7 +209,7 @@ export default function ProductListPage() {
 
       doc.save(`products_report_${new Date().toISOString().split("T")[0]}.pdf`);
       toast.success("PDF report downloaded successfully");
-    } catch (err) {
+    } catch (err: any) {
       console.error("Failed to download PDF:", err);
       toast.error("Failed to download PDF report");
     }
@@ -192,6 +230,21 @@ export default function ProductListPage() {
                 }
                 className="max-w-xs"
               />
+              {/* Add Category Filter */}
+              <select
+                value={filters.category}
+                onChange={(e) =>
+                  setFilters({ ...filters, category: e.target.value })
+                }
+                className="max-w-xs p-2 border rounded-lg"
+              >
+                <option value="">All Categories</option>
+                {Object.values(PRODUCT_CATEGORY).map((cat) => (
+                  <option key={cat} value={cat}>
+                    {cat}
+                  </option>
+                ))}
+              </select>
             </div>
             <div className="flex gap-2">
               <Tooltip content="Download all products as Excel">
@@ -220,6 +273,13 @@ export default function ProductListPage() {
               </Tooltip>
             </div>
           </div>
+
+          {/* Error Display */}
+          {isError && (
+            <div className="text-red-500 text-center">
+              Error: {error?.message || "Failed to load products"}
+            </div>
+          )}
 
           {/* Product Table */}
           <div className="overflow-x-auto">
@@ -289,10 +349,10 @@ export default function ProductListPage() {
                         ${product.price}
                       </td>
                       <td className="px-6 py-4 text-gray-700 dark:text-gray-200">
-                        {product.stock}
+                        {product.inventories?.[0]?.stock ?? "N/A"}
                       </td>
                       <td className="px-6 py-4 text-gray-700 dark:text-gray-200">
-                        {product.status}
+                        {product.status ?? "N/A"}
                       </td>
                       <td className="px-6 py-4">
                         <div className="flex gap-2">
@@ -302,6 +362,7 @@ export default function ProductListPage() {
                               isIconOnly
                               color="danger"
                               onClick={() => handleDeleteProduct(product._id)}
+                              isDisabled={deleteProductMutation.isPending}
                             >
                               <DeleteIcon className="w-4 h-4" />
                             </Button>

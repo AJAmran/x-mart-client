@@ -58,9 +58,7 @@ const CategoryProductsSlider = ({ category }: CategoryProductsSliderProps) => {
   if (isLoading || !products?.length) {
     return (
       <div className="flex gap-4 sm:gap-6 overflow-hidden py-6 px-4 sm:px-6 lg:px-8">
-        {/* Base skeleton for category card */}
-        <Skeleton className="h-[420px] w-[280px] sm:w-[300px] lg:w-[320px] xl:w-[340px] rounded-xl flex-shrink-0 hidden sm:block" />
-        {/* Responsive skeleton loaders for products */}
+        <Skeleton className="h-[420px] w-[280px] sm:w-[300px] lg:w-[320px] xl:w-[340px] rounded-xl flex-shrink-0" />
         <div className="flex gap-4 sm:gap-6">
           <Skeleton className="h-[420px] w-[280px] sm:w-[300px] lg:w-[320px] xl:w-[340px] rounded-xl flex-shrink-0" />
           <Skeleton className="h-[420px] w-[280px] sm:w-[300px] lg:w-[320px] xl:w-[340px] rounded-xl flex-shrink-0 hidden sm:block" />
@@ -72,14 +70,16 @@ const CategoryProductsSlider = ({ category }: CategoryProductsSliderProps) => {
 
   return (
     <section className="relative py-6 px-4 sm:px-6 lg:px-8">
+      {/* Mobile category title - only shown on mobile */}
+      <h2 className="text-xl font-bold mb-4 md:hidden">
+        {categoryNames[category]}
+      </h2>
+
       <div className="relative">
-        {/* Category name on mobile */}
-        <h2 className="text-2xl font-bold text-gray-900 mb-4 sm:hidden">
-          {categoryNames[category]}
-        </h2>
         <div className="flex gap-4 sm:gap-6">
+          {/* Category card - hidden on mobile */}
           <div
-            className="flex-shrink-0 w-[280px] sm:w-[300px] lg:w-[320px] xl:w-[340px] hidden sm:block"
+            className="flex-shrink-0 w-[280px] sm:w-[300px] lg:w-[320px] xl:w-[340px] hidden md:block"
             role="region"
             aria-label={`${category} category`}
           >
@@ -101,22 +101,21 @@ const CategoryProductsSlider = ({ category }: CategoryProductsSliderProps) => {
           </div>
         </div>
 
-        {/* Navigation buttons */}
-        <div
-          className="absolute top-1/2 -translate-y-1/2 w-full px-4 sm:px-6 lg:px-8"
-          data-products={products.length}
-        >
-          <PrevButton
-            onClick={onPrevButtonClick}
-            disabled={prevBtnDisabled}
-            className="absolute -left-12 sm:-left-14 lg:-left-16 p-3 rounded-full bg-white/90 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-white transition-all z-10 hidden lg:products-gt-3:block sm:products-gt-2:block products-gt-1:block"
-          />
-          <NextButton
-            onClick={onNextButtonClick}
-            disabled={nextBtnDisabled}
-            className="absolute -right-12 sm:-right-14 lg:-right-16 p-3 rounded-full bg-white/90 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-white transition-all z-10 hidden lg:products-gt-3:block sm:products-gt-2:block products-gt-1:block"
-          />
-        </div>
+        {/* Navigation buttons - always visible if there are multiple products */}
+        {products.length > 1 && (
+          <div className="absolute top-1/2 -translate-y-1/2 w-full px-4 sm:px-6 lg:px-8">
+            <PrevButton
+              onClick={onPrevButtonClick}
+              disabled={prevBtnDisabled}
+              className="absolute -left-4 sm:-left-6 lg:-left-8 p-2 sm:p-3 rounded-full bg-white shadow-md disabled:opacity-30 disabled:cursor-not-allowed hover:bg-gray-100 transition-all z-10"
+            />
+            <NextButton
+              onClick={onNextButtonClick}
+              disabled={nextBtnDisabled}
+              className="absolute -right-4 sm:-right-6 lg:-right-8 p-2 sm:p-3 rounded-full bg-white shadow-md disabled:opacity-30 disabled:cursor-not-allowed hover:bg-gray-100 transition-all z-10"
+            />
+          </div>
+        )}
       </div>
     </section>
   );

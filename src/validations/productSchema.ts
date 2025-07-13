@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { PRODUCT_CATEGORY, PRODUCT_STATUS, PRODUCT_AVAILABILITY, PRODUCT_OPERATION_TYPES } from "@/src/types";
+import { PRODUCT_AVAILABILITY, PRODUCT_CATEGORY, PRODUCT_OPERATION_TYPES, PRODUCT_STATUS } from "../constants";
 
 // Reusable schemas
 const inventorySchema = z.object({
@@ -8,7 +8,7 @@ const inventorySchema = z.object({
   branchId: z.string().min(1, "Branch ID is required"),
 });
 
-const discountSchema = z.object({
+export const discountSchema = z.object({
   type: z.enum(["percentage", "fixed"], {
     required_error: "Discount type is required",
   }),
