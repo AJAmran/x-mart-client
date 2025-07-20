@@ -1,14 +1,10 @@
 import React from 'react';
-import NavbarClient from './NavbarClient';
 import { getCurrentUser } from '@/src/services/AuthService';
+import NavbarClient from './NavbarClient';
 
-const Navbar = async () => {
- const user = await getCurrentUser();
-  return (
-    <>
-      <NavbarClient user={user}/>
-    </>
-  );
-};
+// Server component fetching user data
+export default async function Navbar() {
+  const user = await getCurrentUser();
 
-export default Navbar;
+  return <NavbarClient user={user} />;
+}

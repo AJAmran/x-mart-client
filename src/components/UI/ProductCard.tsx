@@ -23,8 +23,6 @@ const ProductCard = ({
   const [isLoading, setIsLoading] = useState(false);
   const { addItem } = useCart();
 
-  console.log(product);
-
   const handleAddToCart = (e: any) => {
     if (e && typeof e.stopPropagation === "function") {
       e.stopPropagation(); // Prevent card click from triggering navigation

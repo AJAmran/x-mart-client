@@ -32,7 +32,7 @@ export const USER_ROLE = {
 export const USER_STATUS = {
   ACTIVE: "ACTIVE",
   BLOCKED: "BLOCKED",
-  PENDING: "PENDING", // Optional status if you need email verification
+  PENDING: "PENDING",
 } as const;
 
 export const USER_ROLE_OPTIONS = [
@@ -180,3 +180,4 @@ export const PRODUCT_OPERATION_TYPES = {
 
 export type UserRoleType = keyof typeof USER_ROLE;
 export type UserStatusType = keyof typeof USER_STATUS;
+
