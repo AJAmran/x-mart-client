@@ -29,7 +29,7 @@ const categoryNames = {
   PERSONALCARE: "Personal Care",
   HOUSEHOLD: "Household Essentials",
   STATIONERY: "Stationery",
-};
+} as const;
 
 const CategoryProductsSlider = ({ category }: CategoryProductsSliderProps) => {
   const [emblaRef, emblaApi] = useEmblaCarousel(
@@ -39,15 +39,11 @@ const CategoryProductsSlider = ({ category }: CategoryProductsSliderProps) => {
       containScroll: "trimSnaps",
       dragFree: false,
       loop: false,
-      breakpoints: {
-        "(max-width: 1024px)": { slidesToScroll: 1 },
-        "(max-width: 640px)": { slidesToScroll: 1 },
-      },
     },
     [Autoplay({ delay: 4000, stopOnInteraction: true })]
   );
 
-  const { data: products, isLoading } = useProductsByCategory(category);
+  const { data: products = [], isLoading } = useProductsByCategory(category);
   const {
     prevBtnDisabled,
     nextBtnDisabled,
@@ -55,17 +51,36 @@ const CategoryProductsSlider = ({ category }: CategoryProductsSliderProps) => {
     onNextButtonClick,
   } = usePrevNextButtons(emblaApi);
 
-  if (isLoading || !products?.length) {
+  if (isLoading) {
     return (
-      <div className="flex gap-4 sm:gap-6 overflow-hidden py-6 px-4 sm:px-6 lg:px-8">
-        <Skeleton className="h-[420px] w-[280px] sm:w-[300px] lg:w-[320px] xl:w-[340px] rounded-xl flex-shrink-0" />
-        <div className="flex gap-4 sm:gap-6">
-          <Skeleton className="h-[420px] w-[280px] sm:w-[300px] lg:w-[320px] xl:w-[340px] rounded-xl flex-shrink-0" />
-          <Skeleton className="h-[420px] w-[280px] sm:w-[300px] lg:w-[320px] xl:w-[340px] rounded-xl flex-shrink-0 hidden sm:block" />
-          <Skeleton className="h-[420px] w-[280px] sm:w-[300px] lg:w-[320px] xl:w-[340px] rounded-xl flex-shrink-0 hidden lg:block" />
+      <section className="relative py-6 px-4 sm:px-6 lg:px-8">
+        <h2 className="text-xl font-bold mb-4 md:hidden">
+          <Skeleton className="h-6 w-40" />
+        </h2>
+
+        <div className="relative">
+          <div className="flex gap-4 sm:gap-6">
+            <Skeleton
+              className="h-[420px] w-[280px] sm:w-[300px] lg:w-[320px] xl:w-[340px] rounded-xl flex-shrink-0 hidden md:block"
+            />
+            <div className="flex-1 overflow-hidden">
+              <div className="flex gap-4 sm:gap-6">
+                {Array.from({ length: 10 }).map((_, i) => (
+                  <Skeleton
+                    key={i}
+                    className="h-[420px] w-[280px] sm:w-[300px] lg:w-[320px] xl:w-[340px] rounded-xl flex-shrink-0 min-w-0 basis-[280px] sm:basis-[300px] lg:basis-[320px] xl:basis-[340px]"
+                  />
+                ))}
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
+      </section>
     );
+  }
+
+  if (!products.length) {
+    return null;
   }
 
   return (

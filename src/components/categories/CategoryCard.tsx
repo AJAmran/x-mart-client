@@ -10,17 +10,17 @@ type CategoryCardProps = {
 };
 
 const categoryImages = {
-  FISH: "https://s3-ap-southeast-1.amazonaws.com/com.meenabazaronline.v1.01/homeBanner/2024/12/31/50kHBqJjtsaarqqhjNlW7ioR1v2SGfjUyscsLBPG___tmd.webp",
-  MEAT: "https://s3-ap-southeast-1.amazonaws.com/com.meenabazaronline.v1.01/homeBanner/2024/12/31/PDk0Xxi7hP8fbLkFY8xr75iCbYcjvlEyiAqruCks___tmd.webp",
-  FRUITS: "https://s3-ap-southeast-1.amazonaws.com/com.meenabazaronline.v1.01/homeBanner/2024/12/31/Eb7O4zdvvaXarXg1y8VmMCJbshRjZvxCFBWpQsvS___tmd.webp",
-  VEGETABLES: "https://s3-ap-southeast-1.amazonaws.com/com.meenabazaronline.v1.01/homeBanner/2024/12/31/AothKQzvd4M5PNh0d0gNeIQHbgqXkzkFhEVhefyh___tmd.webp",
-  DAIRY: "https://s3-ap-southeast-1.amazonaws.com/com.meenabazaronline.v1.01/homeBanner/2024/12/31/zEfr5gjApqnDQq650zsQ32zUF3O6g9MIyPu7l1PX___tmd.webp",
-  FROZEN: "https://s3-ap-southeast-1.amazonaws.com/com.meenabazaronline.v1.01/homeBanner/2024/12/31/m3I5wBTxrYjiDD44DWH8hQClSzkxVnXLNSYwdhKZ___tmd.webp",
-  GROCERY: "https://s3-ap-southeast-1.amazonaws.com/com.meenabazaronline.v1.01/homeBanner/2024/5/12/JCjHZuLbZM6oaM9T4V5Jjr3x11U6fNAiY5aAPmfK___tmd.webp",
-  PERSONALCARE: "https://www.kindpng.com/picc/m/160-1606870_personal-care-products-png-transparent-png.png",
-  HOUSEHOLD: "",
-  STATIONERY: "",
-};
+  FISH: "/fishcategories.webp",
+  MEAT: "/chicken.webp",
+  FRUITS: "/fruts.webp",
+  VEGETABLES: "/vegitable.webp",
+  DAIRY: "/dairy.avif",
+  FROZEN: "/frozen.webp",
+  GROCERY: "/groshary.webp",
+  PERSONALCARE: "/PERSONALCARE.webp",
+  HOUSEHOLD: "/household.webp",
+  STATIONERY: "/stationery.webp",
+} as const;
 
 const categoryNames = {
   FISH: "Fresh Fish",
@@ -33,7 +33,7 @@ const categoryNames = {
   PERSONALCARE: "Personal Care",
   HOUSEHOLD: "Household Essentials",
   STATIONERY: "Stationery",
-};
+} as const;
 
 const CategoryCard = ({ category }: CategoryCardProps) => {
   return (
@@ -47,13 +47,21 @@ const CategoryCard = ({ category }: CategoryCardProps) => {
     >
       <CardBody className="p-0 relative">
         <Image
-          src={categoryImages[category] || "/placeholder.jpg"}
+          src={categoryImages[category]}
           alt={categoryNames[category]}
           width={340}
           height={420}
           className="w-full h-full object-cover"
           radius="none"
         />
+        <div className="absolute top-4 left-4 z-10">
+          <h2
+            className="text-xl sm:text-2xl lg:text-3xl font-bold text-white"
+            style={{ textShadow: "0 2px 4px rgba(0, 0, 0, 0.5)" }}
+          >
+            {categoryNames[category]}
+          </h2>
+        </div>
       </CardBody>
     </Card>
   );
