@@ -21,6 +21,14 @@ export default function FeatureProduct() {
     router.push("/shop");
   };
 
+  // Helper function to determine grid class based on product count
+  const getGridClass = (count: number) => {
+    if (count === 1) {
+      return "flex justify-center items-start";
+    }
+    return "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 justify-items-center";
+  };
+
   if (isLoading) {
     return (
       <section className="py-8" aria-label="Loading Featured Products">
@@ -32,7 +40,7 @@ export default function FeatureProduct() {
             Loading featured products...
           </p>
         </div>
-        <div className="container mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        <div className="container mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 justify-items-center">
           {Array.from({ length: 4 }).map((_, index) => (
             <CardSkeletons key={index} />
           ))}
@@ -101,13 +109,28 @@ export default function FeatureProduct() {
           Explore our top picks handpicked just for you.
         </p>
       </div>
-      <div className="container mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 px-4 sm:px-6 lg:px-8">
+
+      {/* Dynamic container that centers when only one product */}
+      <div
+        className={`
+        container mx-auto 
+        px-4 sm:px-6 lg:px-8
+        ${getGridClass(displayedProducts.length)}
+      `}
+      >
         {displayedProducts.map((product: TProduct, index: number) => (
           <motion.div
             key={product._id}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3, delay: index * 0.1 }}
+            className={`
+              ${
+                displayedProducts.length === 1
+                  ? "w-full max-w-[340px]" 
+                  : "w-full max-w-[340px]"
+              }
+            `}
           >
             <ProductCard
               product={product}
@@ -116,6 +139,7 @@ export default function FeatureProduct() {
           </motion.div>
         ))}
       </div>
+
       <motion.div
         className="text-center mt-12"
         initial={{ opacity: 0, y: 20 }}
@@ -138,7 +162,6 @@ export default function FeatureProduct() {
             See All Products
           </motion.span>
         </MyButton>
-
       </motion.div>
     </section>
   );

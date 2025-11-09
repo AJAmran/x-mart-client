@@ -95,18 +95,33 @@ export interface Option {
   price?: number;
 }
 
-// interfaces/cartInterface.ts
+
 export type TCartItem = {
   productId: string;
   quantity: number;
   price: number;
   name: string;
   image: string;
+  stock?: number;
 };
 
 export type TCart = {
   items: TCartItem[];
   totalPrice: number;
+  totalItems: number;
+};
+
+export type TWishlistItem = {
+  productId: string;
+  price: number;
+  name: string;
+  image: string;
+  stock?: number;
+  addedAt: string;
+};
+
+export type TWishlist = {
+  items: TWishlistItem[];
   totalItems: number;
 };
 

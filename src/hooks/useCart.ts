@@ -1,3 +1,4 @@
+// hooks/useCart.ts
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { TCart, TCartItem } from "../types";
@@ -9,7 +10,12 @@ export const useCart = () => {
   const { data: cart } = useQuery<TCart>({
     queryKey: ["cart"],
     queryFn: () => {
+      if (typeof window === "undefined") {
+        return { items: [], totalPrice: 0, totalItems: 0 };
+      }
+      
       const localCart = JSON.parse(localStorage.getItem("cart") || "[]");
+
       return {
         items: localCart,
         totalPrice: localCart.reduce(
@@ -54,14 +60,12 @@ export const useCart = () => {
     let updatedItems: TCartItem[];
 
     if (existingItem) {
-      // If the item already exists, update its quantity
       updatedItems = cart.items.map((i) =>
         i.productId === item.productId
           ? { ...i, quantity: i.quantity + item.quantity }
           : i
       );
     } else {
-      // If the item doesn't exist, add it to the cart
       updatedItems = [...cart.items, item];
     }
 
@@ -76,6 +80,7 @@ export const useCart = () => {
     const updatedItems = cart.items.filter(
       (item) => item.productId !== productId
     );
+
     updateCartMutation.mutate(updatedItems);
     toast.success("Item removed from cart!");
   };
@@ -83,9 +88,17 @@ export const useCart = () => {
   // Update item quantity in cart
   const updateQuantity = (productId: string, quantity: number) => {
     if (!cart) return;
+    
+    if (quantity <= 0) {
+      removeItem(productId);
+
+      return;
+    }
+
     const updatedItems = cart.items.map((item) =>
       item.productId === productId ? { ...item, quantity } : item
     );
+
     updateCartMutation.mutate(updatedItems);
   };
 
@@ -95,11 +108,19 @@ export const useCart = () => {
     toast.success("Cart cleared!");
   };
 
+  // Check if item is in cart
+  const isInCart = (productId: string): boolean => {
+    if (!cart) return false;
+    
+    return cart.items.some(item => item.productId === productId);
+  };
+
   return {
     cart: cart || { items: [], totalPrice: 0, totalItems: 0 },
     addItem,
     removeItem,
     updateQuantity,
     clearCart,
+    isInCart,
   };
 };

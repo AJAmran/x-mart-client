@@ -19,6 +19,12 @@ export default function MainNavigation({ categories }: MainNavigationProps) {
           <div className="flex items-center gap-6 sm:gap-8">
             <CategoriesDropdownClient categories={categories} buttonText="Shop by Category" />
             <NextLink
+              href="/shop"
+              className="text-sm font-semibold text-white hover:text-blue-200"
+            >
+              Shop
+            </NextLink>
+            <NextLink
               href="/track-order"
               className="text-sm font-semibold text-white hover:text-blue-200"
             >

@@ -5,9 +5,10 @@ import { Button } from "@nextui-org/button";
 import { Image } from "@nextui-org/image";
 import { useState } from "react";
 import { TProduct } from "@/src/types";
-import { ShoppingCart, Eye, Tag } from "lucide-react";
+import { ShoppingCart, Eye, Tag, Heart } from "lucide-react";
 import Link from "next/link";
 import { useCart } from "@/src/hooks/useCart";
+import { useWishlist } from "@/src/hooks/useWishlist";
 
 type ProductCardProps = {
   product: TProduct;
@@ -21,32 +22,67 @@ const ProductCard = ({
   onPress,
 }: ProductCardProps) => {
   const [isLoading, setIsLoading] = useState(false);
-  const { addItem } = useCart();
+  const [isWishlistLoading, setIsWishlistLoading] = useState(false);
+  const { addItem, isInCart } = useCart();
+  const { addItem: addToWishlist, removeItem: removeFromWishlist, isInWishlist } = useWishlist();
 
-  const handleAddToCart = (e: any) => {
-    if (e && typeof e.stopPropagation === "function") {
-      e.stopPropagation(); // Prevent card click from triggering navigation
-    }
+  const handleAddToCart = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+
     setIsLoading(true);
     if (!product._id) {
       setIsLoading(false);
       return;
     }
+
     const cartItem = {
       productId: product._id,
       quantity: 1,
       price: product.price,
       name: product.name,
       image: product.images?.[0] || "/placeholder.jpg",
+      stock: product.inventories?.[0]?.stock,
     };
+
     addItem(cartItem);
     setTimeout(() => {
       setIsLoading(false);
-    }, 1000);
+    }, 500);
+  };
+
+  const handleWishlistToggle = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    setIsWishlistLoading(true);
+
+    if (!product._id) {
+      setIsWishlistLoading(false);
+      return;
+    }
+
+    const wishlistItem = {
+      productId: product._id,
+      price: product.price,
+      name: product.name,
+      image: product.images?.[0] || "/placeholder.jpg",
+      stock: product.inventories?.[0]?.stock,
+    };
+
+    if (isInWishlist(product._id)) {
+      removeFromWishlist(product._id);
+    } else {
+      addToWishlist(wishlistItem);
+    }
+
+    setTimeout(() => {
+      setIsWishlistLoading(false);
+    }, 500);
   };
 
   const handleCardClick = () => {
-    if (onPress) onPress(); // Trigger custom onPress if provided
+    if (onPress) onPress();
   };
 
   const discountedPrice = product?.discount?.value
@@ -54,6 +90,9 @@ const ProductCard = ({
       ? (product.price * (1 - product.discount.value / 100)).toFixed(2)
       : (product.price - product.discount.value).toFixed(2)
     : product.price;
+
+  const isProductInCart = isInCart(product._id);
+  const isProductInWishlist = isInWishlist(product._id);
 
   if (variant === "category") {
     return (
@@ -83,7 +122,7 @@ const ProductCard = ({
                 color="primary"
                 size="sm"
                 className="mt-3 bg-primary-600 text-white hover:bg-primary-700"
-                onClick={(e) => e.stopPropagation()} // Prevent card click
+                onClick={(e) => e.stopPropagation()}
               >
                 Shop Now
               </Button>
@@ -102,18 +141,33 @@ const ProductCard = ({
     >
       <Card
         shadow="sm"
-        className="h-full border rounded-xl overflow-hidden hover:shadow-lg transition-shadow duration-300 bg-white"
+        className="h-full border rounded-xl overflow-hidden hover:shadow-lg transition-shadow duration-300 bg-white relative"
         role="presentation"
         onClick={handleCardClick}
       >
         {/* Discount Badge */}
         {(product?.discount?.value ?? 0) > 0 && (
-          <div className="absolute top-3 right-3 z-40 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full flex items-center">
+          <div className="absolute top-3 left-3 z-40 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full flex items-center">
             <Tag size={12} className="mr-1" />
             {product.discount?.value}
             {product.discount?.type === "percentage" ? "%" : "৳"} OFF
           </div>
         )}
+
+        {/* Wishlist Button */}
+        <Button
+          isIconOnly
+          size="sm"
+          variant="flat"
+          className="absolute top-3 right-3 z-40 bg-white/90 backdrop-blur-sm"
+          onClick={handleWishlistToggle} // ✅ FIXED
+          isLoading={isWishlistLoading}
+        >
+          <Heart
+            size={16}
+            className={isProductInWishlist ? "fill-red-500 text-red-500" : ""}
+          />
+        </Button>
 
         {/* Image Section */}
         <div className="relative flex justify-center items-center bg-gray-50 p-4">
@@ -163,22 +217,27 @@ const ProductCard = ({
             startContent={<Eye size={16} />}
             size="sm"
             onClick={(e) => {
-              e.stopPropagation(); // Prevent card click
-              window.location.href = `/product/${product._id}`; // Manual navigation
+              e.preventDefault();
+              e.stopPropagation();
+              window.location.href = `/product/${product._id}`;
             }}
           >
             Details
           </Button>
           <Button
             variant="solid"
-            color="primary"
+            color={isProductInCart ? "success" : "primary"}
             isLoading={isLoading}
             isDisabled={!product.inventories?.[0]?.stock}
-            startContent={<ShoppingCart size={16} />}
+            startContent={isProductInCart ? null : <ShoppingCart size={16} />}
             size="sm"
-            onPress={handleAddToCart}
+            onClick={handleAddToCart} // ✅ FIXED
           >
-            {product.inventories?.[0]?.stock > 0 ? "Add to Cart" : "Out of Stock"}
+            {isProductInCart
+              ? "In Cart"
+              : product.inventories?.[0]?.stock > 0
+              ? "Add to Cart"
+              : "Out of Stock"}
           </Button>
         </CardFooter>
       </Card>

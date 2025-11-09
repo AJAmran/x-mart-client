@@ -138,7 +138,7 @@ export default function ProductListPage() {
           "Sl.": index + 1,
           Name: product.name,
           Price: product.price,
-          Stock: product.inventories?.[0]?.stock ?? 0, // Updated to use inventories
+          Stock: product.inventories?.[0]?.stock ?? 0,
           Status: product.status ?? "N/A",
           Category: product.category ?? "N/A",
           Description: product.description ?? "N/A",
@@ -193,7 +193,7 @@ export default function ProductListPage() {
         index + 1,
         product.name,
         `$${product.price}`,
-        product.inventories?.[0]?.stock ?? 0, // Updated to use inventories
+        product.inventories?.[0]?.stock ?? 0,
         product.status ?? "N/A",
         product.category ?? "N/A",
       ]);

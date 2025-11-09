@@ -1,8 +1,9 @@
+// components/cart/CartItem.tsx
 "use client";
 
 import { Button } from "@nextui-org/button";
 import { Image } from "@nextui-org/image";
-
+import { Minus, Plus, Trash2 } from "lucide-react";
 import { useCart } from "@/src/hooks/useCart";
 import { TCartItem } from "@/src/types";
 
@@ -13,10 +14,22 @@ interface CartItemProps {
 export const CartItem = ({ item }: CartItemProps) => {
   const { updateQuantity, removeItem } = useCart();
 
+  const handleDecrease = () => {
+    if (item.quantity > 1) {
+      updateQuantity(item.productId, item.quantity - 1);
+    } else {
+      removeItem(item.productId);
+    }
+  };
+
+  const handleIncrease = () => {
+    updateQuantity(item.productId, item.quantity + 1);
+  };
+
   return (
-    <div className="flex justify-between items-center p-4 border-b dark:border-gray-700">
-      {/* Product Image and Details */}
-      <div className="flex items-center gap-4">
+    <div className="flex gap-4 p-4 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+      {/* Product Image */}
+      <div className="flex-shrink-0">
         <Image
           src={item.image || "/placeholder.jpg"}
           alt={item.name}
@@ -24,38 +37,56 @@ export const CartItem = ({ item }: CartItemProps) => {
           height={80}
           className="w-20 h-20 object-cover rounded-lg"
         />
-        <div>
-          <h4 className="font-bold">{item.name}</h4>
-          <p className="text-sm text-gray-500">Unit Price: ৳{item.price}</p>
-          <p className="text-sm text-gray-500">
-            Total: ৳{(item.price * item.quantity).toFixed(2)}
-          </p>
-        </div>
       </div>
 
-      {/* Quantity Controls and Remove Button */}
-      <div className="flex items-center gap-2">
+      {/* Product Details */}
+      <div className="flex-1 min-w-0">
+        <h4 className="font-semibold text-sm text-gray-900 dark:text-white truncate">
+          {item.name}
+        </h4>
+        <p className="text-sm text-gray-500 mt-1">Unit Price: ৳{item.price}</p>
+        <p className="text-sm font-semibold text-green-600 mt-1">
+          Total: ৳{(item.price * item.quantity).toFixed(2)}
+        </p>
+      </div>
+
+      {/* Quantity Controls */}
+      <div className="flex flex-col items-end gap-3 flex-shrink-0">
+        <div className="flex items-center gap-2">
+          <Button
+            isIconOnly
+            size="sm"
+            variant="flat"
+            onPress={handleDecrease}
+            aria-label="Decrease quantity"
+          >
+            <Minus size={14} />
+          </Button>
+          
+          <span className="w-8 text-center font-medium text-sm">
+            {item.quantity}
+          </span>
+          
+          <Button
+            isIconOnly
+            size="sm"
+            variant="flat"
+            onPress={handleIncrease}
+            aria-label="Increase quantity"
+          >
+            <Plus size={14} />
+          </Button>
+        </div>
+        
         <Button
-          size="sm"
-          onPress={() => updateQuantity(item.productId, item.quantity - 1)}
-          isDisabled={item.quantity <= 1}
-        >
-          -
-        </Button>
-        <span>{item.quantity}</span>
-        <Button
-          size="sm"
-          onPress={() => updateQuantity(item.productId, item.quantity + 1)}
-        >
-          +
-        </Button>
-        <Button
+          isIconOnly
           size="sm"
           color="danger"
           variant="light"
           onPress={() => removeItem(item.productId)}
+          aria-label="Remove item"
         >
-          Remove
+          <Trash2 size={14} />
         </Button>
       </div>
     </div>
