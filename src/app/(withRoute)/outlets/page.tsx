@@ -1,3 +1,4 @@
+// app/outlets/page.tsx
 import { OutletCard } from "@/src/components/outlets/OutletCard";
 import { SearchAndFilter } from "@/src/components/outlets/SearchAndFilter";
 import { TBranch } from "@/src/interface/branch";
@@ -5,18 +6,29 @@ import { getAllBranches } from "@/src/services/BranchService";
 import { MapPin, Clock, Phone, Globe } from "lucide-react";
 import Image from "next/image";
 
-export default async function OutletsPage() {
-  const { data: outlets } = await getAllBranches(
-    { status: "active" },
-    { limit: 12 }
-  );
+// Force dynamic rendering
+export const dynamic = 'force-dynamic';
+// Or alternatively, you can use:
+// export const revalidate = 0;
 
-  console.log("Fetched outlets:", outlets); 
+export default async function OutletsPage() {
+  let outlets: TBranch[] = [];
+  
+  try {
+    const response = await getAllBranches(
+      { status: "active" },
+      { limit: 12 }
+    );
+    outlets = response.data || [];
+  } catch (error) {
+    console.error("Error fetching outlets:", error);
+    outlets = [];
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Hero Section */}
-      <section className="relativee">
+      <section className="relative">
         <div className="container mx-auto px-4 py-24 md:py-32">
           <div className="max-w-3xl mx-auto text-center">
             <h1 className="text-4xl md:text-5xl font-bold mb-6">Our Outlets</h1>
@@ -72,17 +84,25 @@ export default async function OutletsPage() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {outlets.map((outlet: TBranch) => (
-              <OutletCard key={outlet._id} outlet={outlet} />
-            ))}
-          </div>
+          {outlets.length > 0 ? (
+            <>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {outlets.map((outlet: TBranch) => (
+                  <OutletCard key={outlet._id} outlet={outlet} />
+                ))}
+              </div>
 
-          <div className="mt-12 text-center">
-            <button className="px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors shadow-md">
-              Load More Locations
-            </button>
-          </div>
+              <div className="mt-12 text-center">
+                <button className="px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors shadow-md">
+                  Load More Locations
+                </button>
+              </div>
+            </>
+          ) : (
+            <div className="text-center py-12">
+              <p className="text-gray-500 text-lg">No outlets available at the moment.</p>
+            </div>
+          )}
         </div>
       </section>
 
