@@ -18,10 +18,10 @@ import {
 import { Tooltip } from "@heroui/tooltip";
 import { Button } from "@nextui-org/button";
 import { Input } from "@nextui-org/input";
+import { Chip } from "@heroui/chip";
 import {
   FileSpreadsheet,
   FileText,
-  PlusIcon,
   RefreshCw,
   SearchIcon,
 } from "lucide-react";
@@ -108,14 +108,22 @@ const UserManagementPage = () => {
       </div>
 
       {/* Table */}
-      <Table aria-label="Users table" className="mt-4">
+      <Table
+        aria-label="Users table"
+        className="mt-4"
+        shadow="none"
+        classNames={{
+          wrapper: "bg-white/70 dark:bg-gray-800/70 backdrop-blur-md border-none",
+          th: "bg-gray-100/50 dark:bg-gray-900/50 text-default-600",
+        }}
+      >
         <TableHeader>
-          <TableColumn>NAME</TableColumn>
+          <TableColumn>USER</TableColumn>
           <TableColumn>EMAIL</TableColumn>
           <TableColumn>PHONE</TableColumn>
           <TableColumn>ROLE</TableColumn>
           <TableColumn>STATUS</TableColumn>
-          <TableColumn>ACTIONS</TableColumn>
+          <TableColumn align="center">ACTIONS</TableColumn>
         </TableHeader>
 
         <TableBody
@@ -124,30 +132,39 @@ const UserManagementPage = () => {
           emptyContent="No users found"
         >
           {users.map((user: any) => (
-            <TableRow key={user._id}>
-              <TableCell className="flex items-center gap-2">
-                {user.profilePhoto ? (
-                  <img
-                    src={user.profilePhoto}
-                    alt={user.name}
-                    className="w-8 h-8 rounded-full"
-                  />
-                ) : (
-                  <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center font-medium text-gray-600">
-                    {user.name.charAt(0)}
+            <TableRow key={user._id} className="border-b border-gray-100 dark:border-gray-800 last:border-none">
+              <TableCell>
+                <div className="flex items-center gap-3">
+                  {user.profilePhoto ? (
+                    <img
+                      src={user.profilePhoto}
+                      alt={user.name}
+                      className="w-10 h-10 rounded-full object-cover border-2 border-primary/20"
+                    />
+                  ) : (
+                    <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center font-bold text-primary">
+                      {user.name.charAt(0)}
+                    </div>
+                  )}
+                  <div className="flex flex-col">
+                    <span className="font-semibold text-sm">{user.name}</span>
+                    <span className="text-tiny text-default-400 capitalize">{user.role.toLowerCase()}</span>
                   </div>
-                )}
-                {user.name}
+                </div>
               </TableCell>
-              <TableCell>{user.email}</TableCell>
-              <TableCell>{user.mobileNumber || "-"}</TableCell>
+              <TableCell>
+                <span className="text-sm font-medium">{user.email}</span>
+              </TableCell>
+              <TableCell>
+                <span className="text-sm text-default-500">{user.mobileNumber || "N/A"}</span>
+              </TableCell>
               <TableCell>
                 <Select
                   size="sm"
-                  variant="underlined"
+                  variant="bordered"
                   selectedKeys={[user.role]}
                   onChange={(e) => handleRoleChange(user._id, e.target.value)}
-                  className="w-24"
+                  className="w-32"
                 >
                   {Object.entries(USER_ROLE).map(([key, value]) => (
                     <SelectItem key={key}>
@@ -157,22 +174,22 @@ const UserManagementPage = () => {
                 </Select>
               </TableCell>
               <TableCell>
-                <span
-                  className={`px-2 py-1 rounded-full text-xs ${
-                    user.status === "ACTIVE"
-                      ? "bg-green-100 text-green-800"
-                      : "bg-red-100 text-red-800"
-                  }`}
+                <Chip
+                  size="sm"
+                  variant="flat"
+                  color={user.status === "ACTIVE" ? "success" : "danger"}
                 >
                   {user.status}
-                </span>
+                </Chip>
               </TableCell>
               <TableCell>
-                <UserActions
-                  user={user}
-                  onEdit={() => handleOpenForm(user)}
-                  onDelete={refetch}
-                />
+                <div className="flex justify-center">
+                  <UserActions
+                    user={user}
+                    onEdit={() => handleOpenForm(user)}
+                    onDelete={refetch}
+                  />
+                </div>
               </TableCell>
             </TableRow>
           ))}
@@ -183,22 +200,16 @@ const UserManagementPage = () => {
       <div className="flex justify-between items-center mt-4">
         <Select
           size="sm"
-          className="w-20"
+          className="w-48"
           selectedKeys={[limit.toString()]}
           onChange={(e) => setLimit(Number(e.target.value))}
+          label="Rows per page"
+          labelPlacement="outside-left"
         >
-          <SelectItem key="10">
-            10
-          </SelectItem>
-          <SelectItem key="25">
-            25
-          </SelectItem>
-          <SelectItem key="50">
-            50
-          </SelectItem>
-          <SelectItem key="100">
-            100
-          </SelectItem>
+          <SelectItem key="10">10 per page</SelectItem>
+          <SelectItem key="25">25 per page</SelectItem>
+          <SelectItem key="50">50 per page</SelectItem>
+          <SelectItem key="100">100 per page</SelectItem>
         </Select>
 
         <Pagination
@@ -206,6 +217,8 @@ const UserManagementPage = () => {
           page={page}
           onChange={setPage}
           showControls
+          variant="flat"
+          color="primary"
         />
       </div>
 

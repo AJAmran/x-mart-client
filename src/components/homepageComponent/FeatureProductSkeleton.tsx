@@ -1,5 +1,5 @@
 import { Skeleton } from "@heroui/skeleton";
-import CardSkeletons from "../CardSkelton";
+import CardSkeletons from "../CardSkeleton";
 
 
 export default function FeatureProductSkeleton() {

@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { DAYS_OF_WEEK } from "../constant/branch";
+import { DAYS_OF_WEEK } from "../constants/branch";
 
 const contactSchema = z.object({
   phone: z.string().min(1, "Phone number is required"),

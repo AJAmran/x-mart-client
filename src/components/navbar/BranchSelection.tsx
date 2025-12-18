@@ -4,7 +4,6 @@ import React, { useState, useEffect, useMemo } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Dropdown, DropdownItem, DropdownMenu, DropdownTrigger } from "@nextui-org/dropdown";
 import { Select, SelectItem } from "@nextui-org/select";
-import { Card, CardBody } from "@nextui-org/card";
 import { MapPinIcon, ChevronDownIcon } from "lucide-react";
 import { Skeleton } from "@heroui/skeleton";
 import { MyButton } from "../UI/MyButton";
@@ -29,34 +28,10 @@ export default function BranchSelector({ isMobile = false }: BranchSelectorProps
     return [];
   }, [branchesResponse]);
 
-  const branchAreas = useMemo(() => {
-    if (!Array.isArray(branches)) return [];
-    const areasMap = new Map<
-      string,
-      { label: string; branches: Array<{ label: string; value: string; branch: TBranch }> }
-    >();
-
-    branches.forEach((branch: TBranch) => {
-      if (!branch?._id || !branch?.location?.city) return;
-      const city = branch.location.city;
-
-      if (!areasMap.has(city)) {
-        areasMap.set(city, { label: city, branches: [] });
-      }
-      areasMap.get(city)?.branches.push({
-        label: branch.name,
-        value: branch._id,
-        branch,
-      });
-    });
-
-    return Array.from(areasMap.values());
-  }, [branches]);
-
   const selectedBranchName = useMemo(() => {
     if (!selectedBranch) return "Select Branch";
     const branch = branches.find((b) => b._id === selectedBranch);
-    
+
     return branch ? branch.name : "Select Branch";
   }, [selectedBranch, branches]);
 
@@ -74,7 +49,7 @@ export default function BranchSelector({ isMobile = false }: BranchSelectorProps
 
   const handleBranchSelect = (branchId: string) => {
     const params = new URLSearchParams(searchParams.toString());
-    
+
     params.set("branch", branchId);
     setSelectedBranch(branchId);
     localStorage.setItem("selectedBranch", branchId);
@@ -95,8 +70,8 @@ export default function BranchSelector({ isMobile = false }: BranchSelectorProps
       >
         {branches.map((branch) => (
           <SelectItem
-            key={branch._id}
-            value={branch._id}
+            key={branch._id || ""}
+            value={branch._id || ""}
             textValue={branch.name}
           >
             <div className="flex flex-col">
@@ -114,59 +89,39 @@ export default function BranchSelector({ isMobile = false }: BranchSelectorProps
   return isLoading ? (
     <Skeleton className="h-10 w-40 rounded-full" />
   ) : (
-    <Dropdown>
+    <Dropdown placement="bottom-start" backdrop="blur">
       <DropdownTrigger>
         <MyButton
-          variant="ghost"
-          className="flex items-center gap-2 text-sm font-semibold text-gray-700 dark:text-gray-200 hover:bg-primary-100/50 dark:hover:bg-primary-900/30 rounded-full px-4 py-2"
-          endContent={<ChevronDownIcon className="w-4 h-4" />}
-          startContent={<MapPinIcon className="w-5 h-5" />}
+          variant="flat"
+          className="flex items-center gap-2 text-sm font-bold bg-primary-50 dark:bg-primary-900/20 text-primary-700 dark:text-primary-300 rounded-2xl px-5 py-2 hover:opacity-80 transition-opacity"
+          endContent={<ChevronDownIcon className="w-3 h-3" />}
+          startContent={<MapPinIcon className="w-4 h-4" />}
         >
           {selectedBranchName}
         </MyButton>
       </DropdownTrigger>
       <DropdownMenu
         aria-label="Branch selection"
-        className="w-[400px] max-h-[500px] overflow-y-auto p-2"
-        itemClasses={{ base: "gap-4" }}
+        className="w-[350px] p-2"
+        variant="flat"
       >
-        {branchAreas.map((area) => (
-          <DropdownItem key={area.label} textValue={area.label} className="group" isReadOnly>
-            <div className="w-full">
-              <h3 className="text-lg font-bold text-gray-800 dark:text-gray-100 mb-2">
-                Select Area
-              </h3>
-              <div className="grid grid-cols-1 gap-2">
-                {area.branches.map((branch) => (
-                  <Card
-                    key={branch.value}
-                    isPressable
-                    onPress={() => handleBranchSelect(branch.value)}
-                    className={`border-2 ${
-                      selectedBranch === branch.value
-                        ? "border-primary-500 dark:border-primary-400"
-                        : "border-transparent hover:border-gray-200 dark:hover:border-gray-700"
-                    }`}
-                  >
-                    <CardBody className="p-3">
-                      <div className="flex gap-3">
-                        <div className="flex flex-col">
-                          <h4 className="font-semibold">{branch.label}</h4>
-                          <p className="text-sm text-gray-600 dark:text-gray-400">
-                            {branch.branch.location.address}
-                          </p>
-                          <div className="flex items-center mt-1">
-                            <MapPinIcon className="w-4 h-4 text-primary-500 mr-1" />
-                            <span className="text-xs text-gray-500 dark:text-gray-400">
-                              {branch.branch.location.city}, {branch.branch.location.state}
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                    </CardBody>
-                  </Card>
-                ))}
+        {branches.map((branch) => (
+          <DropdownItem
+            key={branch._id || ""}
+            textValue={branch.name}
+            onPress={() => branch._id && handleBranchSelect(branch._id)}
+            className={`py-3 ${selectedBranch === branch._id ? "bg-primary/10" : ""}`}
+            startContent={
+              <div className="p-2 bg-primary/10 rounded-xl">
+                <MapPinIcon className="w-4 h-4 text-primary" />
               </div>
+            }
+          >
+            <div className="flex flex-col gap-0.5">
+              <span className="font-bold text-sm text-default-700">{branch.name}</span>
+              <span className="text-tiny text-default-400 font-medium">
+                {branch.location.address}, {branch.location.city}
+              </span>
             </div>
           </DropdownItem>
         ))}

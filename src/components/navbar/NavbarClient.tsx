@@ -14,7 +14,7 @@ import UserActions from "./UserActions";
 import MobileMenu from "./MobileMenu";
 import MainNavigation from "./MainNavigation";
 import { IUser } from "@/src/types";
-import { categoriesData } from "@/src/data/CategoriestData";
+import { categoriesData } from "@/src/data/CategoriesData";
 import SearchBar from "../SearchBar";
 import BranchSelector from "./BranchSelection";
 

@@ -1,7 +1,9 @@
 // siteConfig.ts
 export const siteConfig = {
   name: "X-mart",
-  description: "Make beautiful websites regardless of your design experience.",
+  description: "X-mart - Your ultimate destination for fresh groceries, premium kitchenware, and daily essentials. Fast delivery and best prices guaranteed.",
+  url: "https://x-mart-client.vercel.app", // Assuming a deployment URL
+  ogImage: "https://i.ibb.co.com/kMQpNqy/Smart-Blender.jpg",
   navItems: [
     {
       label: "Shop",
@@ -54,4 +56,9 @@ export const siteConfig = {
       href: "#",
     },
   ],
+  links: {
+    github: "https://github.com/AJAmran/x-mart-client",
+    twitter: "https://twitter.com/xmart",
+    facebook: "https://facebook.com/xmart",
+  },
 };

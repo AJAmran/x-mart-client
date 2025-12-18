@@ -19,7 +19,7 @@ import { ThemeSwitch } from "../theme-switch";
 import { IUser } from "@/src/types";
 
 import BranchSelector from "./BranchSelection";
-import { Category } from "@/src/data/CategoriestData";
+import { Category } from "@/src/data/CategoriesData";
 
 interface MobileMenuProps {
   user: IUser | null;

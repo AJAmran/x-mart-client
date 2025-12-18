@@ -6,7 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { TProduct } from "@/src/types";
 import { updateProductSchema } from "@/src/validations/productSchema";
 import { Button } from "@nextui-org/button";
-import { EditIcon } from "lucide-react";
+import { EditIcon } from "@/src/components/icons";
 import {
   Modal,
   ModalBody,
@@ -210,8 +210,8 @@ export default function EditProductModal({ product }: { product: TProduct }) {
                     min={
                       control._formValues.discount?.startDate
                         ? new Date(control._formValues.discount.startDate)
-                            .toISOString()
-                            .split("T")[0]
+                          .toISOString()
+                          .split("T")[0]
                         : undefined
                     }
                   />

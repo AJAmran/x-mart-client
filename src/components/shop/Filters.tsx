@@ -7,7 +7,8 @@ import { Card, CardBody } from "@nextui-org/card";
 import { Select, SelectItem } from "@nextui-org/select";
 import { Button } from "@nextui-org/button";
 import { Slider } from "@heroui/slider";
-import { Category } from "@/src/data/CategoriestData";
+import { Category } from "@/src/data/CategoriesData";
+import { RefreshCw } from "lucide-react";
 
 interface FiltersProps {
   categories: Category[];
@@ -212,52 +213,55 @@ export default function Filters({ categories, initialFilters }: FiltersProps) {
 
         {/* Category Filter */}
         <div>
-          <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-gray-100">
+          <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-gray-100 flex items-center justify-between">
             Category
-          </h3>
-          <div className="grid grid-cols-1 gap-3">
-            {categories.map((category) => (
-              <label
-                key={category.id}
-                className="flex items-center cursor-pointer space-x-2"
-                htmlFor={`category-${category.id}`}
+            {filters.category && (
+              <button
+                type="button"
+                className="text-xs text-blue-500 hover:underline bg-transparent border-none p-0 cursor-pointer"
+                onClick={() => handleFilterChange("category", "")}
               >
-                <input
-                  type="checkbox"
-                  id={`category-${category.id}`}
-                  checked={filters.category === category.id}
-                  onChange={() =>
-                    handleFilterChange(
-                      "category",
-                      filters.category === category.id ? "" : category.id
-                    )
+                Clear
+              </button>
+            )}
+          </h3>
+          <div className="flex flex-wrap gap-2">
+            {categories.map((category) => (
+              <Button
+                key={category.id}
+                size="sm"
+                variant={filters.category === category.id ? "solid" : "flat"}
+                color={filters.category === category.id ? "primary" : "default"}
+                onClick={() =>
+                  handleFilterChange(
+                    "category",
+                    filters.category === category.id ? "" : category.id
+                  )
+                }
+                className={`
+                  rounded-full transition-all duration-300
+                  ${filters.category === category.id
+                    ? "shadow-md shadow-blue-500/30"
+                    : "bg-gray-100 dark:bg-gray-700/50 hover:bg-gray-200 dark:hover:bg-gray-700"
                   }
-                  className="hidden"
-                  aria-label={`Filter by ${category.name}`}
-                />
-                <span className="w-5 h-5 flex items-center justify-center border-2 border-gray-300 rounded-sm dark:border-gray-600">
-                  <span
-                    className={`w-3 h-3 bg-primary rounded-sm transition-all ${
-                      filters.category === category.id ? "block" : "hidden"
-                    }`}
-                  />
-                </span>
-                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                  {category.name}
-                </span>
-              </label>
+                `}
+                aria-label={`Filter by ${category.name}`}
+              >
+                {category.name}
+              </Button>
             ))}
           </div>
         </div>
 
         {/* Reset Button */}
         <Button
-          className="w-full bg-transparent border border-red-500 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20"
-          variant="flat"
+          className="w-full mt-4 font-semibold text-danger border-danger/20 hover:bg-danger/10 transition-colors"
+          variant="bordered"
           onClick={resetFilters}
           aria-label="Reset filters"
+          startContent={<RefreshCw size={16} />}
         >
-          Reset Filters
+          Reset All Filters
         </Button>
       </CardBody>
     </Card>

@@ -4,7 +4,7 @@ import React from "react";
 import Image from "next/image";
 import { Button } from "@nextui-org/button";
 import { useRouter } from "next/navigation";
-import { categoriesData, Category } from "@/src/data/CategoriestData";
+import { categoriesData, Category } from "@/src/data/CategoriesData";
 
 interface CategoriesDropdownProps {
   categories: Category[];

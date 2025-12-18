@@ -1,4 +1,4 @@
-import { categoriesData } from "@/src/data/CategoriestData";
+import { categoriesData } from "@/src/data/CategoriesData";
 import CategoriesDropdownClient from "./CategoriesDropdownClient";
 
 

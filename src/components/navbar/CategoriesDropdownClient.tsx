@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import Image from "next/image";
 import { Button } from "@nextui-org/button";
 import { useRouter } from "next/navigation";
-import { Category } from "@/src/data/CategoriestData";
+import { Category } from "@/src/data/CategoriesData";
 import { AlignJustify, ChevronDown, ChevronRight } from "lucide-react";
 
 interface CategoriesDropdownProps {
@@ -20,7 +20,7 @@ const CategoriesDropdownClient: React.FC<CategoriesDropdownProps> = ({
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
 
   const handleCategoryClick = (categoryId: string) => {
-    router.push(`/shop?category=${categoryId.toUpperCase()}`);
+    router.push(`/shop?category=${categoryId}`);
   };
 
   const handleSubCategoryClick = (
@@ -28,14 +28,14 @@ const CategoriesDropdownClient: React.FC<CategoriesDropdownProps> = ({
     subCategoryId: string
   ) => {
     router.push(
-      `/shop?category=${categoryId.toUpperCase()}&subcategory=${subCategoryId.toUpperCase()}`
+      `/shop?category=${categoryId}&subcategory=${subCategoryId}`
     );
   };
 
   return (
     <div className="relative group">
       <Button
-        className="text-sm font-semibold text-white bg-blue-500 px-4 py-2 rounded-md transition-colors"
+        className="text-sm font-semibold text-primary-foreground bg-primary/90 hover:bg-primary px-4 py-2 rounded-md transition-colors"
         variant="solid"
         startContent={<AlignJustify className="w-4 h-4" />}
         endContent={<ChevronDown className="w-4 h-4 ml-2" />}
@@ -53,11 +53,10 @@ const CategoriesDropdownClient: React.FC<CategoriesDropdownProps> = ({
               onMouseLeave={() => setActiveCategory(null)}
             >
               <Button
-                className={`w-full text-start px-4 border-b py-3 text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center justify-between transition-colors ${
-                  activeCategory === category.id
+                className={`w-full text-start px-4 border-b py-3 text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center justify-between transition-colors ${activeCategory === category.id
                     ? "bg-gray-50 dark:bg-gray-700"
                     : ""
-                }`}
+                  }`}
                 variant="light"
                 onClick={() => handleCategoryClick(category.id)}
               >

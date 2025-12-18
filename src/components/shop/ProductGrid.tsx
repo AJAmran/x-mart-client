@@ -6,7 +6,7 @@ import { motion } from "framer-motion";
 import ProductCard from "@/src/components/UI/ProductCard";
 import { useProducts } from "@/src/hooks/useProducts";
 import { TProduct } from "@/src/types";
-import CardSkeletons from "../CardSkelton";
+import CardSkeletons from "../CardSkeleton";
 
 
 interface ProductGridProps {

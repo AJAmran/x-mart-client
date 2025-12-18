@@ -13,7 +13,7 @@ import { Input } from "@nextui-org/input";
 import { ChevronRight, Share2, ShoppingCart, X, AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
 
-import CardSkeletons from "@/src/components/CardSkelton";
+import CardSkeletons from "@/src/components/CardSkeleton";
 import ProductCard from "@/src/components/UI/ProductCard";
 import { useCart } from "@/src/hooks/useCart";
 import { useProductById, useProducts } from "@/src/hooks/useProducts";
@@ -354,17 +354,17 @@ const ProductDetailsPage = () => {
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6 md:grid-cols-3 lg:grid-cols-4">
             {relevantProductsResponse?.isLoading
               ? Array.from({ length: 4 }).map((_, i) => (
-                  <CardSkeletons key={i} />
-                ))
+                <CardSkeletons key={i} />
+              ))
               : relevantProducts.map((product: TProduct) => (
-                  <ProductCard
-                    key={product._id}
-                    onPress={() =>
-                      (window.location.href = `/product/${product._id}`)
-                    }
-                    product={product}
-                  />
-                ))}
+                <ProductCard
+                  key={product._id}
+                  onPress={() =>
+                    (window.location.href = `/product/${product._id}`)
+                  }
+                  product={product}
+                />
+              ))}
           </div>
         </motion.div>
       </div>

@@ -1,5 +1,12 @@
 "use client";
 
+import { useState } from "react";
+import * as XLSX from "xlsx";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
+import { toast } from "sonner";
+import { DownloadIcon, SearchIcon } from "lucide-react";
+
 import ApplyDiscountModal from "@/src/components/product/ApplyDiscountModal";
 import EditProductModal from "@/src/components/product/EditProductModal";
 import {
@@ -14,13 +21,17 @@ import { Tooltip } from "@heroui/tooltip";
 import { Button } from "@nextui-org/button";
 import { Card, CardBody } from "@nextui-org/card";
 import { Input } from "@nextui-org/input";
-import { DeleteIcon, DownloadIcon } from "lucide-react";
-import { useState } from "react";
-import * as XLSX from "xlsx";
-import jsPDF from "jspdf";
-import autoTable from "jspdf-autotable";
-import { toast } from "sonner";
 import { PRODUCT_CATEGORY } from "@/src/constants";
+import { DeleteIcon } from "@/src/components/icons";
+import {
+  Table,
+  TableHeader,
+  TableColumn,
+  TableBody,
+  TableRow,
+  TableCell,
+} from "@heroui/table";
+import { Chip } from "@heroui/chip";
 
 // Define types for filters and options
 type ProductFilters = {
@@ -77,7 +88,6 @@ export default function ProductListPage() {
   const {
     data: allProductsResponse,
     isLoading: isAllProductsLoading,
-    isError: isAllProductsError,
   } = useProducts(
     { ...filters, category: normalizeCategory(filters.category) },
     {
@@ -117,18 +127,13 @@ export default function ProductListPage() {
     }
   };
 
-  // Function to download products as Excel
   const downloadExcel = () => {
     try {
       if (isAllProductsLoading) {
         toast.warning("Please wait, data is still loading...");
         return;
       }
-      if (
-        isAllProductsError ||
-        !allProductsResponse ||
-        allProducts.length === 0
-      ) {
+      if (allProducts.length === 0) {
         toast.error("No products available to download");
         return;
       }
@@ -147,38 +152,26 @@ export default function ProductListPage() {
           "Created At": product.createdAt
             ? new Date(product.createdAt).toLocaleDateString()
             : "N/A",
-          "Updated At": product.updatedAt
-            ? new Date(product.updatedAt).toLocaleDateString()
-            : "N/A",
         })
       );
 
       const worksheet = XLSX.utils.json_to_sheet(worksheetData);
       const workbook = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(workbook, worksheet, "Products");
-      XLSX.writeFile(
-        workbook,
-        `products_report_${new Date().toISOString().split("T")[0]}.xlsx`
-      );
+      XLSX.writeFile(workbook, `products_report_${new Date().toISOString().split("T")[0]}.xlsx`);
       toast.success("Excel report downloaded successfully");
     } catch (err: any) {
-      console.error("Failed to download Excel:", err);
       toast.error("Failed to download Excel report");
     }
   };
 
-  // Function to download products as PDF
   const downloadPDF = () => {
     try {
       if (isAllProductsLoading) {
         toast.warning("Please wait, data is still loading...");
         return;
       }
-      if (
-        isAllProductsError ||
-        !allProductsResponse ||
-        allProducts.length === 0
-      ) {
+      if (allProducts.length === 0) {
         toast.error("No products available to download");
         return;
       }
@@ -210,201 +203,153 @@ export default function ProductListPage() {
       doc.save(`products_report_${new Date().toISOString().split("T")[0]}.pdf`);
       toast.success("PDF report downloaded successfully");
     } catch (err: any) {
-      console.error("Failed to download PDF:", err);
       toast.error("Failed to download PDF report");
     }
   };
 
   return (
-    <Card className="shadow-lg">
-      <CardBody className="p-6">
-        <div className="flex flex-col gap-6">
-          {/* Header with Filters and Download Buttons */}
-          <div className="flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center">
-            <div className="flex gap-4 w-full sm:w-auto">
-              <Input
-                placeholder="Search by name"
-                value={filters.searchTerm}
-                onChange={(e) =>
-                  setFilters({ ...filters, searchTerm: e.target.value })
-                }
-                className="max-w-xs"
-              />
-              {/* Add Category Filter */}
-              <select
-                value={filters.category}
-                onChange={(e) =>
-                  setFilters({ ...filters, category: e.target.value })
-                }
-                className="max-w-xs p-2 border rounded-lg"
-              >
-                <option value="">All Categories</option>
-                {Object.values(PRODUCT_CATEGORY).map((cat) => (
-                  <option key={cat} value={cat}>
-                    {cat}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div className="flex gap-2">
-              <Tooltip content="Download all products as Excel">
-                <Button
-                  color="primary"
-                  variant="flat"
-                  onClick={downloadExcel}
-                  isDisabled={isAllProductsLoading || allProducts.length === 0}
-                  className="flex items-center gap-2"
-                >
-                  <DownloadIcon className="w-4 h-4" />
-                  Excel
-                </Button>
-              </Tooltip>
-              <Tooltip content="Download all products as PDF">
-                <Button
-                  color="primary"
-                  variant="flat"
-                  onClick={downloadPDF}
-                  isDisabled={isAllProductsLoading || allProducts.length === 0}
-                  className="flex items-center gap-2"
-                >
-                  <DownloadIcon className="w-4 h-4" />
-                  PDF
-                </Button>
-              </Tooltip>
-            </div>
+    <div className="space-y-6">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <h1 className="text-2xl font-bold">Product Management</h1>
+        <div className="flex gap-2">
+          <Button
+            color="primary"
+            variant="flat"
+            size="sm"
+            onClick={downloadExcel}
+            startContent={<DownloadIcon className="w-4 h-4" />}
+          >
+            Excel
+          </Button>
+          <Button
+            color="primary"
+            variant="flat"
+            size="sm"
+            onClick={downloadPDF}
+            startContent={<DownloadIcon className="w-4 h-4" />}
+          >
+            PDF
+          </Button>
+        </div>
+      </div>
+
+      <Card className="shadow-sm border-none bg-white/70 dark:bg-gray-800/70 backdrop-blur-md">
+        <CardBody className="p-4">
+          <div className="flex flex-col md:flex-row gap-4 mb-6">
+            <Input
+              placeholder="Search products..."
+              value={filters.searchTerm}
+              onChange={(e) => setFilters({ ...filters, searchTerm: e.target.value })}
+              className="max-w-xs"
+              startContent={<SearchIcon className="w-4 h-4 text-default-400" />}
+            />
+            <select
+              value={filters.category}
+              onChange={(e) => setFilters({ ...filters, category: e.target.value })}
+              className="max-w-xs p-2 bg-gray-100 dark:bg-gray-900 border-none rounded-xl text-sm focus:ring-2 focus:ring-blue-500 transition-all outline-none"
+            >
+              <option value="">All Categories</option>
+              {Object.values(PRODUCT_CATEGORY).map((cat) => (
+                <option key={cat} value={cat}>{cat}</option>
+              ))}
+            </select>
           </div>
 
-          {/* Error Display */}
+          <Table
+            aria-label="Product list table"
+            shadow="none"
+            classNames={{
+              wrapper: "bg-transparent p-0",
+              th: "bg-gray-100/50 dark:bg-gray-900/50 text-default-600",
+            }}
+          >
+            <TableHeader>
+              <TableColumn>PRODUCT</TableColumn>
+              <TableColumn>PRICE</TableColumn>
+              <TableColumn>STOCK</TableColumn>
+              <TableColumn>STATUS</TableColumn>
+              <TableColumn align="center">ACTIONS</TableColumn>
+            </TableHeader>
+            <TableBody
+              emptyContent={"No products found."}
+              isLoading={isLoading}
+              loadingContent={<Skeleton className="w-full h-40 rounded-xl" />}
+            >
+              {products.map((product: TProduct) => (
+                <TableRow key={product._id} className="border-b border-gray-100 dark:border-gray-800 last:border-none">
+                  <TableCell>
+                    <div className="flex flex-col">
+                      <span className="font-semibold text-sm">{product.name}</span>
+                      <span className="text-tiny text-default-400 uppercase">{product.category}</span>
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <span className="font-bold text-blue-600 dark:text-blue-400">${product.price}</span>
+                  </TableCell>
+                  <TableCell>
+                    <Chip
+                      size="sm"
+                      variant="flat"
+                      color={(product.inventories?.[0]?.stock ?? 0) < 10 ? "danger" : "success"}
+                    >
+                      {product.inventories?.[0]?.stock ?? 0} in stock
+                    </Chip>
+                  </TableCell>
+                  <TableCell>
+                    <Chip
+                      size="sm"
+                      variant="dot"
+                      color={product.status === "ACTIVE" ? "success" : "warning"}
+                    >
+                      {product.status || "N/A"}
+                    </Chip>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex items-center justify-center gap-2">
+                      <EditProductModal product={product} />
+                      <Tooltip content="Delete Product">
+                        <Button
+                          isIconOnly
+                          size="sm"
+                          variant="light"
+                          color="danger"
+                          onClick={() => handleDeleteProduct(product._id)}
+                          isDisabled={deleteProductMutation.isPending}
+                        >
+                          <DeleteIcon className="w-4 h-4" />
+                        </Button>
+                      </Tooltip>
+                      <ApplyDiscountModal
+                        product={product}
+                        onRemoveDiscount={() => handleRemoveDiscount(product._id)}
+                      />
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+
           {isError && (
-            <div className="text-red-500 text-center">
+            <div className="text-red-500 text-center py-4">
               Error: {error?.message || "Failed to load products"}
             </div>
           )}
 
-          {/* Product Table */}
-          <div className="overflow-x-auto">
-            <table className="min-w-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg">
-              <thead>
-                <tr className="bg-gray-100 dark:bg-gray-700">
-                  <th className="px-6 py-3 text-left text-sm font-medium text-gray-700 dark:text-gray-200">
-                    Sl.
-                  </th>
-                  <th className="px-6 py-3 text-left text-sm font-medium text-gray-700 dark:text-gray-200">
-                    Name
-                  </th>
-                  <th className="px-6 py-3 text-left text-sm font-medium text-gray-700 dark:text-gray-200">
-                    Price
-                  </th>
-                  <th className="px-6 py-3 text-left text-sm font-medium text-gray-700 dark:text-gray-200">
-                    Stock
-                  </th>
-                  <th className="px-6 py-3 text-left text-sm font-medium text-gray-700 dark:text-gray-200">
-                    Status
-                  </th>
-                  <th className="px-6 py-3 text-left text-sm font-medium text-gray-700 dark:text-gray-200">
-                    Actions
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {isLoading ? (
-                  Array.from({ length: options.limit }).map((_, index) => (
-                    <tr
-                      key={index}
-                      className="border-b border-gray-200 dark:border-gray-700"
-                    >
-                      <td className="px-6 py-4">
-                        <Skeleton className="h-4 w-12 rounded-lg" />
-                      </td>
-                      <td className="px-6 py-4">
-                        <Skeleton className="h-4 w-32 rounded-lg" />
-                      </td>
-                      <td className="px-6 py-4">
-                        <Skeleton className="h-4 w-20 rounded-lg" />
-                      </td>
-                      <td className="px-6 py-4">
-                        <Skeleton className="h-4 w-20 rounded-lg" />
-                      </td>
-                      <td className="px-6 py-4">
-                        <Skeleton className="h-4 w-20 rounded-lg" />
-                      </td>
-                      <td className="px-6 py-4">
-                        <Skeleton className="h-8 w-24 rounded-lg" />
-                      </td>
-                    </tr>
-                  ))
-                ) : products.length > 0 ? (
-                  products.map((product: TProduct, index: number) => (
-                    <tr
-                      key={product._id}
-                      className="border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700"
-                    >
-                      <td className="px-6 py-4 text-gray-700 dark:text-gray-200">
-                        {(options.page - 1) * options.limit + index + 1}
-                      </td>
-                      <td className="px-6 py-4 text-gray-700 dark:text-gray-200">
-                        {product.name}
-                      </td>
-                      <td className="px-6 py-4 text-gray-700 dark:text-gray-200">
-                        ${product.price}
-                      </td>
-                      <td className="px-6 py-4 text-gray-700 dark:text-gray-200">
-                        {product.inventories?.[0]?.stock ?? "N/A"}
-                      </td>
-                      <td className="px-6 py-4 text-gray-700 dark:text-gray-200">
-                        {product.status ?? "N/A"}
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="flex gap-2">
-                          <EditProductModal product={product} />
-                          <Tooltip content="Delete">
-                            <Button
-                              isIconOnly
-                              color="danger"
-                              onClick={() => handleDeleteProduct(product._id)}
-                              isDisabled={deleteProductMutation.isPending}
-                            >
-                              <DeleteIcon className="w-4 h-4" />
-                            </Button>
-                          </Tooltip>
-                          <ApplyDiscountModal
-                            product={product}
-                            onRemoveDiscount={() =>
-                              handleRemoveDiscount(product._id)
-                            }
-                          />
-                        </div>
-                      </td>
-                    </tr>
-                  ))
-                ) : (
-                  <tr>
-                    <td
-                      colSpan={6}
-                      className="px-6 py-4 text-center text-gray-500 dark:text-gray-400"
-                    >
-                      No products found.
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
-
-          {/* Pagination */}
           <div className="flex justify-center mt-6">
-            {isLoading ? (
-              <Skeleton className="h-10 w-64 rounded-lg" />
-            ) : totalPages > 1 ? (
+            {totalPages > 1 && (
               <Pagination
                 total={totalPages}
                 page={options.page}
                 onChange={(page) => setOptions({ ...options, page })}
+                showControls
+                variant="flat"
+                color="primary"
               />
-            ) : null}
+            )}
           </div>
-        </div>
-      </CardBody>
-    </Card>
+        </CardBody>
+      </Card>
+    </div>
   );
 }

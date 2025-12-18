@@ -10,13 +10,13 @@ type CategoryCardProps = {
 };
 
 const categoryImages = {
-  FISH: "/fishcategories.webp",
+  FISH: "/fish.webp",
   MEAT: "/chicken.webp",
-  FRUITS: "/fruts.webp",
-  VEGETABLES: "/vegitable.webp",
+  FRUITS: "/fruits.webp",
+  VEGETABLES: "/vegetables.webp",
   DAIRY: "/dairy.avif",
   FROZEN: "/frozen.webp",
-  GROCERY: "/groshary.webp",
+  GROCERY: "/grocery.webp",
   PERSONALCARE: "/PERSONALCARE.webp",
   HOUSEHOLD: "/household.webp",
   STATIONERY: "/stationery.webp",

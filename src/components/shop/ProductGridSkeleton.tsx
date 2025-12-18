@@ -1,4 +1,4 @@
-import CardSkeletons from "../CardSkelton";
+import CardSkeletons from "../CardSkeleton";
 
 
 export default function ProductGridSkeleton() {

@@ -3,7 +3,7 @@
 import { FC } from "react";
 import { Card, CardHeader, CardBody } from "@nextui-org/card";
 import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from "@heroui/table";
-import {  ChartIcon, FunnelIcon, ProfileIcon } from "@/src/components/icons";
+import { ChartIcon, FunnelIcon, ProfileIcon } from "@/src/components/icons";
 
 
 const DashboardHome: FC = () => {
@@ -14,55 +14,75 @@ const DashboardHome: FC = () => {
 
       {/* Statistics Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        <Card className="shadow-md hover:shadow-lg transition-all">
-          <CardHeader>
-            <div className="flex items-center space-x-3">
-              <ProfileIcon size={24} className="text-primary" />
-              <h3 className="text-lg font-bold">Users</h3>
+        <Card className="relative overflow-hidden group shadow-md hover:shadow-xl transition-all duration-300 border-none bg-gradient-to-br from-blue-500/10 to-transparent dark:from-blue-500/20">
+          <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
+            <ProfileIcon size={80} />
+          </div>
+          <CardHeader className="pb-0 pt-4 px-4 flex-col items-start">
+            <div className="p-2 bg-blue-500 rounded-lg text-white mb-3 shadow-lg shadow-blue-500/30">
+              <ProfileIcon size={20} />
             </div>
+            <p className="text-tiny uppercase font-bold text-blue-500">Total Users</p>
+            <h3 className="text-3xl font-extrabold mt-1">1,245</h3>
           </CardHeader>
-          <CardBody>
-            <p className="text-2xl font-extrabold">1,245</p>
-            <p className="text-sm text-muted">Active Users</p>
+          <CardBody className="py-2">
+            <p className="text-sm text-default-500 flex items-center">
+              <span className="text-green-500 font-semibold mr-1">↑ 12%</span> vs last month
+            </p>
           </CardBody>
         </Card>
 
-        <Card className="shadow-md hover:shadow-lg transition-all">
-          <CardHeader>
-            <div className="flex items-center space-x-3">
-              <FunnelIcon size={24} className="text-primary" />
-              <h3 className="text-lg font-bold">Orders</h3>
+        <Card className="relative overflow-hidden group shadow-md hover:shadow-xl transition-all duration-300 border-none bg-gradient-to-br from-orange-500/10 to-transparent dark:from-orange-500/20">
+          <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
+            <FunnelIcon size={80} />
+          </div>
+          <CardHeader className="pb-0 pt-4 px-4 flex-col items-start">
+            <div className="p-2 bg-orange-500 rounded-lg text-white mb-3 shadow-lg shadow-orange-500/30">
+              <FunnelIcon size={20} />
             </div>
+            <p className="text-tiny uppercase font-bold text-orange-500">Orders</p>
+            <h3 className="text-3xl font-extrabold mt-1">512</h3>
           </CardHeader>
-          <CardBody>
-            <p className="text-2xl font-extrabold">512</p>
-            <p className="text-sm text-muted">This Month</p>
+          <CardBody className="py-2">
+            <p className="text-sm text-default-500 flex items-center">
+              <span className="text-green-500 font-semibold mr-1">↑ 8%</span> vs last month
+            </p>
           </CardBody>
         </Card>
 
-        <Card className="shadow-md hover:shadow-lg transition-all">
-          <CardHeader>
-            <div className="flex items-center space-x-3">
-              <ChartIcon size={24} className="text-primary" />
-              <h3 className="text-lg font-bold">Sales</h3>
+        <Card className="relative overflow-hidden group shadow-md hover:shadow-xl transition-all duration-300 border-none bg-gradient-to-br from-green-500/10 to-transparent dark:from-green-500/20">
+          <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
+            <ChartIcon size={80} />
+          </div>
+          <CardHeader className="pb-0 pt-4 px-4 flex-col items-start">
+            <div className="p-2 bg-green-500 rounded-lg text-white mb-3 shadow-lg shadow-green-500/30">
+              <ChartIcon size={20} />
             </div>
+            <p className="text-tiny uppercase font-bold text-green-500">Revenue</p>
+            <h3 className="text-3xl font-extrabold mt-1">$24,560</h3>
           </CardHeader>
-          <CardBody>
-            <p className="text-2xl font-extrabold">$24,560</p>
-            <p className="text-sm text-muted">Revenue</p>
+          <CardBody className="py-2">
+            <p className="text-sm text-default-500 flex items-center">
+              <span className="text-green-500 font-semibold mr-1">↑ 24%</span> vs last month
+            </p>
           </CardBody>
         </Card>
 
-        <Card className="shadow-md hover:shadow-lg transition-all">
-          <CardHeader>
-            <div className="flex items-center space-x-3">
-              <ChartIcon size={24} className="text-primary" />
-              <h3 className="text-lg font-bold">Profit</h3>
+        <Card className="relative overflow-hidden group shadow-md hover:shadow-xl transition-all duration-300 border-none bg-gradient-to-br from-purple-500/10 to-transparent dark:from-purple-500/20">
+          <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
+            <ChartIcon size={80} />
+          </div>
+          <CardHeader className="pb-0 pt-4 px-4 flex-col items-start">
+            <div className="p-2 bg-purple-500 rounded-lg text-white mb-3 shadow-lg shadow-purple-500/30">
+              <ChartIcon size={20} />
             </div>
+            <p className="text-tiny uppercase font-bold text-purple-500">Total Profit</p>
+            <h3 className="text-3xl font-extrabold mt-1">$8,245</h3>
           </CardHeader>
-          <CardBody>
-            <p className="text-2xl font-extrabold">$8,245</p>
-            <p className="text-sm text-muted">This Month</p>
+          <CardBody className="py-2">
+            <p className="text-sm text-default-500 flex items-center">
+              <span className="text-green-500 font-semibold mr-1">↑ 15%</span> vs last month
+            </p>
           </CardBody>
         </Card>
       </div>

@@ -9,7 +9,7 @@ import { productSchema } from "@/src/validations/productSchema";
 import { Input, Textarea } from "@nextui-org/input";
 import { Select, SelectItem } from "@nextui-org/select";
 import { Button } from "@nextui-org/button";
-import { categoriesData } from "@/src/data/CategoriestData";
+import { categoriesData } from "@/src/data/CategoriesData";
 import { PRODUCT_CATEGORY } from "@/src/constants";
 
 // Create a form-specific type that includes the stock field

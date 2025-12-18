@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { ThemeSwitch } from "../theme-switch";
+import { usePathname } from "next/navigation";
 
 interface MenuItem {
   label: string;
@@ -68,9 +69,20 @@ const menuItems: MenuItem[] = [
 
 const Sidebar: FC = () => {
   const [openSubmenu, setOpenSubmenu] = useState<string | null>(null);
+  const pathname = usePathname();
 
   const toggleSubmenu = (menu: string) => {
     setOpenSubmenu(openSubmenu === menu ? null : menu);
+  };
+
+  const isActive = (href?: string) => {
+    if (!href) return false;
+    return pathname === href;
+  };
+
+  const isSubmenuActive = (submenu?: { href: string }[]) => {
+    if (!submenu) return false;
+    return submenu.some((item) => pathname === item.href);
   };
 
   return (
@@ -95,14 +107,20 @@ const Sidebar: FC = () => {
                 {item.href ? (
                   <Link
                     href={item.href}
-                    className="flex items-center space-x-3 p-3 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-blue-50 dark:hover:bg-gray-700 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200"
+                    className={`flex items-center space-x-3 p-3 rounded-lg transition-all duration-200 ${isActive(item.href)
+                        ? "bg-blue-600 text-white shadow-md shadow-blue-500/30"
+                        : "text-gray-700 dark:text-gray-200 hover:bg-blue-50 dark:hover:bg-gray-700 hover:text-blue-600 dark:hover:text-blue-400"
+                      }`}
                   >
-                    <item.icon className="w-5 h-5" />
+                    <item.icon className={`w-5 h-5 ${isActive(item.href) ? "text-white" : ""}`} />
                     <span className="text-sm font-medium">{item.label}</span>
                   </Link>
                 ) : (
                   <div
-                    className="flex items-center justify-between p-3 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-blue-50 dark:hover:bg-gray-700 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200 cursor-pointer"
+                    className={`flex items-center justify-between p-3 rounded-lg transition-all duration-200 cursor-pointer ${isSubmenuActive(item.submenu)
+                        ? "text-blue-600 dark:text-blue-400 bg-blue-50/50 dark:bg-blue-900/20"
+                        : "text-gray-700 dark:text-gray-200 hover:bg-blue-50 dark:hover:bg-gray-700 hover:text-blue-600 dark:hover:text-blue-400"
+                      }`}
                     onClick={() => toggleSubmenu(item.label)}
                     role="button"
                     tabIndex={0}
@@ -123,13 +141,16 @@ const Sidebar: FC = () => {
                     )}
                   </div>
                 )}
-                {item.submenu && openSubmenu === item.label && (
-                  <ul className="pl-10 space-y-1 mt-1">
+                {item.submenu && (openSubmenu === item.label || isSubmenuActive(item.submenu)) && (
+                  <ul className="pl-10 space-y-1 mt-1 mb-2">
                     {item.submenu.map((subItem) => (
                       <li key={subItem.label}>
                         <Link
                           href={subItem.href}
-                          className="flex items-center p-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-gray-700 hover:text-blue-600 dark:hover:text-blue-400 text-sm transition-colors duration-200"
+                          className={`flex items-center p-2 rounded-lg text-sm transition-all duration-200 ${isActive(subItem.href)
+                              ? "text-blue-600 dark:text-blue-400 font-bold bg-blue-50 dark:bg-blue-900/30"
+                              : "text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50/30 dark:hover:bg-gray-700/50"
+                            }`}
                         >
                           <span>{subItem.label}</span>
                         </Link>

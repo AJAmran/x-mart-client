@@ -6,7 +6,7 @@ import ProductCard from "@/src/components/UI/ProductCard";
 import { useFeaturedProducts } from "@/src/hooks/useFeaturedProducts";
 import { TProduct } from "@/src/types";
 import { Button } from "@nextui-org/button";
-import CardSkeletons from "../CardSkelton";
+import CardSkeletons from "../CardSkeleton";
 import { MyButton } from "../UI/MyButton";
 
 export default function FeatureProduct() {
@@ -33,9 +33,9 @@ export default function FeatureProduct() {
     return (
       <section className="py-8" aria-label="Loading Featured Products">
         <div className="text-center mb-12">
-          <h1 className="text-lg md:text-xl lg:text-3xl font-bold tracking-tight">
+          <h2 className="text-lg md:text-xl lg:text-3xl font-bold tracking-tight">
             Featured Products
-          </h1>
+          </h2>
           <p className="mt-2 text-sm lg:text-base">
             Loading featured products...
           </p>
@@ -53,9 +53,9 @@ export default function FeatureProduct() {
     return (
       <section className="py-8" aria-label="Featured Products Error">
         <div className="text-center mb-12">
-          <h1 className="text-lg md:text-xl lg:text-3xl font-bold tracking-tight">
+          <h2 className="text-lg md:text-xl lg:text-3xl font-bold tracking-tight">
             Featured Products
-          </h1>
+          </h2>
           <p className="mt-2 text-sm lg:text-base text-red-500">
             Failed to load featured products. Please try again later.
           </p>
@@ -77,9 +77,9 @@ export default function FeatureProduct() {
     return (
       <section className="py-8" aria-label="No Featured Products">
         <div className="text-center mb-12">
-          <h1 className="text-lg md:text-xl lg:text-3xl font-bold tracking-tight">
+          <h2 className="text-lg md:text-xl lg:text-3xl font-bold tracking-tight">
             Featured Products
-          </h1>
+          </h2>
           <p className="mt-2 text-sm lg:text-base">
             No featured products available at the moment.
           </p>
@@ -102,9 +102,9 @@ export default function FeatureProduct() {
   return (
     <section className="py-8" aria-label="Featured Products">
       <div className="text-center mb-12">
-        <h1 className="text-lg md:text-xl lg:text-3xl font-bold tracking-tight">
+        <h2 className="text-lg md:text-xl lg:text-3xl font-bold tracking-tight">
           Featured Products
-        </h1>
+        </h2>
         <p className="mt-2 text-sm lg:text-base">
           Explore our top picks handpicked just for you.
         </p>
@@ -125,10 +125,9 @@ export default function FeatureProduct() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3, delay: index * 0.1 }}
             className={`
-              ${
-                displayedProducts.length === 1
-                  ? "w-full max-w-[340px]" 
-                  : "w-full max-w-[340px]"
+              ${displayedProducts.length === 1
+                ? "w-full max-w-[340px]"
+                : "w-full max-w-[340px]"
               }
             `}
           >

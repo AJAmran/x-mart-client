@@ -4,7 +4,7 @@ import React from "react";
 import Image from "next/image";
 import { Card, CardBody, CardHeader } from "@nextui-org/card";
 import { useRouter } from "next/navigation";
-import { Category } from "@/src/data/CategoriestData";
+import { Category } from "@/src/data/CategoriesData";
 
 interface CategoriesClientProps {
   categories: Category[];
@@ -26,7 +26,7 @@ const CategoriesClient: React.FC<CategoriesClientProps> = ({ categories }) => {
           radius="lg"
           isHoverable
           isPressable
-          onPress={() => handleCategoryClick(category.id.toUpperCase())}
+          onPress={() => handleCategoryClick(category.id)}
           aria-label={`Shop ${category.name} category`}
         >
           <CardHeader className="flex justify-center items-center p-6">

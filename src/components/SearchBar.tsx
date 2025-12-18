@@ -1,7 +1,8 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { Input } from "@nextui-org/input";
-import { Search as SearchIcon, X } from "lucide-react";
+import { SearchIcon } from "./icons";
+import { X } from "lucide-react";
 
 interface SearchBarProps {
   value: string;
@@ -69,10 +70,10 @@ const SearchBar: React.FC<SearchBarProps> = ({
           )
         }
         classNames={{
-          base: "w-full max-w-md",
-          input: "text-sm",
+          base: "w-full",
+          input: "text-base",
           inputWrapper:
-            "border border-gray-300 hover:border-gray-400 focus-within:border-blue-500 focus-within:ring-1 focus-within:ring-blue-500",
+            "h-12 border-2 border-transparent bg-gray-100/50 dark:bg-gray-800/50 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-2xl focus-within:border-primary/50 focus-within:ring-4 focus-within:ring-primary/10 transition-all duration-300 shadow-sm",
         }}
       />
     </form>
