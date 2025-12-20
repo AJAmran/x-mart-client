@@ -12,10 +12,10 @@ export function OutletCard({ outlet }: { outlet: TBranch }) {
     <div className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow">
       <div className="relative h-48">
         <Image
-          src={outlet.images?.[0] || '/images/outlet-default.jpg'}
-          alt={outlet.name}
           fill
+          alt={outlet.name}
           className="object-cover"
+          src={outlet.images?.[0] || '/images/outlet-default.jpg'}
         />
         <div className="absolute top-4 right-4 bg-white px-3 py-1 rounded-full text-sm font-medium shadow-sm">
           {outlet.status === 'active' ? 'Open Now' : 'Closed'}
@@ -51,15 +51,15 @@ export function OutletCard({ outlet }: { outlet: TBranch }) {
 
         <div className="flex items-center justify-between mt-6">
           <a
-            href={`tel:${outlet.contact.phone}`}
             className="flex items-center text-blue-600 hover:text-blue-800"
+            href={`tel:${outlet.contact.phone}`}
           >
             <Phone className="h-4 w-4 mr-2" />
             {outlet.contact.phone}
           </a>
           <button
-            onClick={() => router.push(`/outlets/${outlet._id}`)}
             className="flex items-center text-blue-600 hover:text-blue-800 font-medium"
+            onClick={() => router.push(`/outlets/${outlet._id}`)}
           >
             View Details <ChevronRight className="h-4 w-4 ml-1" />
           </button>

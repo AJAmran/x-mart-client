@@ -40,10 +40,10 @@ export default function NavbarClient({ user }: NavbarClientProps) {
   return (
     <div className="sticky top-0 z-50 w-full">
       <NextUINavbar
-        maxWidth="2xl"
-        className="bg-white dark:bg-gray-900"
         isBordered
+        className="bg-white dark:bg-gray-900"
         isMenuOpen={isMenuOpen}
+        maxWidth="2xl"
         onMenuOpenChange={setIsMenuOpen}
       >
         <NavbarContent
@@ -52,9 +52,9 @@ export default function NavbarClient({ user }: NavbarClientProps) {
         >
           <NavbarBrand as="li" className="gap-3">
             <NextLink
+              aria-label="X-mart Home"
               className="flex items-center gap-2"
               href="/"
-              aria-label="X-mart Home"
             >
               <Logo className="w-10 h-10 text-primary-600 dark:text-primary-400" />
               <p className="font-bold text-2xl tracking-tight text-gray-900 dark:text-white">
@@ -68,12 +68,12 @@ export default function NavbarClient({ user }: NavbarClientProps) {
           </NavbarContent>
 
           <SearchBar
-            onSearch={handleSearch}
             className="hidden sm:block w-96"
-            placeholder="Search products..."
             debounceDelay={300}
-            onChange={() => {}}
+            placeholder="Search products..."
             value={searchParams.get("search") || ""}
+            onChange={() => {}}
+            onSearch={handleSearch}
           />
 
           <NavbarContent
@@ -89,8 +89,8 @@ export default function NavbarClient({ user }: NavbarClientProps) {
         </NavbarContent>
 
         <MobileMenu
-          user={user}
           categories={categoriesData}
+          user={user}
           onSearch={handleSearch}
         />
       </NextUINavbar>

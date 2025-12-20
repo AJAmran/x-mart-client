@@ -37,22 +37,22 @@ const ProfilePage = () => {
   if (isLoading || !user) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <Spinner size="lg" label="Loading profile..." />
+        <Spinner label="Loading profile..." size="lg" />
       </div>
     );
   }
 
   return (
-    <Suspense fallback={<Spinner size="lg" label="Loading profile..." />}>
+    <Suspense fallback={<Spinner label="Loading profile..." size="lg" />}>
       <div className="flex items-center justify-center min-h-screen">
         <Card className="w-full max-w-lg p-6 rounded-2xl shadow-xl">
           <CardHeader className="flex flex-col items-center">
             <Image
-              src={user.profilePhoto || "/default-avatar.png"}
               alt={user.name}
-              width={120}
-              height={120}
               className="rounded-full border-2 border-primary mb-4"
+              height={120}
+              src={user.profilePhoto || "/default-avatar.png"}
+              width={120}
             />
             <h2 className="text-2xl font-bold text-center">{user.name}</h2>
             <p className="text-sm text-gray-500">{user.role}</p>
@@ -85,16 +85,16 @@ const ProfilePage = () => {
           <Divider className="my-4" />
           <div className="flex flex-col gap-4 px-4 pb-4">
             <Link href="/auth/change-password">
-              <Button color="primary" className="w-full" variant="flat">
+              <Button className="w-full" color="primary" variant="flat">
                 Change Password
               </Button>
             </Link>
             <Button
-              color="danger"
-              variant="flat"
               className="w-full"
-              onClick={handleLogout}
+              color="danger"
               isLoading={isLoading}
+              variant="flat"
+              onClick={handleLogout}
             >
               Logout
             </Button>

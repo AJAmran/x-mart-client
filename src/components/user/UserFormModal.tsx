@@ -55,7 +55,6 @@ const UserFormModal: React.FC<UserFormModalProps> = ({
 
   // Reset form when user prop changes
   useEffect(() => {
-    console.log("User prop received:", user);
     if (user) {
       const defaultValues = {
         name: user.name || "",
@@ -63,7 +62,7 @@ const UserFormModal: React.FC<UserFormModalProps> = ({
         mobileNumber: user.mobileNumber || "",
         profilePhoto: user.profilePhoto || "",
       };
-      console.log("Resetting form with defaultValues:", defaultValues);
+
       reset(defaultValues);
     }
   }, [user, reset]);
@@ -77,24 +76,23 @@ const UserFormModal: React.FC<UserFormModalProps> = ({
         mobileNumber: data.mobileNumber,
         profilePhoto: data.profilePhoto,
       };
-      console.log("Updating user with data:", updateData);
+
       await updateUser.mutateAsync({ id: user._id, userData: updateData });
       toast.success("User updated successfully");
       onClose();
     } catch (error: any) {
-      console.error("Error submitting form:", error);
       toast.error(error.message || "Failed to update user");
     }
   };
 
   return (
-    <Modal isOpen={isOpen} onOpenChange={onClose} size="lg">
+    <Modal isOpen={isOpen} size="lg" onOpenChange={onClose}>
       <ModalContent>
         {(onClose) => (
           <>
             <ModalHeader>Edit User</ModalHeader>
             <ModalBody>
-              <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+              <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
                 <Input
                   label="Name"
                   {...register("name")}
@@ -105,9 +103,9 @@ const UserFormModal: React.FC<UserFormModalProps> = ({
                   label="Email"
                   type="email"
                   {...register("email")}
+                  disabled={true} // Email is typically immutable for existing users
                   errorMessage={errors.email?.message}
                   isInvalid={!!errors.email}
-                  disabled={true} // Email is typically immutable for existing users
                 />
                 <Input
                   label="Mobile Number"
@@ -129,8 +127,8 @@ const UserFormModal: React.FC<UserFormModalProps> = ({
               </Button>
               <Button
                 color="primary"
-                onClick={handleSubmit(onSubmit)}
                 isLoading={updateUser.isPending}
+                onClick={handleSubmit(onSubmit)}
               >
                 Update
               </Button>

@@ -29,45 +29,45 @@ const ProfileModal = ({ user }: ProfileModalProps) => {
   return (
     <div className="relative">
       <Button
-        variant="light"
         className="flex items-center gap-2 px-3 py-2 rounded-lg transition hover:bg-gray-200 dark:hover:bg-gray-700"
+        variant="light"
         onMouseEnter={() => setIsOpen(true)}
         onMouseLeave={() => setIsOpen(false)}
       >
         <Image
-          src={user.profilePhoto || "/default-avatar.png"}
           alt={user.name}
-          width={32}
-          height={32}
           className="rounded-full border-2 border-yellow-300"
+          height={32}
+          src={user.profilePhoto || "/default-avatar.png"}
+          width={32}
         />
       </Button>
 
       {isOpen && (
         <motion.div
-          className="absolute right-0 w-64 bg-white dark:bg-gray-800 shadow-lg rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden z-50"
-          initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
+          className="absolute right-0 w-64 bg-white dark:bg-gray-800 shadow-lg rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden z-50"
           exit={{ opacity: 0, y: -10 }}
+          initial={{ opacity: 0, y: -10 }}
           onMouseEnter={() => setIsOpen(true)}
           onMouseLeave={() => setIsOpen(false)}
         >
           <div className="flex flex-col items-center p-4">
             <Image
-              src={user.profilePhoto || "/default-avatar.png"}
               alt={user.name}
-              width={80}
-              height={80}
               className="rounded-full border border-gray-300"
+              height={80}
+              src={user.profilePhoto || "/default-avatar.png"}
+              width={80}
             />
             <p className="text-lg font-semibold mt-2">{user.name}</p>
             <p className="text-sm text-gray-500">{user.email}</p>
           </div>
           <div className="border-t border-gray-200 dark:border-gray-700">
             <Button
-              variant="flat"
-              color="primary"
               className="w-full py-2 text-center"
+              color="primary"
+              variant="flat"
               onClick={handleViewProfile}
             >
               View Profile

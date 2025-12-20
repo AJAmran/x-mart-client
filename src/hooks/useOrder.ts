@@ -9,7 +9,6 @@ import {
   updateOrderStatus,
   cancelOrder,
 } from "@/src/services/OrderService";
-import { TOrder } from "@/src/types";
 
 // Fetch all orders (Admin)
 export const useOrders = (

@@ -1,7 +1,7 @@
 "use client";
 
 import { useParams } from "next/navigation";
-import { Key, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import Link from "next/link";
 import Head from "next/head";
@@ -62,6 +62,7 @@ const ProductDetailsPage = () => {
   const handleAddToCart = () => {
     if (quantity > product.stock) {
       toast.error("Insufficient stock");
+
       return;
     }
     setIsAddingToCart(true);
@@ -72,6 +73,7 @@ const ProductDetailsPage = () => {
       name: product.name,
       image: product.images?.[0] || "/placeholder.jpg",
     };
+
     addItem(cartItem);
     toast.success(`${product?.name} added to cart!`);
     setTimeout(() => {
@@ -162,15 +164,14 @@ const ProductDetailsPage = () => {
     <>
       <Head>
         <title>{`${product.name} | X-mart`}</title>
-        <meta name="description" content={product.description} />
-        <meta name="keywords" content={`${product.name}, ${product.category}, buy online, groceries`} />
-        <meta property="og:title" content={product.name} />
-        <meta property="og:description" content={product.description} />
-        <meta property="og:image" content={images[0]} />
-        <meta property="og:url" content={shareUrl} />
-        <meta name="twitter:card" content="summary_large_image" />
+        <meta content={product.description} name="description" />
+        <meta content={`${product.name}, ${product.category}, buy online, groceries`} name="keywords" />
+        <meta content={product.name} property="og:title" />
+        <meta content={product.description} property="og:description" />
+        <meta content={images[0]} property="og:image" />
+        <meta content={shareUrl} property="og:url" />
+        <meta content="summary_large_image" name="twitter:card" />
         <script
-          type="application/ld+json"
           dangerouslySetInnerHTML={{
             __html: JSON.stringify({
               "@context": "https://schema.org",
@@ -189,27 +190,28 @@ const ProductDetailsPage = () => {
               },
             }),
           }}
+          type="application/ld+json"
         />
       </Head>
       <div className="container mx-auto px-4 py-8">
         {/* Breadcrumb */}
         <motion.div
-          initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3 }}
           className="mb-6 flex items-center text-sm text-gray-500 dark:text-gray-400"
+          initial={{ opacity: 0, y: -10 }}
+          transition={{ duration: 0.3 }}
         >
-          <Link href="/" className="transition-colors hover:text-gray-900 dark:hover:text-gray-100">
+          <Link className="transition-colors hover:text-gray-900 dark:hover:text-gray-100" href="/">
             Home
           </Link>
           <ChevronRight className="mx-2" size={14} />
-          <Link href="/shop" className="transition-colors hover:text-gray-900 dark:hover:text-gray-100">
+          <Link className="transition-colors hover:text-gray-900 dark:hover:text-gray-100" href="/shop">
             Products
           </Link>
           <ChevronRight className="mx-2" size={14} />
           <Link
-            href={`/shop?category=${product.category}`}
             className="transition-colors hover:text-gray-900 dark:hover:text-gray-100"
+            href={`/shop?category=${product.category}`}
           >
             {product.category}
           </Link>
@@ -219,20 +221,20 @@ const ProductDetailsPage = () => {
 
         {/* Product Details Section */}
         <motion.div
-          initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ duration: 0.5 }}
           className="mb-12 grid grid-cols-1 gap-8 lg:grid-cols-2"
+          initial={{ opacity: 0 }}
+          transition={{ duration: 0.5 }}
         >
           {/* Image Gallery */}
           <div className="space-y-4">
             <div
+              aria-label="Open image viewer"
               className="relative flex cursor-pointer items-center justify-center rounded-xl bg-white p-4 shadow-md sm:p-6 dark:bg-gray-800"
-              onClick={handleImageClick}
-              onKeyDown={handleKeyDown}
               role="button"
               tabIndex={0}
-              aria-label="Open image viewer"
+              onClick={handleImageClick}
+              onKeyDown={handleKeyDown}
             >
               <Badge
                 className="absolute top-4 right-4 text-sm"
@@ -241,10 +243,10 @@ const ProductDetailsPage = () => {
                 variant="flat"
               >
                 <Image
+                  isZoomed
                   alt={product.name}
                   className="max-h-[400px] w-full object-contain transition-transform duration-300 hover:scale-105 sm:max-h-[500px]"
                   height={600}
-                  isZoomed
                   src={images[selectedImageIndex]}
                   width={600}
                 />
@@ -255,11 +257,11 @@ const ProductDetailsPage = () => {
                 {images.map((img: string | undefined, idx: number) => (
                   <Image
                     key={idx}
-                    src={img}
                     alt={`${product.name} thumbnail ${idx + 1}`}
-                    width={80}
-                    height={80}
                     className={`cursor-pointer rounded-md object-cover ${idx === selectedImageIndex ? "border-2 border-primary" : "opacity-70"}`}
+                    height={80}
+                    src={img}
+                    width={80}
                     onClick={() => setSelectedImageIndex(idx)}
                   />
                 ))}
@@ -304,14 +306,14 @@ const ProductDetailsPage = () => {
             {/* Quantity Selector */}
             <div className="flex items-center gap-4">
               <Input
-                type="number"
-                label="Quantity"
-                value={quantity.toString()}
-                onChange={(e) => handleQuantityChange(parseInt(e.target.value) || 1)}
-                min={1}
-                max={product.stock}
                 className="w-32"
                 isDisabled={product.stock <= 0}
+                label="Quantity"
+                max={product.stock}
+                min={1}
+                type="number"
+                value={quantity.toString()}
+                onChange={(e) => handleQuantityChange(parseInt(e.target.value) || 1)}
               />
             </div>
 
@@ -322,18 +324,18 @@ const ProductDetailsPage = () => {
                 color="primary"
                 isDisabled={product.stock <= 0}
                 isLoading={isAddingToCart}
-                onPress={handleAddToCart}
                 startContent={<ShoppingCart size={20} />}
                 variant="solid"
+                onPress={handleAddToCart}
               >
                 {product.stock > 0 ? "Add to Cart" : "Out of Stock"}
               </Button>
               <Button
                 className="h-12 w-full rounded-xl text-base font-medium sm:w-auto sm:text-lg"
                 color="secondary"
-                onPress={handleShare}
                 startContent={<Share2 size={20} />}
                 variant="bordered"
+                onPress={handleShare}
               >
                 Share
               </Button>
@@ -343,10 +345,10 @@ const ProductDetailsPage = () => {
 
         {/* Relevant Products Section */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2, duration: 0.5 }}
           className="mt-12"
+          initial={{ opacity: 0, y: 20 }}
+          transition={{ delay: 0.2, duration: 0.5 }}
         >
           <h2 className="mb-6 text-2xl font-bold text-gray-900 dark:text-gray-100 sm:text-3xl">
             You Might Also Like
@@ -359,10 +361,10 @@ const ProductDetailsPage = () => {
               : relevantProducts.map((product: TProduct) => (
                 <ProductCard
                   key={product._id}
+                  product={product}
                   onPress={() =>
                     (window.location.href = `/product/${product._id}`)
                   }
-                  product={product}
                 />
               ))}
           </div>
@@ -373,20 +375,20 @@ const ProductDetailsPage = () => {
       <AnimatePresence>
         {isImageViewerOpen && (
           <motion.div
-            initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
             className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4"
+            exit={{ opacity: 0 }}
+            initial={{ opacity: 0 }}
             onClick={() => setIsImageViewerOpen(false)}
           >
             <motion.div
-              initial={{ scale: 0.8 }}
               animate={{ scale: 1 }}
-              exit={{ scale: 0.8 }}
               className="relative flex h-full w-full max-w-4xl items-center justify-center"
+              exit={{ scale: 0.8 }}
+              initial={{ scale: 0.8 }}
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="overflow-hidden" ref={emblaRef}>
+              <div ref={emblaRef} className="overflow-hidden">
                 <div className="flex">
                   {images.map((img: string | undefined, idx: number) => ( // Changed type of idx to number
                     <div key={idx} className="min-w-full">
@@ -400,9 +402,9 @@ const ProductDetailsPage = () => {
                 </div>
               </div>
               <Button
+                isIconOnly
                 className="absolute right-2 top-2 rounded-full"
                 color="danger"
-                isIconOnly
                 onPress={() => setIsImageViewerOpen(false)}
               >
                 <X size={24} />

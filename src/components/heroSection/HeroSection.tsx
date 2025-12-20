@@ -2,7 +2,6 @@
 
 import React from "react";
 import { Flame, Clock, Tag } from "lucide-react";
-import Image from "next/image";
 import { Card } from "@nextui-org/card";
 import Carousel from "./Carousel";
 
@@ -11,33 +10,30 @@ interface PromoCard {
   icon: React.ReactNode;
   title: string;
   description: string;
-  bgImage: string;
+  gradient: string;
 }
 
 const promoCards: PromoCard[] = [
   {
     id: 1,
-    icon: <Flame className="w-5 h-5 sm:w-6 sm:h-6" />,
+    icon: <Flame className="w-5 h-5 sm:w-6 sm:h-6 text-white" />,
     title: "Hot Deals",
     description: "Exclusive offers on top products",
-    bgImage:
-      "https://media.istockphoto.com/id/1387606895/vector/hot-deal-banner-special-and-limited-offer-sale-countdown-badge-promo-sticker-with-stopwatch.jpg?s=612x612&w=0&k=20&c=MpGFvD0N4cGiBXijEP76ZbwWKMY-WwrW4cNiyZLF3h8=",
+    gradient: "bg-gradient-to-br from-orange-400 to-red-600",
   },
   {
     id: 2,
-    icon: <Clock className="w-5 h-5 sm:w-6 sm:h-6" />,
+    icon: <Clock className="w-5 h-5 sm:w-6 sm:h-6 text-white" />,
     title: "Flash Sale",
     description: "Hurry, limited time only!",
-    bgImage:
-      "https://media.istockphoto.com/id/2153946880/vector/flash-sale-logo-vector-illustration.jpg?s=612x612&w=0&k=20&c=RHppMAaB2WYtRejPYHXSZifa_coC_UlxZ6t_PWzZFcY=",
+    gradient: "bg-gradient-to-br from-purple-500 to-indigo-600",
   },
   {
     id: 3,
-    icon: <Tag className="w-5 h-5 sm:w-6 sm:h-6" />,
+    icon: <Tag className="w-5 h-5 sm:w-6 sm:h-6 text-white" />,
     title: "Daily Discounts",
     description: "Fresh deals every day",
-    bgImage:
-      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSw-dc-3u7oDtNzoUNYMB3UVbDvScuEGaulWg&s",
+    gradient: "bg-gradient-to-br from-green-400 to-emerald-600",
   },
 ];
 
@@ -51,24 +47,16 @@ const HeroSection: React.FC = () => {
             <Card
               key={card.id}
               isPressable
-              className="relative flex-1 rounded-xl overflow-hidden hover:shadow-2xl transition-all duration-300 group shadow-lg border-1"
+              className={`relative flex-1 rounded-xl overflow-hidden hover:shadow-2xl transition-all duration-300 group shadow-lg border-none ${card.gradient}`}
             >
-              <Image
-                src={card.bgImage}
-                alt={card.title}
-                fill
-                className="object-cover"
-                sizes="(max-width: 1024px) 100vw, 25vw"
-                loading="lazy"
-              />
-              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/60 flex flex-col items-center justify-center p-4 text-white opacity-0 group-hover:opacity-100 transition-all duration-300">
-                <div className="mb-2 sm:mb-3 p-2 sm:p-3 bg-primary rounded-full">
+              <div className="absolute inset-0 flex flex-col items-center justify-center p-4 text-white">
+                <div className="mb-2 sm:mb-3 p-2 sm:p-3 bg-white/20 backdrop-blur-md rounded-full group-hover:scale-110 transition-transform duration-300">
                   {card.icon}
                 </div>
-                <h3 className="text-sm sm:text-base font-semibold">
+                <h3 className="text-sm sm:text-base font-bold tracking-wide">
                   {card.title}
                 </h3>
-                <p className="text-xs sm:text-sm mt-1 text-center">
+                <p className="text-xs sm:text-sm mt-1 text-center opacity-90 font-medium">
                   {card.description}
                 </p>
               </div>

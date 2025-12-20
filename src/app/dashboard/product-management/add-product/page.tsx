@@ -65,48 +65,48 @@ const AddProductForm = () => {
 
   return (
     <form
-      onSubmit={handleSubmit(onSubmit)}
       className="space-y-6 p-6 bg-white shadow-lg rounded-md max-w-xl"
+      onSubmit={handleSubmit(onSubmit)}
     >
       <h2 className="text-2xl font-semibold text-gray-700">Add New Product</h2>
 
       {/* Product Name */}
       <Input
         {...register("name")}
+        errorMessage={errors.name?.message}
+        isInvalid={!!errors.name}
         label="Product Name"
         placeholder="Enter product name"
-        isInvalid={!!errors.name}
-        errorMessage={errors.name?.message}
       />
 
       {/* Description */}
       <Textarea
         {...register("description")}
+        errorMessage={errors.description?.message}
+        isInvalid={!!errors.description}
         label="Description"
         placeholder="Enter product description"
-        isInvalid={!!errors.description}
-        errorMessage={errors.description?.message}
       />
 
       {/* Price */}
       <Input
         {...register("price", { valueAsNumber: true })}
-        type="number"
-        label="Price"
-        placeholder="Enter product price"
-        isInvalid={!!errors.price}
         errorMessage={errors.price?.message}
+        isInvalid={!!errors.price}
+        label="Price"
         min="0"
+        placeholder="Enter product price"
         step="0.01"
+        type="number"
       />
 
       {/* Category */}
       <Select
         {...register("category")}
+        errorMessage={errors.category?.message}
+        isInvalid={!!errors.category}
         label="Category"
         placeholder="Select category"
-        isInvalid={!!errors.category}
-        errorMessage={errors.category?.message}
       >
         {categoriesData.map((category) => (
           <SelectItem
@@ -121,30 +121,30 @@ const AddProductForm = () => {
       {/* Stock */}
       <Input
         {...register("stock", { valueAsNumber: true })}
-        type="number"
-        label="Stock"
-        placeholder="Enter product stock"
-        isInvalid={!!errors.stock}
         errorMessage={errors.stock?.message}
+        isInvalid={!!errors.stock}
+        label="Stock"
         min="0"
+        placeholder="Enter product stock"
+        type="number"
       />
 
       {/* Image URL */}
       <Input
         {...register("images.0")}
+        errorMessage={errors.images?.[0]?.message || errors.images?.message}
+        isInvalid={!!errors.images}
         label="Image URL"
         placeholder="Enter product image URL"
-        isInvalid={!!errors.images}
-        errorMessage={errors.images?.[0]?.message || errors.images?.message}
       />
 
       {/* Submit Button */}
       <Button
-        type="submit"
-        color="primary"
-        isLoading={isPending || isSubmitting}
-        disabled={isPending || isSubmitting}
         fullWidth
+        color="primary"
+        disabled={isPending || isSubmitting}
+        isLoading={isPending || isSubmitting}
+        type="submit"
       >
         {isPending || isSubmitting ? "Creating..." : "Create Product"}
       </Button>

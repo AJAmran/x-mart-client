@@ -6,6 +6,7 @@ import { TOrder } from "@/src/types";
 // Create an order
 export const createOrder = async (data: Partial<TOrder>) => {
   const response = await axiosInstance.post("/orders", data);
+
   return response.data;
 };
 
@@ -32,18 +33,21 @@ export const getAllOrders = async (
   };
 
   const response = await axiosInstance.get("/orders", { params });
+
   return response.data;
 };
 
 // Get a single order by ID
 export const getOrderById = async (id: string) => {
   const response = await axiosInstance.get(`/orders/${id}`);
+
   return response.data;
 };
 
 // Get user's orders
 export const getUserOrders = async () => {
   const response = await axiosInstance.get("/orders/my-orders");
+
   return response.data;
 };
 
@@ -57,11 +61,13 @@ export const updateOrderStatus = async (
     status,
     note,
   });
+
   return response.data;
 };
 
 // Cancel an order (User)
 export const cancelOrder = async (id: string) => {
   const response = await axiosInstance.patch(`/orders/${id}/cancel`);
+
   return response.data;
 };

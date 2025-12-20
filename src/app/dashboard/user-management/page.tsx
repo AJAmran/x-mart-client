@@ -82,11 +82,11 @@ const UserManagementPage = () => {
       {/* Filters & Exports */}
       <div className="flex flex-col md:flex-row justify-between gap-4">
         <Input
+          className="max-w-xs"
           placeholder="Search users..."
-          startContent={<SearchIcon size={18} className="text-gray-400" />}
+          startContent={<SearchIcon className="text-gray-400" size={18} />}
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="max-w-xs"
         />
         <div className="flex gap-2">
           <Tooltip content="Refresh">
@@ -111,11 +111,11 @@ const UserManagementPage = () => {
       <Table
         aria-label="Users table"
         className="mt-4"
-        shadow="none"
         classNames={{
           wrapper: "bg-white/70 dark:bg-gray-800/70 backdrop-blur-md border-none",
           th: "bg-gray-100/50 dark:bg-gray-900/50 text-default-600",
         }}
+        shadow="none"
       >
         <TableHeader>
           <TableColumn>USER</TableColumn>
@@ -127,9 +127,9 @@ const UserManagementPage = () => {
         </TableHeader>
 
         <TableBody
+          emptyContent="No users found"
           isLoading={isLoading}
           loadingContent="Loading users..."
-          emptyContent="No users found"
         >
           {users.map((user: any) => (
             <TableRow key={user._id} className="border-b border-gray-100 dark:border-gray-800 last:border-none">
@@ -137,9 +137,9 @@ const UserManagementPage = () => {
                 <div className="flex items-center gap-3">
                   {user.profilePhoto ? (
                     <img
-                      src={user.profilePhoto}
                       alt={user.name}
                       className="w-10 h-10 rounded-full object-cover border-2 border-primary/20"
+                      src={user.profilePhoto}
                     />
                   ) : (
                     <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center font-bold text-primary">
@@ -160,11 +160,11 @@ const UserManagementPage = () => {
               </TableCell>
               <TableCell>
                 <Select
+                  className="w-32"
+                  selectedKeys={[user.role]}
                   size="sm"
                   variant="bordered"
-                  selectedKeys={[user.role]}
                   onChange={(e) => handleRoleChange(user._id, e.target.value)}
-                  className="w-32"
                 >
                   {Object.entries(USER_ROLE).map(([key, value]) => (
                     <SelectItem key={key}>
@@ -175,9 +175,9 @@ const UserManagementPage = () => {
               </TableCell>
               <TableCell>
                 <Chip
+                  color={user.status === "ACTIVE" ? "success" : "danger"}
                   size="sm"
                   variant="flat"
-                  color={user.status === "ACTIVE" ? "success" : "danger"}
                 >
                   {user.status}
                 </Chip>
@@ -186,8 +186,8 @@ const UserManagementPage = () => {
                 <div className="flex justify-center">
                   <UserActions
                     user={user}
-                    onEdit={() => handleOpenForm(user)}
                     onDelete={refetch}
+                    onEdit={() => handleOpenForm(user)}
                   />
                 </div>
               </TableCell>
@@ -199,12 +199,12 @@ const UserManagementPage = () => {
       {/* Pagination */}
       <div className="flex justify-between items-center mt-4">
         <Select
-          size="sm"
           className="w-48"
-          selectedKeys={[limit.toString()]}
-          onChange={(e) => setLimit(Number(e.target.value))}
           label="Rows per page"
           labelPlacement="outside-left"
+          selectedKeys={[limit.toString()]}
+          size="sm"
+          onChange={(e) => setLimit(Number(e.target.value))}
         >
           <SelectItem key="10">10 per page</SelectItem>
           <SelectItem key="25">25 per page</SelectItem>
@@ -213,20 +213,20 @@ const UserManagementPage = () => {
         </Select>
 
         <Pagination
-          total={totalPages}
-          page={page}
-          onChange={setPage}
           showControls
-          variant="flat"
           color="primary"
+          page={page}
+          total={totalPages}
+          variant="flat"
+          onChange={setPage}
         />
       </div>
 
       {/* Modal */}
       <UserFormModal
         isOpen={isFormOpen}
-        onClose={handleCloseForm}
         user={selectedUser}
+        onClose={handleCloseForm}
       />
     </div>
   );

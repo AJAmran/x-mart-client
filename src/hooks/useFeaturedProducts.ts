@@ -17,7 +17,6 @@ export const useFeaturedProducts = () => {
 
       // Ensure products is an array
       if (!Array.isArray(products)) {
-        console.error("Expected an array of products, but got:", products);
         return [];
       }
 

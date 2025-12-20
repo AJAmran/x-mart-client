@@ -36,13 +36,14 @@ export default function ValuesSection({ values }: ValuesSectionProps) {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg Grid-cols-4 gap-8">
           {values.map((value, index) => {
             const Icon = iconMap[value.icon];
+
             return (
               <motion.div
                 key={value.title}
-                variants={cardVariants}
-                initial="hidden"
                 animate="visible"
+                initial="hidden"
                 transition={{ delay: index * 0.2 }}
+                variants={cardVariants}
               >
                 <Card className="shadow-lg hover:shadow-xl transition-shadow">
                   <CardBody className="p-6 text-center">

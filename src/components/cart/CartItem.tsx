@@ -31,11 +31,11 @@ export const CartItem = ({ item }: CartItemProps) => {
       {/* Product Image */}
       <div className="flex-shrink-0">
         <Image
-          src={item.image || "/placeholder.jpg"}
           alt={item.name}
-          width={80}
-          height={80}
           className="w-20 h-20 object-cover rounded-lg"
+          height={80}
+          src={item.image || "/placeholder.jpg"}
+          width={80}
         />
       </div>
 
@@ -55,10 +55,10 @@ export const CartItem = ({ item }: CartItemProps) => {
         <div className="flex items-center gap-2">
           <Button
             isIconOnly
+            aria-label="Decrease quantity"
             size="sm"
             variant="flat"
             onPress={handleDecrease}
-            aria-label="Decrease quantity"
           >
             <Minus size={14} />
           </Button>
@@ -69,10 +69,10 @@ export const CartItem = ({ item }: CartItemProps) => {
           
           <Button
             isIconOnly
+            aria-label="Increase quantity"
             size="sm"
             variant="flat"
             onPress={handleIncrease}
-            aria-label="Increase quantity"
           >
             <Plus size={14} />
           </Button>
@@ -80,11 +80,11 @@ export const CartItem = ({ item }: CartItemProps) => {
         
         <Button
           isIconOnly
-          size="sm"
+          aria-label="Remove item"
           color="danger"
+          size="sm"
           variant="light"
           onPress={() => removeItem(item.productId)}
-          aria-label="Remove item"
         >
           <Trash2 size={14} />
         </Button>

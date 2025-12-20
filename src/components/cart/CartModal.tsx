@@ -23,17 +23,17 @@ export const CartModal = () => {
   return (
     <>
       <Badge 
-        content={cart.totalItems} 
         color="danger" 
-        size="sm"
+        content={cart.totalItems} 
         isInvisible={cart.totalItems === 0}
+        size="sm"
       >
         <Button 
           isIconOnly 
-          variant="light" 
-          onPress={onOpen}
+          aria-label="Shopping cart" 
           className="relative text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
-          aria-label="Shopping cart"
+          variant="light"
+          onPress={onOpen}
         >
           <ShoppingCart className="w-5 h-5" />
         </Button>
@@ -41,9 +41,9 @@ export const CartModal = () => {
 
       <Modal 
         isOpen={isOpen} 
-        onOpenChange={onOpenChange} 
+        scrollBehavior="inside" 
         size="2xl"
-        scrollBehavior="inside"
+        onOpenChange={onOpenChange}
       >
         <ModalContent>
           {(onClose) => (
@@ -97,8 +97,8 @@ export const CartModal = () => {
                 <ModalFooter className="flex justify-between border-t dark:border-gray-700">
                   <Button 
                     color="danger" 
-                    variant="light" 
-                    startContent={<Trash2 size={16} />}
+                    startContent={<Trash2 size={16} />} 
+                    variant="light"
                     onPress={clearCart}
                   >
                     Clear Cart
@@ -112,8 +112,8 @@ export const CartModal = () => {
                       Continue Shopping
                     </Button>
                     <Button
-                      color="success"
                       as={Link}
+                      color="success"
                       href="/checkout"
                       onPress={onClose}
                     >

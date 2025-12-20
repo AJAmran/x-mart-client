@@ -63,18 +63,18 @@ export default function TeamSection({ team }: TeamSectionProps) {
     <section className="py-20">
       <div className="">
         <motion.h2
-          initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
           className="text-4xl md:text-5xl font-bold text-center mb-16 text-gray-900 dark:text-white"
+          initial={{ opacity: 0, y: -20 }}
+          transition={{ duration: 0.6 }}
         >
           Meet Our Team
         </motion.h2>
         <motion.div
-          variants={containerVariants}
-          initial="hidden"
           animate="visible"
           className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8"
+          initial="hidden"
+          variants={containerVariants}
         >
           {team.map((member) => (
             <motion.div
@@ -83,26 +83,26 @@ export default function TeamSection({ team }: TeamSectionProps) {
               whileHover="hover"
             >
               <Card
-                className="relative overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300 rounded-xl"
                 isHoverable
+                className="relative overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300 rounded-xl"
               >
                 <CardBody className="p-6 text-center flex flex-col items-center">
                   <div className="relative flex justify-center items-center w-32 h-32 mb-4">
                     <Image
-                      src={member.image}
-                      alt={`Portrait of ${member.name}`}
-                      width={120}
-                      height={120}
-                      className="rounded-full border-4 border-primary/20 shadow-md object-cover"
                       isZoomed
+                      alt={`Portrait of ${member.name}`}
+                      className="rounded-full border-4 border-primary/20 shadow-md object-cover"
+                      height={120}
                       loading="lazy"
+                      src={member.image}
+                      width={120}
                     />
                     {/* Overlay for hover effect */}
                     <motion.div
                       className="absolute inset-0 bg-primary/10 rounded-full"
                       initial={{ opacity: 0 }}
-                      whileHover={{ opacity: 1 }}
                       transition={{ duration: 0.3 }}
+                      whileHover={{ opacity: 1 }}
                     />
                   </div>
                   <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
@@ -117,26 +117,27 @@ export default function TeamSection({ team }: TeamSectionProps) {
                     <motion.div
                       className="flex justify-center gap-4 mt-4"
                       initial={{ opacity: 0, y: 10 }}
-                      whileHover={{ opacity: 1, y: 0 }}
                       transition={{ duration: 0.3 }}
+                      whileHover={{ opacity: 1, y: 0 }}
                     >
                       {Object.entries(member.socialLinks).map(
                         ([platform, url]) => {
                           const { icon: Icon, label } =
                             socialIcons[platform as keyof typeof socialIcons];
+
                           return (
                             <Tooltip
                               key={platform}
+                              color="primary"
                               content={label}
                               placement="top"
-                              color="primary"
                             >
                               <a
-                                href={url}
-                                target="_blank"
-                                rel="noopener noreferrer"
                                 aria-label={`${member.name}'s ${label} profile`}
                                 className="text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary transition-colors"
+                                href={url}
+                                rel="noopener noreferrer"
+                                target="_blank"
                               >
                                 <Icon size={20} />
                               </a>

@@ -77,11 +77,13 @@ const Sidebar: FC = () => {
 
   const isActive = (href?: string) => {
     if (!href) return false;
+
     return pathname === href;
   };
 
   const isSubmenuActive = (submenu?: { href: string }[]) => {
     if (!submenu) return false;
+
     return submenu.some((item) => pathname === item.href);
   };
 
@@ -91,8 +93,8 @@ const Sidebar: FC = () => {
       <div className="p-6">
         <div className="flex items-center justify-between mb-8">
           <Link
-            href="/"
             className="text-2xl font-bold text-blue-600 dark:text-blue-400 tracking-tight"
+            href="/"
           >
             X-Mart
           </Link>
@@ -106,11 +108,11 @@ const Sidebar: FC = () => {
               <li key={item.label}>
                 {item.href ? (
                   <Link
-                    href={item.href}
                     className={`flex items-center space-x-3 p-3 rounded-lg transition-all duration-200 ${isActive(item.href)
                         ? "bg-blue-600 text-white shadow-md shadow-blue-500/30"
                         : "text-gray-700 dark:text-gray-200 hover:bg-blue-50 dark:hover:bg-gray-700 hover:text-blue-600 dark:hover:text-blue-400"
                       }`}
+                    href={item.href}
                   >
                     <item.icon className={`w-5 h-5 ${isActive(item.href) ? "text-white" : ""}`} />
                     <span className="text-sm font-medium">{item.label}</span>
@@ -121,9 +123,9 @@ const Sidebar: FC = () => {
                         ? "text-blue-600 dark:text-blue-400 bg-blue-50/50 dark:bg-blue-900/20"
                         : "text-gray-700 dark:text-gray-200 hover:bg-blue-50 dark:hover:bg-gray-700 hover:text-blue-600 dark:hover:text-blue-400"
                       }`}
-                    onClick={() => toggleSubmenu(item.label)}
                     role="button"
                     tabIndex={0}
+                    onClick={() => toggleSubmenu(item.label)}
                     onKeyDown={(e) => {
                       if (e.key === "Enter" || e.key === " ") {
                         toggleSubmenu(item.label);
@@ -146,11 +148,11 @@ const Sidebar: FC = () => {
                     {item.submenu.map((subItem) => (
                       <li key={subItem.label}>
                         <Link
-                          href={subItem.href}
                           className={`flex items-center p-2 rounded-lg text-sm transition-all duration-200 ${isActive(subItem.href)
                               ? "text-blue-600 dark:text-blue-400 font-bold bg-blue-50 dark:bg-blue-900/30"
                               : "text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50/30 dark:hover:bg-gray-700/50"
                             }`}
+                          href={subItem.href}
                         >
                           <span>{subItem.label}</span>
                         </Link>
@@ -167,8 +169,8 @@ const Sidebar: FC = () => {
       {/* Bottom Section */}
       <div className="p-6 border-t border-gray-200 dark:border-gray-700">
         <Link
-          href="/logout"
           className="flex items-center justify-center p-3 rounded-lg bg-red-600 hover:bg-red-700 text-white text-sm font-medium transition-colors duration-200"
+          href="/logout"
         >
           <LogOut className="w-5 h-5 mr-2" />
           Logout

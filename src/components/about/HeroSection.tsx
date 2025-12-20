@@ -59,8 +59,8 @@ export default function HeroSection() {
       {/* Background Wave Effect */}
       <div className="absolute inset-0 opacity-20">
         <motion.div
-          className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent"
           animate={{ x: ["-100%", "100%"] }}
+          className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent"
           transition={{ repeat: Infinity, duration: 10, ease: "linear" }}
         />
       </div>
@@ -68,12 +68,12 @@ export default function HeroSection() {
       {/* Hero Image with Parallax */}
       <motion.div className="absolute inset-0 z-0" style={{ y }}>
         <Image
-          src="/hero-bg.jpg"
           alt="X-mart hero background"
-          width={1920}
-          height={1080}
           className="object-cover w-full h-full opacity-30"
+          height={1080}
           loading="lazy"
+          src="/hero-bg.jpg"
+          width={1920}
         />
       </motion.div>
 
@@ -82,23 +82,23 @@ export default function HeroSection() {
 
       <div className="container mx-auto px-4 relative z-20">
         <motion.div
-          variants={containerVariants}
-          initial="hidden"
           animate="visible"
           className="text-center max-w-4xl mx-auto"
+          initial="hidden"
+          variants={containerVariants}
         >
           {/* Headline with Shadow */}
           <motion.h1
-            variants={childVariants}
             className="text-4xl sm:text-5xl md:text-6xl font-extrabold mb-6 tracking-tight drop-shadow-lg"
+            variants={childVariants}
           >
             Discover X-mart
           </motion.h1>
 
           {/* Subheadline */}
           <motion.p
-            variants={childVariants}
             className="text-lg sm:text-xl md:text-2xl mb-10 font-light max-w-2xl mx-auto"
+            variants={childVariants}
           >
             Empowering global shoppers with quality, trust, and innovation since
             2018.
@@ -106,8 +106,8 @@ export default function HeroSection() {
 
           {/* CTAs */}
           <motion.div
-            variants={childVariants}
             className="flex flex-col sm:flex-row justify-center gap-4"
+            variants={childVariants}
           >
             <motion.div
               variants={buttonVariants}
@@ -115,13 +115,13 @@ export default function HeroSection() {
               whileTap="tap"
             >
               <Button
-                as={Link}
-                href="/shop"
-                color="secondary"
-                size="lg"
-                endContent={<ArrowRight size={20} />}
-                className="font-semibold px-8 py-3 bg-secondary-500 text-white dark:bg-secondary-600 dark:text-white shadow-lg"
                 aria-label="Explore our products"
+                as={Link}
+                className="font-semibold px-8 py-3 bg-secondary-500 text-white dark:bg-secondary-600 dark:text-white shadow-lg"
+                color="secondary"
+                endContent={<ArrowRight size={20} />}
+                href="/shop"
+                size="lg"
               >
                 Explore Products
               </Button>
@@ -132,13 +132,13 @@ export default function HeroSection() {
               whileTap="tap"
             >
               <Button
-                as={Link}
-                href="/about"
-                variant="bordered"
-                size="lg"
-                endContent={<ShoppingBag size={20} />}
-                className="font-semibold px-8 py-3 border-2 border-white text-white dark:border-gray-300 dark:text-gray-300 hover:bg-white/20 dark:hover:bg-gray-800/20"
                 aria-label="Learn more about X-mart"
+                as={Link}
+                className="font-semibold px-8 py-3 border-2 border-white text-white dark:border-gray-300 dark:text-gray-300 hover:bg-white/20 dark:hover:bg-gray-800/20"
+                endContent={<ShoppingBag size={20} />}
+                href="/about"
+                size="lg"
+                variant="bordered"
               >
                 Learn More
               </Button>
@@ -149,8 +149,8 @@ export default function HeroSection() {
 
       {/* Particle Effect (Optional) */}
       <motion.div
-        className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-white/10 to-transparent dark:from-gray-900/10"
         animate={{ opacity: [0.2, 0.4, 0.2] }}
+        className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-white/10 to-transparent dark:from-gray-900/10"
         transition={{ repeat: Infinity, duration: 3 }}
       />
     </section>

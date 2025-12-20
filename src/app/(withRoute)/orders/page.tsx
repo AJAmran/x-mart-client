@@ -21,6 +21,7 @@ const OrderHistoryPage = () => {
 
   const getStatusStyles = (status: keyof typeof ORDER_STATUS) => {
     const baseStyles = "px-3 py-1 rounded-full text-xs font-medium";
+
     switch (status) {
       case "PENDING":
         return `${baseStyles} bg-yellow-50 text-yellow-800 border border-yellow-200`;
@@ -58,8 +59,8 @@ const OrderHistoryPage = () => {
     return (
       <div className="flex justify-center items-center min-h-screen">
         <Spinner
-          label="Loading your orders..."
           color="primary"
+          label="Loading your orders..."
           labelColor="foreground"
           size="lg"
         />
@@ -74,9 +75,9 @@ const OrderHistoryPage = () => {
             <p className="text-lg font-semibold mb-2">Error loading orders</p>
             <p>{error.message}</p>
             <Button
+              className="mt-4"
               color="danger"
               variant="light"
-              className="mt-4"
               onClick={() => window.location.reload()}
             >
               Retry
@@ -96,9 +97,9 @@ const OrderHistoryPage = () => {
           </p>
         </div>
         <Button
+          className="mt-4 md:mt-0"
           color="primary"
           variant="light"
-          className="mt-4 md:mt-0"
           onPress={() => router.push("/")}
         >
           Continue Shopping
@@ -134,7 +135,6 @@ const OrderHistoryPage = () => {
                       Order #{order._id.slice(0, 8).toUpperCase()}
                     </h2>
                     <Chip
-                      variant="dot"
                       classNames={{
                         base: getStatusStyles(order.status),
                         dot:
@@ -148,6 +148,7 @@ const OrderHistoryPage = () => {
                                   ? "bg-green-500"
                                   : "bg-red-500",
                       }}
+                      variant="dot"
                     >
                       <span className="flex items-center gap-1">
                         {getStatusIcon(order.status)} {order.status}
@@ -179,20 +180,20 @@ const OrderHistoryPage = () => {
                       className="flex p-6 hover:bg-gray-50 transition-colors"
                     >
                       <Badge
-                        content={item.quantity}
-                        color="primary"
-                        shape="circle"
                         className="border-2 border-white"
+                        color="primary"
+                        content={item.quantity}
+                        shape="circle"
                       >
                         <Image
-                          src={item.image || "/placeholder.jpg"}
                           alt={item.name}
-                          width={96}
-                          height={96}
                           className="w-24 h-24 object-cover rounded-lg"
                           classNames={{
                             wrapper: "bg-gray-100",
                           }}
+                          height={96}
+                          src={item.image || "/placeholder.jpg"}
+                          width={96}
                         />
                       </Badge>
                       <div className="ml-6 flex-1">
@@ -213,7 +214,7 @@ const OrderHistoryPage = () => {
                             View Product
                           </Button>
                           {order.status === "DELIVERED" && (
-                            <Button size="sm" variant="flat" color="success">
+                            <Button color="success" size="sm" variant="flat">
                               Buy Again
                             </Button>
                           )}
@@ -276,30 +277,30 @@ const OrderHistoryPage = () => {
                 </div>
                 <div className="flex flex-col sm:flex-row gap-2 w-full md:w-auto">
                   <Button
+                    className="w-full md:w-auto"
                     color="primary"
                     variant="solid"
                     onPress={() => router.push(`/orders/${order._id}`)}
-                    className="w-full md:w-auto"
                   >
                     Order Details
                   </Button>
                   {order.status === ORDER_STATUS.PENDING && (
                     <Button
+                      className="w-full md:w-auto"
                       color="danger"
-                      variant="flat"
-                      onPress={() => cancelOrder(order._id)}
                       isDisabled={isPending}
                       isLoading={isPending}
-                      className="w-full md:w-auto"
+                      variant="flat"
+                      onPress={() => cancelOrder(order._id)}
                     >
                       Cancel Order
                     </Button>
                   )}
                   {order.status === ORDER_STATUS.DELIVERED && (
                     <Button
+                      className="w-full md:w-auto"
                       color="success"
                       variant="flat"
-                      className="w-full md:w-auto"
                     >
                       Leave Review
                     </Button>

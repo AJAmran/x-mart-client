@@ -46,6 +46,7 @@ export const changePassword = async (passwordData: {
       "/auth/change-password",
       passwordData
     );
+
     return data;
   } catch (error: any) {
     throw new Error(error.message);
@@ -97,7 +98,7 @@ export const getNewAccessToken = async () => {
     });
 
     return res.data;
-  } catch (error) {
+  } catch {
     throw new Error("Failed to get new access token");
   }
 };

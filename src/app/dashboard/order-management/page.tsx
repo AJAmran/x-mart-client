@@ -53,7 +53,7 @@ const OrderManagementPage = () => {
   if (isLoading) {
     return (
       <div className="flex justify-center items-center min-h-screen">
-        <Spinner label="Loading orders..." color="primary" size="lg" />
+        <Spinner color="primary" label="Loading orders..." size="lg" />
       </div>
     );
   }
@@ -72,11 +72,11 @@ const OrderManagementPage = () => {
           </p>
         </div>
         <Button
-          variant="flat"
+          className="bg-blue-50 hover:bg-blue-100"
           color="primary"
           startContent={<RefreshCw size={18} />}
+          variant="flat"
           onPress={() => refetch()}
-          className="bg-blue-50 hover:bg-blue-100"
         >
           Refresh
         </Button>
@@ -84,24 +84,24 @@ const OrderManagementPage = () => {
 
       <FilterBar
         filters={filters}
-        onFilterChange={handleFilterChange}
         onClearFilters={handleClearFilters}
+        onFilterChange={handleFilterChange}
       />
 
       <OrderTable
-        orders={orders}
-        options={options}
-        meta={meta}
-        onSort={handleSort}
-        onPageChange={(page) => setOptions((prev) => ({ ...prev, page }))}
-        updateStatus={updateStatus}
         isPending={isPending}
+        meta={meta}
+        options={options}
+        orders={orders}
+        updateStatus={updateStatus}
+        onPageChange={(page) => setOptions((prev) => ({ ...prev, page }))}
+        onSort={handleSort}
       />
 
       <StatusUpdateModal
-        updateStatus={updateStatus}
         isPending={isPending}
         refetch={refetch}
+        updateStatus={updateStatus}
       />
     </div>
   );

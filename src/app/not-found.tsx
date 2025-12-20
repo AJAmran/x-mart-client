@@ -14,14 +14,14 @@ export default function NotFound() {
               <div className="text-8xl font-bold text-gray-700 dark:text-gray-300 mb-2">
                 404
               </div>
-              <div className="w-24 h-1 bg-gradient-to-r from-blue-500 to-purple-600 mx-auto rounded-full"></div>
+              <div className="w-24 h-1 bg-gradient-to-r from-blue-500 to-purple-600 mx-auto rounded-full" />
             </div>
           </div>
           
           {/* Floating elements */}
-          <div className="absolute -top-2 -left-2 w-6 h-6 bg-yellow-400 rounded-full animate-bounce"></div>
-          <div className="absolute -bottom-2 -right-2 w-4 h-4 bg-red-400 rounded-full animate-bounce delay-75"></div>
-          <div className="absolute top-1/2 -right-4 w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
+          <div className="absolute -top-2 -left-2 w-6 h-6 bg-yellow-400 rounded-full animate-bounce" />
+          <div className="absolute -bottom-2 -right-2 w-4 h-4 bg-red-400 rounded-full animate-bounce delay-75" />
+          <div className="absolute top-1/2 -right-4 w-3 h-3 bg-green-400 rounded-full animate-pulse" />
         </div>
 
         {/* Content */}
@@ -45,21 +45,21 @@ export default function NotFound() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <Button
                 as={Link}
-                href="/"
-                color="primary"
-                variant="flat"
                 className="h-12 justify-start"
+                color="primary"
+                href="/"
                 startContent={<Home className="w-5 h-5" />}
+                variant="flat"
               >
                 Home Page
               </Button>
               <Button
                 as={Link}
-                href="/shop"
-                color="primary"
-                variant="flat"
                 className="h-12 justify-start"
+                color="primary"
+                href="/shop"
                 startContent={<ShoppingBag className="w-5 h-5" />}
+                variant="flat"
               >
                 Browse Shop
               </Button>
@@ -71,8 +71,8 @@ export default function NotFound() {
             <p>Try searching for what you need:</p>
             <div className="flex justify-center">
               <Link 
-                href="/shop" 
-                className="inline-flex items-center gap-2 text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium transition-colors"
+                className="inline-flex items-center gap-2 text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium transition-colors" 
+                href="/shop"
               >
                 <Search className="w-4 h-4" />
                 Explore Products
@@ -84,10 +84,10 @@ export default function NotFound() {
           <div className="pt-4">
             <Button
               as={Link}
-              href="/"
-              color="primary"
-              size="lg"
               className="w-full sm:w-auto px-8 py-6 text-lg font-semibold rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 bg-gradient-to-r from-blue-600 to-purple-600"
+              color="primary"
+              href="/"
+              size="lg"
               startContent={<Home className="w-6 h-6" />}
             >
               Back to Homepage

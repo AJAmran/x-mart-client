@@ -38,89 +38,89 @@ const ShippingInformation: React.FC<ShippingInformationProps> = ({
       <CardBody className="space-y-4">
         {/* Full Name (Disabled) */}
         <Input
+          isDisabled
+          required
+          errorMessage={errors.name}
+          isInvalid={!!errors.name}
           label="Full Name"
           name="name"
           value={shippingInfo.name}
-          isDisabled
-          isInvalid={!!errors.name}
-          errorMessage={errors.name}
-          required
         />
 
         {/* Email (Disabled) */}
         <Input
+          isDisabled
+          required
+          errorMessage={errors.email}
+          isInvalid={!!errors.email}
           label="Email"
           name="email"
           value={shippingInfo.email}
-          isDisabled
-          isInvalid={!!errors.email}
-          errorMessage={errors.email}
-          required
         />
 
         {/* Address Line 1 */}
         <Input
+          required
+          errorMessage={errors.addressLine1}
+          isInvalid={!!errors.addressLine1}
           label="Address Line 1"
           name="addressLine1"
           value={shippingInfo.addressLine1}
           onChange={handleShippingChange}
-          isInvalid={!!errors.addressLine1}
-          errorMessage={errors.addressLine1}
-          required
         />
 
         {/* Address Line 2 */}
         <Input
+          errorMessage={errors.addressLine2}
+          isInvalid={!!errors.addressLine2}
           label="Address Line 2"
           name="addressLine2"
           value={shippingInfo.addressLine2}
           onChange={handleShippingChange}
-          isInvalid={!!errors.addressLine2}
-          errorMessage={errors.addressLine2}
         />
 
         {/* City/District */}
         <Input
+          required
+          errorMessage={errors.city}
+          isInvalid={!!errors.city}
           label="City/District"
           name="city"
           value={shippingInfo.city}
           onChange={handleShippingChange}
-          isInvalid={!!errors.city}
-          errorMessage={errors.city}
-          required
         />
 
         {/* Postal Code */}
         <Input
+          required
+          errorMessage={errors.postalCode}
+          isInvalid={!!errors.postalCode}
           label="Postal Code"
           name="postalCode"
           value={shippingInfo.postalCode}
           onChange={handleShippingChange}
-          isInvalid={!!errors.postalCode}
-          errorMessage={errors.postalCode}
-          required
         />
 
         {/* Division */}
         <Input
+          required
+          errorMessage={errors.division}
+          isInvalid={!!errors.division}
           label="Division"
           name="division"
           value={shippingInfo.division}
           onChange={handleShippingChange}
-          isInvalid={!!errors.division}
-          errorMessage={errors.division}
-          required
         />
 
         {/* Phone Number (Disabled) */}
         <Input
+          isDisabled
+          required
+          errorMessage={errors.phone}
+          isInvalid={!!errors.phone}
           label="Phone Number"
           name="phone"
           value={shippingInfo.phone}
-          isDisabled
-          isInvalid={!!errors.phone}
-          errorMessage={errors.phone}
-          required
         />
       </CardBody>
     </Card>

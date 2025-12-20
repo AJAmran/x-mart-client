@@ -51,30 +51,30 @@ const SearchBar: React.FC<SearchBarProps> = ({
   };
 
   return (
-    <form onSubmit={handleSearchSubmit} className={`relative ${className}`}>
+    <form className={`relative ${className}`} onSubmit={handleSearchSubmit}>
       <Input
-        type="text"
-        placeholder={placeholder}
-        value={inputValue}
-        onChange={handleChange}
-        startContent={<SearchIcon size={20} className="text-gray-400" />}
-        endContent={
-          inputValue && (
-            <button
-              type="button"
-              onClick={handleClear}
-              className="p-1 rounded-full hover:bg-gray-100 transition-colors"
-            >
-              <X size={16} className="text-gray-400" />
-            </button>
-          )
-        }
         classNames={{
           base: "w-full",
           input: "text-base",
           inputWrapper:
             "h-12 border-2 border-transparent bg-gray-100/50 dark:bg-gray-800/50 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-2xl focus-within:border-primary/50 focus-within:ring-4 focus-within:ring-primary/10 transition-all duration-300 shadow-sm",
         }}
+        endContent={
+          inputValue && (
+            <button
+              className="p-1 rounded-full hover:bg-gray-100 transition-colors"
+              type="button"
+              onClick={handleClear}
+            >
+              <X className="text-gray-400" size={16} />
+            </button>
+          )
+        }
+        placeholder={placeholder}
+        startContent={<SearchIcon className="text-gray-400" size={20} />}
+        type="text"
+        value={inputValue}
+        onChange={handleChange}
       />
     </form>
   );

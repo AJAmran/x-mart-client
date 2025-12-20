@@ -117,8 +117,8 @@ export default async function AboutPage() {
     <main className="min-h-screen ">
       {/* Structured Data for SEO */}
       <script
-        type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+        type="application/ld+json"
       />
 
       {/* Page Content */}

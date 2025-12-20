@@ -122,6 +122,7 @@ export default function Filters({ categories, initialFilters }: FiltersProps) {
   const handleSortChange = useCallback((value: string) => {
     if (value) {
       const [key, order] = value.split(":");
+
       setSortBy(key);
       setSortOrder(order as "desc" | "asc");
     }
@@ -138,6 +139,7 @@ export default function Filters({ categories, initialFilters }: FiltersProps) {
   // Auto-apply filters on change
   useEffect(() => {
     updateURL();
+
     return () => {
       updateURL.cancel(); // Cancel debounced calls on unmount
     };
@@ -145,8 +147,8 @@ export default function Filters({ categories, initialFilters }: FiltersProps) {
 
   return (
     <Card
-      className="p-4 shadow-sm bg-white dark:bg-gray-800"
       aria-label="Product Filters"
+      className="p-4 shadow-sm bg-white dark:bg-gray-800"
     >
       <CardBody className="space-y-6">
         {/* Sorting */}
@@ -155,10 +157,6 @@ export default function Filters({ categories, initialFilters }: FiltersProps) {
             Sort By
           </h3>
           <Select
-            label="Sort By"
-            placeholder="Select sorting option"
-            selectedKeys={[`${sortBy}:${sortOrder}`]}
-            onChange={(e) => handleSortChange(e.target.value)}
             aria-label="Sort products"
             classNames={{
               trigger:
@@ -166,6 +164,10 @@ export default function Filters({ categories, initialFilters }: FiltersProps) {
               listbox: "bg-white dark:bg-gray-900",
               popoverContent: "bg-white dark:bg-gray-900",
             }}
+            label="Sort By"
+            placeholder="Select sorting option"
+            selectedKeys={[`${sortBy}:${sortOrder}`]}
+            onChange={(e) => handleSortChange(e.target.value)}
           >
             <SelectItem key="price:desc" value="price:desc">
               Price: High to Low
@@ -185,9 +187,17 @@ export default function Filters({ categories, initialFilters }: FiltersProps) {
             Price Range
           </h3>
           <Slider
+            aria-label="Select price range"
+            classNames={{
+              track: "bg-gray-200 dark:bg-gray-700",
+              filler: "bg-primary",
+              thumb:
+                "bg-white dark:bg-gray-900 border-gray-300 dark:border-gray-600",
+            }}
+            formatOptions={{ style: "currency", currency: "BDT" }}
             label="Price Range"
-            minValue={0}
             maxValue={10000}
+            minValue={0}
             step={100}
             value={[filters.minPrice, filters.maxPrice]}
             onChange={(value: number | number[]) => {
@@ -195,14 +205,6 @@ export default function Filters({ categories, initialFilters }: FiltersProps) {
                 handleFilterChange("minPrice", value[0]);
                 handleFilterChange("maxPrice", value[1]);
               }
-            }}
-            formatOptions={{ style: "currency", currency: "BDT" }}
-            aria-label="Select price range"
-            classNames={{
-              track: "bg-gray-200 dark:bg-gray-700",
-              filler: "bg-primary",
-              thumb:
-                "bg-white dark:bg-gray-900 border-gray-300 dark:border-gray-600",
             }}
           />
           <div className="flex justify-between text-sm mt-2 text-gray-600 dark:text-gray-400">
@@ -217,8 +219,8 @@ export default function Filters({ categories, initialFilters }: FiltersProps) {
             Category
             {filters.category && (
               <button
-                type="button"
                 className="text-xs text-blue-500 hover:underline bg-transparent border-none p-0 cursor-pointer"
+                type="button"
                 onClick={() => handleFilterChange("category", "")}
               >
                 Clear
@@ -229,15 +231,7 @@ export default function Filters({ categories, initialFilters }: FiltersProps) {
             {categories.map((category) => (
               <Button
                 key={category.id}
-                size="sm"
-                variant={filters.category === category.id ? "solid" : "flat"}
-                color={filters.category === category.id ? "primary" : "default"}
-                onClick={() =>
-                  handleFilterChange(
-                    "category",
-                    filters.category === category.id ? "" : category.id
-                  )
-                }
+                aria-label={`Filter by ${category.name}`}
                 className={`
                   rounded-full transition-all duration-300
                   ${filters.category === category.id
@@ -245,7 +239,15 @@ export default function Filters({ categories, initialFilters }: FiltersProps) {
                     : "bg-gray-100 dark:bg-gray-700/50 hover:bg-gray-200 dark:hover:bg-gray-700"
                   }
                 `}
-                aria-label={`Filter by ${category.name}`}
+                color={filters.category === category.id ? "primary" : "default"}
+                size="sm"
+                variant={filters.category === category.id ? "solid" : "flat"}
+                onClick={() =>
+                  handleFilterChange(
+                    "category",
+                    filters.category === category.id ? "" : category.id
+                  )
+                }
               >
                 {category.name}
               </Button>
@@ -255,11 +257,11 @@ export default function Filters({ categories, initialFilters }: FiltersProps) {
 
         {/* Reset Button */}
         <Button
+          aria-label="Reset filters"
           className="w-full mt-4 font-semibold text-danger border-danger/20 hover:bg-danger/10 transition-colors"
+          startContent={<RefreshCw size={16} />}
           variant="bordered"
           onClick={resetFilters}
-          aria-label="Reset filters"
-          startContent={<RefreshCw size={16} />}
         >
           Reset All Filters
         </Button>

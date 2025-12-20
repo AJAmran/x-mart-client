@@ -72,15 +72,15 @@ export default function EditProductModal({ product }: { product: TProduct }) {
       <Button isIconOnly onPress={onOpen}>
         <EditIcon />
       </Button>
-      <Modal isOpen={isOpen} onOpenChange={onOpenChange} size="lg">
+      <Modal isOpen={isOpen} size="lg" onOpenChange={onOpenChange}>
         <ModalContent>
           <form onSubmit={handleSubmit(onSubmit)}>
             <ModalHeader>Edit Product</ModalHeader>
             <ModalBody className="max-h-[60vh] overflow-y-auto">
               {/* Name Field */}
               <Controller
-                name="name"
                 control={control}
+                name="name"
                 render={({ field }) => (
                   <Input
                     label="Name"
@@ -92,8 +92,8 @@ export default function EditProductModal({ product }: { product: TProduct }) {
 
               {/* Description Field */}
               <Controller
-                name="description"
                 control={control}
+                name="description"
                 render={({ field }) => (
                   <Textarea
                     label="Description"
@@ -105,8 +105,8 @@ export default function EditProductModal({ product }: { product: TProduct }) {
 
               {/* Price Field */}
               <Controller
-                name="price"
                 control={control}
+                name="price"
                 render={({ field }) => (
                   <Input
                     label="Price"
@@ -119,23 +119,23 @@ export default function EditProductModal({ product }: { product: TProduct }) {
 
               {/* Stock Field - Now using inventories[0].stock */}
               <Controller
-                name="inventories.0.stock"
                 control={control}
+                name="inventories.0.stock"
                 render={({ field }) => (
                   <Input
                     label="Stock"
+                    min={0}
                     type="number"
                     value={field.value?.toString()}
                     onChange={(e) => field.onChange(Number(e.target.value))}
-                    min={0}
                   />
                 )}
               />
 
               {/* Discount Type */}
               <Controller
-                name="discount.type"
                 control={control}
+                name="discount.type"
                 render={({ field }) => (
                   <Select
                     label="Discount Type"
@@ -154,23 +154,23 @@ export default function EditProductModal({ product }: { product: TProduct }) {
 
               {/* Discount Value */}
               <Controller
-                name="discount.value"
                 control={control}
+                name="discount.value"
                 render={({ field }) => (
                   <Input
                     label="Discount Value"
+                    min={0}
                     type="number"
                     value={field.value?.toString()}
                     onChange={(e) => field.onChange(Number(e.target.value))}
-                    min={0}
                   />
                 )}
               />
 
               {/* Discount Start Date */}
               <Controller
-                name="discount.startDate"
                 control={control}
+                name="discount.startDate"
                 render={({ field }) => (
                   <Input
                     label="Start Date"
@@ -191,11 +191,18 @@ export default function EditProductModal({ product }: { product: TProduct }) {
 
               {/* Discount End Date */}
               <Controller
-                name="discount.endDate"
                 control={control}
+                name="discount.endDate"
                 render={({ field }) => (
                   <Input
                     label="End Date"
+                    min={
+                      control._formValues.discount?.startDate
+                        ? new Date(control._formValues.discount.startDate)
+                          .toISOString()
+                          .split("T")[0]
+                        : undefined
+                    }
                     type="date"
                     value={
                       field.value
@@ -207,19 +214,12 @@ export default function EditProductModal({ product }: { product: TProduct }) {
                         e.target.value ? new Date(e.target.value) : undefined
                       )
                     }
-                    min={
-                      control._formValues.discount?.startDate
-                        ? new Date(control._formValues.discount.startDate)
-                          .toISOString()
-                          .split("T")[0]
-                        : undefined
-                    }
                   />
                 )}
               />
             </ModalBody>
             <ModalFooter>
-              <Button type="submit" isLoading={updateProductMutation.isPending}>
+              <Button isLoading={updateProductMutation.isPending} type="submit">
                 Save
               </Button>
             </ModalFooter>

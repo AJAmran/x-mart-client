@@ -19,6 +19,7 @@ export default async function OutletsPage() {
       { status: "active" },
       { limit: 12 }
     );
+
     outlets = response.data || [];
   } catch (error) {
     console.error("Error fetching outlets:", error);
@@ -39,7 +40,7 @@ export default async function OutletsPage() {
             <SearchAndFilter />
           </div>
         </div>
-        <div className="absolute bottom-0 left-0 right-0 h-16 bg-white transform skew-y-1 origin-top-left"></div>
+        <div className="absolute bottom-0 left-0 right-0 h-16 bg-white transform skew-y-1 origin-top-left" />
       </section>
 
       {/* Features Section */}
@@ -130,12 +131,12 @@ export default async function OutletsPage() {
             </div>
             <div className="lg:w-1/2 relative h-96 rounded-xl overflow-hidden shadow-xl">
               <Image
-                src="/images/map-placeholder.jpg"
-                alt="Map of our locations"
                 fill
+                alt="Map of our locations"
                 className="object-cover"
+                src="/images/map-placeholder.jpg"
               />
-              <div className="absolute inset-0 bg-blue-600 opacity-10"></div>
+              <div className="absolute inset-0 bg-blue-600 opacity-10" />
             </div>
           </div>
         </div>

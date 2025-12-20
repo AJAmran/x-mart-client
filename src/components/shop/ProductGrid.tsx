@@ -72,8 +72,8 @@ export default function ProductGrid({ initialFilters }: ProductGridProps) {
       {productList.map((product: TProduct, index: number) => (
         <motion.div
           key={product._id}
-          initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
+          initial={{ opacity: 0, y: 20 }}
           transition={{ duration: 0.3, delay: index * 0.1 }}
         >
           <ProductCard product={product} onPress={() => {}} />

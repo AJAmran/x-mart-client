@@ -151,6 +151,7 @@ export default function TrackingPage() {
     e.preventDefault();
     if (!trackingId.trim()) {
       setError("Please enter a tracking number");
+
       return;
     }
 
@@ -160,6 +161,7 @@ export default function TrackingPage() {
     // Simulate API call
     setTimeout(() => {
       const data = mockTrackingData[trackingId as keyof typeof mockTrackingData];
+
       if (data) {
         setOrderData(data);
       } else {
@@ -171,11 +173,13 @@ export default function TrackingPage() {
 
   const getStatusIcon = (status: string) => {
     const IconComponent = statusConfig[status as keyof typeof statusConfig]?.icon || Package;
+
     return <IconComponent className="w-5 h-5" />;
   };
 
   const getCurrentStatusIndex = () => {
     if (!orderData) return -1;
+
     return orderData.timeline.findIndex((step: any) => !step.completed);
   };
 
@@ -186,9 +190,9 @@ export default function TrackingPage() {
       <div className="container mx-auto px-4">
         {/* Header */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           className="text-center mb-12"
+          initial={{ opacity: 0, y: 20 }}
         >
           <h1 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4">
             Track Your Order
@@ -200,10 +204,10 @@ export default function TrackingPage() {
 
         {/* Search Form - Fixed Centering */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
           className="mb-12"
+          initial={{ opacity: 0, y: 20 }}
+          transition={{ delay: 0.1 }}
         >
           <Card className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl border border-gray-100 dark:border-gray-700 shadow-2xl rounded-2xl mx-auto">
             <CardBody className="p-6 sm:p-8">
@@ -212,12 +216,6 @@ export default function TrackingPage() {
                   {/* Input Field - Takes available space */}
                   <div className="flex-1 min-w-0">
                     <Input
-                      label="Order ID or Tracking Number"
-                      placeholder="e.g., ORD-123456 or 1Z999AA10123456784"
-                      value={trackingId}
-                      onChange={(e) => setTrackingId(e.target.value)}
-                      size="lg"
-                      radius="lg"
                       classNames={{
                         base: "w-full",
                         label: "text-gray-700 dark:text-gray-300 font-semibold mb-2",
@@ -225,20 +223,26 @@ export default function TrackingPage() {
                         input: "text-gray-800 dark:text-gray-100 text-base",
                         description: "text-gray-500 dark:text-gray-400 text-sm mt-1",
                       }}
-                      startContent={<Search className="w-5 h-5 text-gray-400" />}
                       description="You can find this in your order confirmation email"
+                      label="Order ID or Tracking Number"
+                      placeholder="e.g., ORD-123456 or 1Z999AA10123456784"
+                      radius="lg"
+                      size="lg"
+                      startContent={<Search className="w-5 h-5 text-gray-400" />}
+                      value={trackingId}
+                      onChange={(e) => setTrackingId(e.target.value)}
                     />
                   </div>
 
                   {/* Submit Button - Fixed width */}
                   <div className="flex-shrink-0 lg:w-auto w-full">
                     <Button
-                      type="submit"
-                      color="primary"
-                      size="lg"
-                      radius="lg"
-                      isLoading={isLoading}
                       className="w-full lg:w-[160px] h-14 font-semibold text-base transition-all duration-300 hover:scale-[1.02]"
+                      color="primary"
+                      isLoading={isLoading}
+                      radius="lg"
+                      size="lg"
+                      type="submit"
                     >
                       {isLoading ? "Tracking..." : "Track Order"}
                     </Button>
@@ -247,9 +251,9 @@ export default function TrackingPage() {
 
                 {error && (
                   <motion.div
-                    initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
                     className="mt-4 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl text-red-700 dark:text-red-400 flex items-center gap-3"
+                    initial={{ opacity: 0, scale: 0.95 }}
                   >
                     <AlertCircle className="w-5 h-5 flex-shrink-0" />
                     <span className="text-sm">{error}</span>
@@ -263,10 +267,10 @@ export default function TrackingPage() {
         {/* Rest of the component remains the same */}
         {orderData && (
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
             className="space-y-8"
+            initial={{ opacity: 0, y: 20 }}
+            transition={{ delay: 0.2 }}
           >
             {/* Order Header */}
             <Card className="bg-white dark:bg-gray-800 border-none shadow-2xl">
@@ -276,8 +280,8 @@ export default function TrackingPage() {
                     <div className="flex items-center gap-4 mb-4">
                       <Badge
                         color={statusConfig[orderData.status as keyof typeof statusConfig]?.badgeColor as any}
-                        variant="flat"
                         size="lg"
+                        variant="flat"
                       >
                         <div className="flex items-center gap-2">
                           {getStatusIcon(orderData.status)}
@@ -332,10 +336,10 @@ export default function TrackingPage() {
                         return (
                           <motion.div
                             key={step.status}
-                            initial={{ opacity: 0, x: -20 }}
                             animate={{ opacity: 1, x: 0 }}
-                            transition={{ delay: index * 0.1 }}
                             className="flex gap-6 mb-8 last:mb-0"
+                            initial={{ opacity: 0, x: -20 }}
+                            transition={{ delay: index * 0.1 }}
                           >
                             {/* Timeline Line & Dot */}
                             <div className="flex flex-col items-center">
@@ -514,10 +518,10 @@ export default function TrackingPage() {
                   Our customer support team is available 24/7 to assist you
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                  <Button color="primary" size="lg" className="px-8">
+                  <Button className="px-8" color="primary" size="lg">
                     Contact Support
                   </Button>
-                  <Button variant="flat" size="lg" className="px-8">
+                  <Button className="px-8" size="lg" variant="flat">
                     View Order Details
                   </Button>
                 </div>
@@ -529,9 +533,9 @@ export default function TrackingPage() {
         {/* Empty State */}
         {!orderData && !isLoading && !error && (
           <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             className="text-center py-16"
+            initial={{ opacity: 0, scale: 0.95 }}
           >
             <div className="w-32 h-32 mx-auto mb-8 bg-gradient-to-br from-blue-100 to-purple-100 dark:from-blue-900/20 dark:to-purple-900/20 rounded-full flex items-center justify-center">
               <Package className="w-16 h-16 text-blue-500" />

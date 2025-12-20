@@ -36,9 +36,9 @@ const CategoriesDropdownClient: React.FC<CategoriesDropdownProps> = ({
     <div className="relative group">
       <Button
         className="text-sm font-semibold text-primary-foreground bg-primary/90 hover:bg-primary px-4 py-2 rounded-md transition-colors"
-        variant="solid"
-        startContent={<AlignJustify className="w-4 h-4" />}
         endContent={<ChevronDown className="w-4 h-4 ml-2" />}
+        startContent={<AlignJustify className="w-4 h-4" />}
+        variant="solid"
       >
         {buttonText}
       </Button>

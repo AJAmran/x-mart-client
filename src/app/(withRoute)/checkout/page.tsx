@@ -38,6 +38,7 @@ const CheckoutPage = () => {
 
   const handleShippingChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
+
     setShippingInfo((prev) => ({ ...prev, [name]: value }));
     if (errors[name]) {
       setErrors((prev) => ({ ...prev, [name]: "" }));
@@ -46,6 +47,7 @@ const CheckoutPage = () => {
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
+
     if (!shippingInfo.name) newErrors.name = "Name is required.";
     if (!shippingInfo.email) newErrors.email = "Email is required.";
     else if (!/\S+@\S+\.\S+/.test(shippingInfo.email)) {
@@ -66,12 +68,14 @@ const CheckoutPage = () => {
     }
 
     setErrors(newErrors);
+
     return Object.keys(newErrors).length === 0;
   };
 
   const handlePlaceOrder = () => {
     if (!validateForm()) {
       toast.error("Please fix the errors in the form.");
+
       return;
     }
 
@@ -94,22 +98,22 @@ const CheckoutPage = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         <OrderSummary
           cart={cart}
-          updateQuantity={updateQuantity}
           removeItem={removeItem}
+          updateQuantity={updateQuantity}
         />
         <div className="space-y-8">
           <ShippingInformation
-            shippingInfo={shippingInfo}
             errors={errors}
             handleShippingChange={handleShippingChange}
+            shippingInfo={shippingInfo}
           />
           <Button
             className="w-full"
             color="success"
-            size="lg"
-            onPress={handlePlaceOrder}
             isDisabled={cart.items.length === 0 || isPending}
             isLoading={isPending}
+            size="lg"
+            onPress={handlePlaceOrder}
           >
             Place Order (Cash on Delivery)
           </Button>

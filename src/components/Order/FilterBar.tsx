@@ -28,7 +28,7 @@ const FilterBar = ({
   return (
     <div className="mb-6 bg-white border border-gray-200 rounded-lg shadow-sm p-6">
       <div className="flex items-center gap-2 mb-4">
-        <FilterIcon size={18} className="text-gray-500" />
+        <FilterIcon className="text-gray-500" size={18} />
         <h2 className="text-lg font-semibold text-gray-900">Filters</h2>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -36,7 +36,7 @@ const FilterBar = ({
           className="focus:ring-2 focus:ring-blue-500"
           label="Search"
           placeholder="Order ID, User ID, etc..."
-          startContent={<SearchIcon size={18} className="text-gray-400" />}
+          startContent={<SearchIcon className="text-gray-400" size={18} />}
           value={filters.search}
           onChange={(e) => onFilterChange("search", e.target.value)}
         />
@@ -49,8 +49,8 @@ const FilterBar = ({
         />
         <div className="relative">
           <label
-            htmlFor="status-select"
             className="block text-sm font-medium text-gray-700 mb-1"
+            htmlFor="status-select"
           >
             Status
           </label>
@@ -60,10 +60,10 @@ const FilterBar = ({
             aria-label="Select order status"
             className="relative w-full"
             id="status-select"
-            onClick={() => setIsStatusDropdownOpen(!isStatusDropdownOpen)}
-            onKeyDown={handleKeyDown}
             role="button"
             tabIndex={0}
+            onClick={() => setIsStatusDropdownOpen(!isStatusDropdownOpen)}
+            onKeyDown={handleKeyDown}
           >
             <div className="h-12 w-full flex items-center justify-between border border-gray-300 rounded-md px-3 py-2 bg-white hover:border-blue-500 transition-colors">
               <span
@@ -78,10 +78,10 @@ const FilterBar = ({
                 viewBox="0 0 24 24"
               >
                 <path
+                  d="M19 9l-7 7-7-7"
                   strokeLinecap="round"
                   strokeLinejoin="round"
                   strokeWidth="2"
-                  d="M19 9l-7 7-7-7"
                 />
               </svg>
             </div>
@@ -90,7 +90,10 @@ const FilterBar = ({
             <div className="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg max-h-60 overflow-auto">
               <ul className="py-1" role="listbox">
                 <li
+                  aria-selected={filters.status === ""}
                   className="px-4 py-2 hover:bg-blue-50 cursor-pointer text-gray-900"
+                  role="option"
+                  tabIndex={0}
                   onClick={() => {
                     onFilterChange("status", "");
                     setIsStatusDropdownOpen(false);
@@ -101,16 +104,16 @@ const FilterBar = ({
                       setIsStatusDropdownOpen(false);
                     }
                   }}
-                  role="option"
-                  tabIndex={0}
-                  aria-selected={filters.status === ""}
                 >
                   All Statuses
                 </li>
                 {Object.values(ORDER_STATUS).map((status) => (
                   <li
                     key={status}
+                    aria-selected={filters.status === status}
                     className="px-4 py-2 hover:bg-blue-50 cursor-pointer text-gray-900"
+                    role="option"
+                    tabIndex={0}
                     onClick={() => {
                       onFilterChange("status", status);
                       setIsStatusDropdownOpen(false);
@@ -121,9 +124,6 @@ const FilterBar = ({
                         setIsStatusDropdownOpen(false);
                       }
                     }}
-                    role="option"
-                    tabIndex={0}
-                    aria-selected={filters.status === status}
                   >
                     {status}
                   </li>
@@ -136,8 +136,8 @@ const FilterBar = ({
       <Button
         className="mt-4 bg-gray-100 hover:bg-gray-200"
         color="default"
-        onPress={onClearFilters}
         variant="flat"
+        onPress={onClearFilters}
       >
         Clear Filters
       </Button>

@@ -5,16 +5,18 @@ import "jspdf-autotable";
 export const exportToExcel = (data: any[], fileName: string) => {
   const worksheet = utils.json_to_sheet(data);
   const workbook = utils.book_new();
+
   utils.book_append_sheet(workbook, worksheet, "Sheet1");
+
   writeFile(workbook, `${fileName}.xlsx`);
 };
 
 export const exportToPDF = (data: any[], fileName: string) => {
   const doc = new jsPDF();
-  
+
   // Add title
   doc.text(`${fileName.toUpperCase()} LIST`, 14, 15);
-  
+
   // Prepare data for the table
   const tableData = data.map((item) => [
     item.name,

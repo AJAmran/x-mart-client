@@ -5,8 +5,8 @@ import CategoriesDropdownClient from "./CategoriesDropdownClient";
 export default function CategoriesDropdownContainer() {
   return (
     <CategoriesDropdownClient
-      categories={categoriesData}
       buttonText="Categories"
+      categories={categoriesData}
     />
   );
 }

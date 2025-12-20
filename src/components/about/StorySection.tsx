@@ -19,7 +19,7 @@ export default function StorySection({ story }: StorySectionProps) {
         </h2>
         <div className="relative">
           {/* Timeline Line */}
-          <div className="absolute left-1/2 transform -translate-x-1/2 w-1 bg-primary h-full"></div>
+          <div className="absolute left-1/2 transform -translate-x-1/2 w-1 bg-primary h-full" />
           {story.map((item, index) => (
             <div
               key={item.year}
@@ -40,7 +40,7 @@ export default function StorySection({ story }: StorySectionProps) {
                   </CardBody>
                 </Card>
               </div>
-              <div className="w-1/2"></div>
+              <div className="w-1/2" />
             </div>
           ))}
         </div>

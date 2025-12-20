@@ -4,6 +4,7 @@ import { PRODUCT_CATEGORY } from "@/src/constants";
 import { Card, CardBody } from "@nextui-org/card";
 import { Image } from "@nextui-org/image";
 import Link from "next/link";
+import NextImage from "next/image";
 
 type CategoryCardProps = {
   category: keyof typeof PRODUCT_CATEGORY;
@@ -38,21 +39,22 @@ const categoryNames = {
 const CategoryCard = ({ category }: CategoryCardProps) => {
   return (
     <Card
-      as={Link}
-      href={`/shop?category=${category}`}
-      className="w-[280px] sm:w-[300px] lg:w-[320px] xl:w-[340px] h-[420px] rounded-xl"
       isPressable
-      role="link"
       aria-label={`Explore ${categoryNames[category]} category`}
+      as={Link}
+      className="w-[280px] sm:w-[300px] lg:w-[320px] xl:w-[340px] h-[420px] rounded-xl"
+      href={`/shop?category=${category}`}
+      role="link"
     >
-      <CardBody className="p-0 relative">
+      <CardBody className="p-0 relative h-full">
         <Image
-          src={categoryImages[category]}
           alt={categoryNames[category]}
-          width={340}
-          height={420}
+          as={NextImage}
           className="w-full h-full object-cover"
+          height={420}
           radius="none"
+          src={categoryImages[category]}
+          width={340}
         />
         <div className="absolute top-4 left-4 z-10">
           <h2

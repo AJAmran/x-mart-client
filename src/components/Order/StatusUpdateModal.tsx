@@ -88,6 +88,7 @@ const StatusUpdateModal = ({
     };
 
     document.addEventListener("mousedown", handleClickOutside);
+
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
@@ -105,8 +106,8 @@ const StatusUpdateModal = ({
       backdrop="blur"
       className="max-w-[90vw] sm:max-w-2xl mx-auto my-4 sm:my-8"
       isOpen={isOpen}
-      onOpenChange={onOpenChange}
       size="lg"
+      onOpenChange={onOpenChange}
     >
       <ModalContent className="bg-white rounded-lg shadow-xl">
         {(onClose) => (
@@ -127,8 +128,8 @@ const StatusUpdateModal = ({
             <ModalBody className="px-4 sm:px-6 py-6 space-y-4 sm:space-y-6 max-h-[70vh] overflow-y-auto">
               <div>
                 <label
-                  htmlFor="current-status"
                   className="block text-sm font-medium text-gray-700 mb-1"
+                  htmlFor="current-status"
                 >
                   Current Status
                 </label>
@@ -136,8 +137,8 @@ const StatusUpdateModal = ({
                   <Chip
                     className="px-3 sm:px-4 py-1 sm:py-2 text-sm"
                     color={getStatusColor(selectedOrder.status)}
-                    variant="dot"
                     id="current-status"
+                    variant="dot"
                   >
                     {selectedOrder.status}
                   </Chip>
@@ -146,8 +147,8 @@ const StatusUpdateModal = ({
 
               <div className="relative">
                 <label
-                  htmlFor="new-status"
                   className="block text-sm font-medium text-gray-700 mb-1"
+                  htmlFor="new-status"
                 >
                   New Status
                 </label>
@@ -158,9 +159,9 @@ const StatusUpdateModal = ({
                   aria-expanded={isStatusDropdownOpen}
                   className="h-10 sm:h-12 w-full flex items-center justify-between border border-gray-300 rounded-md px-3 py-2 cursor-pointer bg-white hover:border-blue-500 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500"
                   id="new-status"
-                  onClick={() => setIsStatusDropdownOpen(!isStatusDropdownOpen)}
                   role="combobox"
                   tabIndex={0}
+                  onClick={() => setIsStatusDropdownOpen(!isStatusDropdownOpen)}
                   onKeyDown={(e) => {
                     if (e.key === "Enter" || e.key === " ") {
                       setIsStatusDropdownOpen(!isStatusDropdownOpen);
@@ -204,13 +205,13 @@ const StatusUpdateModal = ({
                           key={status}
                           aria-selected={newStatus === status}
                           className="px-3 sm:px-4 py-2 hover:bg-blue-50 cursor-pointer text-gray-900 text-sm sm:text-base transition-colors"
+                          role="option"
+                          tabIndex={0}
                           onClick={() => {
                             setNewStatus(status);
                             setIsStatusDropdownOpen(false);
                           }}
                           onKeyDown={(e) => handleKeyDown(e, status)}
-                          role="option"
-                          tabIndex={0}
                         >
                           {status}
                         </li>
@@ -224,9 +225,9 @@ const StatusUpdateModal = ({
                 className="focus:ring-2 focus:ring-blue-500 text-sm sm:text-base"
                 id="status-note"
                 label="Note (Optional)"
-                onChange={(e) => setNote(e.target.value)}
                 placeholder="Add any notes about this status change"
                 value={note}
+                onChange={(e) => setNote(e.target.value)}
               />
             </ModalBody>
 
@@ -234,8 +235,8 @@ const StatusUpdateModal = ({
               <Button
                 className="w-full sm:w-auto hover:bg-gray-100 text-sm sm:text-base"
                 color="default"
-                onPress={onClose}
                 variant="light"
+                onPress={onClose}
               >
                 Cancel
               </Button>

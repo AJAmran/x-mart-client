@@ -51,11 +51,11 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({
                 </div>
                 <div className="flex items-center gap-2">
                   <Button
+                    isDisabled={item.quantity <= 1}
                     size="sm"
                     onPress={() =>
                       updateQuantity(item.productId, item.quantity - 1)
                     }
-                    isDisabled={item.quantity <= 1}
                   >
                     -
                   </Button>
@@ -69,8 +69,8 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({
                     +
                   </Button>
                   <Button
-                    size="sm"
                     color="danger"
+                    size="sm"
                     variant="light"
                     onPress={() => removeItem(item.productId)}
                   >

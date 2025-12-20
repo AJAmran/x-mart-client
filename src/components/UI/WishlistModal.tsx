@@ -19,7 +19,7 @@ import Link from "next/link";
 
 export const WishlistModal = () => {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
-  const { wishlist, removeItem, moveToCart, clearWishlist } = useWishlist();
+  const { wishlist, removeItem, clearWishlist } = useWishlist();
   const { addItem } = useCart();
 
   const handleMoveToCart = (productId: string) => {
@@ -34,7 +34,7 @@ export const WishlistModal = () => {
         image: item.image,
         stock: item.stock,
       };
-      
+
       addItem(cartItem);
       removeItem(productId);
     }
@@ -47,28 +47,28 @@ export const WishlistModal = () => {
 
   return (
     <>
-      <Badge 
-        content={wishlist.totalItems} 
-        color="danger" 
-        size="sm"
+      <Badge
+        color="danger"
+        content={wishlist.totalItems}
         isInvisible={wishlist.totalItems === 0}
+        size="sm"
       >
-        <Button 
-          isIconOnly 
-          variant="light" 
-          onPress={onOpen}
-          className="relative text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
+        <Button
+          isIconOnly
           aria-label="Wishlist"
+          className="relative text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
+          variant="light"
+          onPress={onOpen}
         >
           <Heart className="w-5 h-5" />
         </Button>
       </Badge>
 
-      <Modal 
-        isOpen={isOpen} 
-        onOpenChange={onOpenChange} 
-        size="2xl"
+      <Modal
+        isOpen={isOpen}
         scrollBehavior="inside"
+        size="2xl"
+        onOpenChange={onOpenChange}
       >
         <ModalContent>
           {(onClose) => (
@@ -81,7 +81,7 @@ export const WishlistModal = () => {
                   </h2>
                 </div>
               </ModalHeader>
-              
+
               <ModalBody className="p-0">
                 {wishlist.items.length > 0 ? (
                   <div className="divide-y dark:divide-gray-700">
@@ -93,11 +93,11 @@ export const WishlistModal = () => {
                         {/* Product Image */}
                         <div className="flex-shrink-0">
                           <Image
-                            src={item.image || "/placeholder.jpg"}
                             alt={item.name}
-                            width={80}
-                            height={80}
                             className="w-20 h-20 object-cover rounded-lg"
+                            height={80}
+                            src={item.image || "/placeholder.jpg"}
+                            width={80}
                           />
                         </div>
 
@@ -116,7 +116,7 @@ export const WishlistModal = () => {
                               day: 'numeric'
                             })}
                           </p>
-                          
+
                           {/* Stock Status */}
                           <div className="mt-2">
                             {item.stock && item.stock > 0 ? (
@@ -130,33 +130,33 @@ export const WishlistModal = () => {
                         {/* Action Buttons */}
                         <div className="flex flex-col gap-2 flex-shrink-0">
                           <Button
-                            size="sm"
                             color="primary"
-                            variant="flat"
-                            startContent={<ShoppingCart size={14} />}
-                            onPress={() => handleMoveToCart(item.productId)}
                             isDisabled={!item.stock || item.stock <= 0}
+                            size="sm"
+                            startContent={<ShoppingCart size={14} />}
+                            variant="flat"
+                            onPress={() => handleMoveToCart(item.productId)}
                           >
                             Add to Cart
                           </Button>
-                          
+
                           <div className="flex gap-1">
                             <Button
                               isIconOnly
+                              aria-label="View product"
                               size="sm"
                               variant="flat"
                               onPress={() => handleViewProduct(item.productId, onClose)}
-                              aria-label="View product"
                             >
                               <Eye size={14} />
                             </Button>
                             <Button
                               isIconOnly
-                              size="sm"
+                              aria-label="Remove from wishlist"
                               color="danger"
+                              size="sm"
                               variant="light"
                               onPress={() => removeItem(item.productId)}
-                              aria-label="Remove from wishlist"
                             >
                               <Trash2 size={14} />
                             </Button>
@@ -184,27 +184,27 @@ export const WishlistModal = () => {
                   </div>
                 )}
               </ModalBody>
-              
+
               {wishlist.items.length > 0 && (
                 <ModalFooter className="flex justify-between border-t dark:border-gray-700">
-                  <Button 
-                    color="danger" 
-                    variant="light" 
+                  <Button
+                    color="danger"
+                    variant="light"
                     onPress={clearWishlist}
                   >
                     Clear All
                   </Button>
                   <div className="flex gap-2">
-                    <Button 
-                      color="primary" 
-                      variant="light" 
+                    <Button
+                      color="primary"
+                      variant="light"
                       onPress={onClose}
                     >
                       Continue Shopping
                     </Button>
                     <Button
-                      color="success"
                       as={Link}
+                      color="success"
                       href="/products"
                       onPress={onClose}
                     >

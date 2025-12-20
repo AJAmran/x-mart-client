@@ -15,6 +15,7 @@ export default function PaginationControls() {
 
   const handlePageChange = (newPage: number) => {
     const params = new URLSearchParams(searchParams.toString());
+
     params.set("page", newPage.toString());
     router.push(`${pathname}?${params.toString()}`);
   };
@@ -22,11 +23,11 @@ export default function PaginationControls() {
   return (
     <div className="flex justify-center mt-8">
       <Pagination
-        total={totalPages}
-        page={page}
-        onChange={handlePageChange}
         showControls
         aria-label="Product pagination"
+        page={page}
+        total={totalPages}
+        onChange={handlePageChange}
       />
     </div>
   );

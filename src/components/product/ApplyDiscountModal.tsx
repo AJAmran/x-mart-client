@@ -39,11 +39,11 @@ export default function ApplyDiscountModal({
     defaultValues: {
       type: product.discount?.type || "percentage",
       value: product.discount?.value || 0,
-      startDate: product.discount?.startDate 
-        ? new Date(product.discount.startDate) 
+      startDate: product.discount?.startDate
+        ? new Date(product.discount.startDate)
         : undefined,
-      endDate: product.discount?.endDate 
-        ? new Date(product.discount.endDate) 
+      endDate: product.discount?.endDate
+        ? new Date(product.discount.endDate)
         : undefined,
       applicableBranches: product.discount?.applicableBranches || [],
     },
@@ -54,11 +54,11 @@ export default function ApplyDiscountModal({
     reset({
       type: product.discount?.type || "percentage",
       value: product.discount?.value || 0,
-      startDate: product.discount?.startDate 
-        ? new Date(product.discount.startDate) 
+      startDate: product.discount?.startDate
+        ? new Date(product.discount.startDate)
         : undefined,
-      endDate: product.discount?.endDate 
-        ? new Date(product.discount.endDate) 
+      endDate: product.discount?.endDate
+        ? new Date(product.discount.endDate)
         : undefined,
       applicableBranches: product.discount?.applicableBranches || [],
     });
@@ -79,7 +79,7 @@ export default function ApplyDiscountModal({
         product.discount ? "Discount updated successfully" : "Discount applied successfully"
       );
       onOpenChange();
-    } catch (error) {
+    } catch {
       toast.error("Failed to apply discount");
     }
   };
@@ -98,8 +98,8 @@ export default function ApplyDiscountModal({
             <ModalBody>
               {/* Discount Type */}
               <Controller
-                name="type"
                 control={control}
+                name="type"
                 render={({ field }) => (
                   <Select
                     label="Discount Type"
@@ -118,23 +118,23 @@ export default function ApplyDiscountModal({
 
               {/* Discount Value */}
               <Controller
-                name="value"
                 control={control}
+                name="value"
                 render={({ field }) => (
                   <Input
                     label="Discount Value"
+                    min={0}
                     type="number"
                     value={field.value.toString()}
                     onChange={(e) => field.onChange(Number(e.target.value))}
-                    min={0}
                   />
                 )}
               />
 
               {/* Start Date */}
               <Controller
-                name="startDate"
                 control={control}
+                name="startDate"
                 render={({ field }) => (
                   <Input
                     label="Start Date"
@@ -147,30 +147,30 @@ export default function ApplyDiscountModal({
 
               {/* End Date */}
               <Controller
-                name="endDate"
                 control={control}
+                name="endDate"
                 render={({ field }) => (
                   <Input
                     label="End Date"
+                    min={control._formValues.startDate ?
+                      new Date(control._formValues.startDate).toISOString().split('T')[0] :
+                      undefined}
                     type="date"
                     value={field.value ? field.value.toISOString().split('T')[0] : ''}
                     onChange={(e) => field.onChange(e.target.value ? new Date(e.target.value) : undefined)}
-                    min={control._formValues.startDate ? 
-                      new Date(control._formValues.startDate).toISOString().split('T')[0] : 
-                      undefined}
                   />
                 )}
               />
             </ModalBody>
             <ModalFooter>
-              <Button type="submit" isLoading={applyDiscountMutation.isPending}>
+              <Button isLoading={applyDiscountMutation.isPending} type="submit">
                 {product.discount ? "Update" : "Apply"}
               </Button>
               {product.discount && (
-                <Button 
-                  color="danger" 
-                  onPress={onRemoveDiscount}
+                <Button
+                  color="danger"
                   isLoading={applyDiscountMutation.isPending}
+                  onPress={onRemoveDiscount}
                 >
                   Remove Discount
                 </Button>

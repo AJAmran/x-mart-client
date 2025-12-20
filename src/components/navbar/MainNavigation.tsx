@@ -21,37 +21,37 @@ export default function MainNavigation({ categories }: MainNavigationProps) {
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between py-3">
           <div className="flex items-center gap-6 sm:gap-8">
-            <CategoriesDropdownClient categories={categories} buttonText="Shop by Category" />
+            <CategoriesDropdownClient buttonText="Shop by Category" categories={categories} />
             <NextLink
-              href="/shop"
               className={`text-sm font-semibold transition-colors ${isActive("/shop") ? "text-white underline underline-offset-4" : "hover:text-white/80"}`}
+              href="/shop"
             >
               Shop
             </NextLink>
             <NextLink
-              href="/track-order"
               className={`text-sm font-semibold transition-colors ${isActive("/track-order") ? "text-white underline underline-offset-4" : "hover:text-white/80"}`}
+              href="/track-order"
             >
               Track Order
             </NextLink>
             <NextLink
-              href="/deals"
               className={`text-sm font-semibold transition-colors ${isActive("/deals") ? "text-white underline underline-offset-4" : "hover:text-white/80"}`}
+              href="/deals"
             >
               Great Deals
             </NextLink>
           </div>
           <div className="hidden lg:flex items-center gap-6 sm:gap-8">
             <NextLink
-              href="/outlets"
               className={`flex items-center gap-2 text-sm font-semibold transition-colors ${isActive("/outlets") ? "text-white underline underline-offset-4" : "hover:text-white/80"}`}
+              href="/outlets"
             >
               <StoreIcon className="w-5 h-5" />
               Our Outlets
             </NextLink>
             <NextLink
-              href="/help"
               className={`flex items-center gap-2 text-sm font-semibold transition-colors ${isActive("/help") ? "text-white underline underline-offset-4" : "hover:text-white/80"}`}
+              href="/help"
             >
               <PhoneIcon className="w-5 h-5" />
               Helpline

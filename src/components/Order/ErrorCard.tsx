@@ -14,9 +14,9 @@ const ErrorCard = ({ error, onRetry }: ErrorCardProps) => {
           <p className="text-lg font-semibold mb-2">Error loading orders</p>
           <p className="text-sm">{error.message}</p>
           <Button
+            className="mt-4 hover:bg-red-100"
             color="danger"
             variant="light"
-            className="mt-4 hover:bg-red-100"
             onClick={onRetry}
           >
             Retry

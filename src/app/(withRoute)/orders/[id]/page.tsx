@@ -7,7 +7,6 @@ import { Image } from "@nextui-org/image";
 import { Spinner } from "@nextui-org/spinner";
 import { Chip } from "@heroui/chip";
 import { Badge } from "@nextui-org/badge";
-import { Tooltip } from "@heroui/tooltip";
 import { Divider } from "@nextui-org/divider";
 import { useRouter } from "next/navigation";
 import { format } from "date-fns";
@@ -45,8 +44,8 @@ const OrderDetailsPage = ({ params }: { params: Promise<{ id: string }> }) => {
   if (isLoading) return (
     <div className="flex justify-center items-center min-h-screen">
       <Spinner 
-        label="Loading order details..." 
         color="primary" 
+        label="Loading order details..." 
         labelColor="foreground"
         size="lg"
       />
@@ -60,9 +59,9 @@ const OrderDetailsPage = ({ params }: { params: Promise<{ id: string }> }) => {
           <p className="text-lg font-semibold mb-2">Error loading order</p>
           <p>{error.message}</p>
           <Button 
+            className="mt-4" 
             color="danger" 
-            variant="light" 
-            className="mt-4"
+            variant="light"
             onPress={() => router.push('/orders')}
           >
             Back to Orders
@@ -79,9 +78,9 @@ const OrderDetailsPage = ({ params }: { params: Promise<{ id: string }> }) => {
           <p className="text-lg font-semibold mb-2">Order not found</p>
           <p>The requested order could not be located.</p>
           <Button 
+            className="mt-4" 
             color="primary" 
-            variant="light" 
-            className="mt-4"
+            variant="light"
             onPress={() => router.push('/orders')}
           >
             View Your Orders
@@ -95,10 +94,10 @@ const OrderDetailsPage = ({ params }: { params: Promise<{ id: string }> }) => {
     <div className="py-8">
       <div className="mb-6">
         <Button
+          className="mb-4"
           startContent={<ArrowLeft size={18} />}
           variant="light"
           onPress={() => router.push("/orders")}
-          className="mb-4"
         >
           Back to Orders
         </Button>
@@ -113,13 +112,13 @@ const OrderDetailsPage = ({ params }: { params: Promise<{ id: string }> }) => {
           
           <div className="flex items-center gap-2">
             <Chip 
-              color={getStatusColor(order.status)} 
-              variant="dot"
-              startContent={getStatusIcon(order.status)}
               classNames={{
                 base: "px-4 py-2",
                 content: "flex items-center gap-2"
-              }}
+              }} 
+              color={getStatusColor(order.status)}
+              startContent={getStatusIcon(order.status)}
+              variant="dot"
             >
               {order.status}
             </Chip>
@@ -140,17 +139,17 @@ const OrderDetailsPage = ({ params }: { params: Promise<{ id: string }> }) => {
                 <div key={item.productId} className="p-4 hover:bg-gray-50 transition-colors">
                   <div className="flex gap-4">
                     <Badge 
-                      content={item.quantity} 
+                      className="border-2 border-white" 
                       color="primary"
+                      content={item.quantity}
                       shape="circle"
-                      className="border-2 border-white"
                     >
                       <Image
-                        src={item.image || "/placeholder.jpg"}
                         alt={item.name}
-                        width={96}
-                        height={96}
                         className="w-24 h-24 object-cover rounded-lg bg-gray-100"
+                        height={96}
+                        src={item.image || "/placeholder.jpg"}
+                        width={96}
                       />
                     </Badge>
                     <div className="flex-1">
@@ -166,9 +165,9 @@ const OrderDetailsPage = ({ params }: { params: Promise<{ id: string }> }) => {
                         </Button>
                         {order.status === "DELIVERED" && (
                           <Button
+                            color="success"
                             size="sm"
                             variant="flat"
-                            color="success"
                           >
                             Buy Again
                           </Button>
@@ -197,7 +196,7 @@ const OrderDetailsPage = ({ params }: { params: Promise<{ id: string }> }) => {
             </CardHeader>
             <CardBody>
               <div className="relative">
-                <div className="absolute left-4 h-full w-0.5 bg-gray-200"></div>
+                <div className="absolute left-4 h-full w-0.5 bg-gray-200" />
                 <ul className="space-y-6">
                   {order.trackingHistory.map((history, index) => (
                     <li key={index} className="relative pl-10">
@@ -206,7 +205,7 @@ const OrderDetailsPage = ({ params }: { params: Promise<{ id: string }> }) => {
                         history.status === "PROCESSING" ? "bg-blue-500" :
                         history.status === "SHIPPED" ? "bg-purple-500" :
                         history.status === "DELIVERED" ? "bg-green-500" : "bg-red-500"
-                      }`}></div>
+                      }`} />
                       <div className="bg-gray-50 p-4 rounded-lg border border-gray-100">
                         <div className="flex justify-between items-start">
                           <div>

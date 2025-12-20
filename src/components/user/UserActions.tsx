@@ -31,7 +31,7 @@ const UserActions: React.FC<UserActionsProps> = ({
     try {
       await updateStatus.mutateAsync({ id: user._id, status });
       onDelete();
-    } catch (error) {
+    } catch {
       toast.error("Failed to update user status");
     }
   };
@@ -40,7 +40,7 @@ const UserActions: React.FC<UserActionsProps> = ({
     try {
       await deleteUser.mutateAsync(user._id);
       onDelete();
-    } catch (error) {
+    } catch {
       toast.error("Failed to delete user");
     }
   };
@@ -74,9 +74,9 @@ const UserActions: React.FC<UserActionsProps> = ({
         </DropdownItem>
         <DropdownItem
           key="delete"
+          className="text-danger"
           startContent={<Trash size={16} />}
           onClick={handleDelete}
-          className="text-danger"
         >
           Delete
         </DropdownItem>

@@ -38,6 +38,7 @@ axiosInstance.interceptors.response.use(
 
       config.headers["Authorization"] = `Bearer ${accessToken}`;
       const cookieStore = await cookies();
+
       cookieStore.set("accessToken", accessToken);
 
       return axiosInstance(config);
@@ -46,6 +47,7 @@ axiosInstance.interceptors.response.use(
         error.response?.data?.message ||
         error.message ||
         "An unexpected error occurred";
+
       return Promise.reject(new Error(errorMessage));
     }
   }

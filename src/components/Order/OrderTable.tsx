@@ -88,56 +88,56 @@ const OrderTable = ({
     <div className="bg-white border border-gray-200 rounded-lg shadow-sm">
       <div className="grid grid-cols-12 gap-4 px-6 py-3 font-semibold text-sm text-gray-600 border-b border-gray-200">
         <button
+          className="col-span-3 flex items-center gap-1 cursor-pointer text-left bg-transparent border-none p-0"
           type="button"
           onClick={() => onSort("_id")}
           onKeyDown={(e) =>
             (e.key === "Enter" || e.key === " ") && onSort("_id")
           }
-          className="col-span-3 flex items-center gap-1 cursor-pointer text-left bg-transparent border-none p-0"
         >
           Order ID {getSortIcon("_id")}
         </button>
 
         <button
+          className="col-span-2 flex items-center gap-1 cursor-pointer text-left bg-transparent border-none p-0"
           type="button"
           onClick={() => onSort("userId")}
           onKeyDown={(e) =>
             (e.key === "Enter" || e.key === " ") && onSort("userId")
           }
-          className="col-span-2 flex items-center gap-1 cursor-pointer text-left bg-transparent border-none p-0"
         >
           User {getSortIcon("userId")}
         </button>
 
         <button
+          className="col-span-2 flex items-center gap-1 cursor-pointer text-left bg-transparent border-none p-0"
           type="button"
           onClick={() => onSort("status")}
           onKeyDown={(e) =>
             (e.key === "Enter" || e.key === " ") && onSort("status")
           }
-          className="col-span-2 flex items-center gap-1 cursor-pointer text-left bg-transparent border-none p-0"
         >
           Status {getSortIcon("status")}
         </button>
 
         <button
+          className="col-span-2 flex items-center gap-1 cursor-pointer text-left bg-transparent border-none p-0"
           type="button"
           onClick={() => onSort("totalPrice")}
           onKeyDown={(e) =>
             (e.key === "Enter" || e.key === " ") && onSort("totalPrice")
           }
-          className="col-span-2 flex items-center gap-1 cursor-pointer text-left bg-transparent border-none p-0"
         >
           Amount {getSortIcon("totalPrice")}
         </button>
 
         <button
+          className="col-span-2 flex items-center gap-1 cursor-pointer text-left bg-transparent border-none p-0"
           type="button"
           onClick={() => onSort("createdAt")}
           onKeyDown={(e) =>
             (e.key === "Enter" || e.key === " ") && onSort("createdAt")
           }
-          className="col-span-2 flex items-center gap-1 cursor-pointer text-left bg-transparent border-none p-0"
         >
           Date {getSortIcon("createdAt")}
         </button>
@@ -176,10 +176,10 @@ const OrderTable = ({
               </div>
               <div className="col-span-2">
                 <Chip
-                  variant="dot"
+                  className="px-3 py-1"
                   color={getStatusColor(order.status)}
                   startContent={getStatusIcon(order.status)}
-                  className="px-3 py-1"
+                  variant="dot"
                 >
                   {order.status}
                 </Chip>
@@ -196,9 +196,9 @@ const OrderTable = ({
               <div className="col-span-1 flex justify-end">
                 <Tooltip content="Update status">
                   <Button
+                    className="bg-blue-50 hover:bg-blue-100"
                     size="sm"
                     variant="flat"
-                    className="bg-blue-50 hover:bg-blue-100"
                     onPress={() => {
                       setSelectedOrder(order);
                       setIsModalOpen(true);
@@ -220,9 +220,9 @@ const OrderTable = ({
           orders
         </div>
         <Pagination
+          className="gap-2"
           page={options.page}
           total={meta.totalPages}
-          className="gap-2"
           onChange={onPageChange}
         />
       </div>
@@ -230,10 +230,10 @@ const OrderTable = ({
       {selectedOrder && (
         <StatusUpdateModal
           isOpen={isModalOpen}
-          onOpenChange={setIsModalOpen}
+          isPending={isPending}
           selectedOrder={selectedOrder}
           updateStatus={updateStatus}
-          isPending={isPending}
+          onOpenChange={setIsModalOpen}
         />
       )}
     </div>

@@ -19,9 +19,9 @@ export default function ContactCTA() {
     <section className="py-16 bg-primary-600 text-white">
       <div className="container mx-auto px-4 text-center">
         <motion.div
-          variants={containerVariants}
-          initial="hidden"
           animate="visible"
+          initial="hidden"
+          variants={containerVariants}
         >
           <h2 className="text-3xl md:text-4xl font-bold mb-4">
             Get in Touch
@@ -30,13 +30,13 @@ export default function ContactCTA() {
             Have questions or want to learn more about X-mart? We&apos;re here to help!
           </p>
           <Button
-            as={Link}
-            href="/contact"
-            color="secondary"
-            size="lg"
-            endContent={<Mail size={20} />}
-            className="font-medium"
             aria-label="Contact us"
+            as={Link}
+            className="font-medium"
+            color="secondary"
+            endContent={<Mail size={20} />}
+            href="/contact"
+            size="lg"
           >
             Contact Us
           </Button>

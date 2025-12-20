@@ -131,10 +131,12 @@ export default function ProductListPage() {
     try {
       if (isAllProductsLoading) {
         toast.warning("Please wait, data is still loading...");
+
         return;
       }
       if (allProducts.length === 0) {
         toast.error("No products available to download");
+
         return;
       }
 
@@ -157,6 +159,7 @@ export default function ProductListPage() {
 
       const worksheet = XLSX.utils.json_to_sheet(worksheetData);
       const workbook = XLSX.utils.book_new();
+
       XLSX.utils.book_append_sheet(workbook, worksheet, "Products");
       XLSX.writeFile(workbook, `products_report_${new Date().toISOString().split("T")[0]}.xlsx`);
       toast.success("Excel report downloaded successfully");
@@ -169,14 +172,17 @@ export default function ProductListPage() {
     try {
       if (isAllProductsLoading) {
         toast.warning("Please wait, data is still loading...");
+
         return;
       }
       if (allProducts.length === 0) {
         toast.error("No products available to download");
+
         return;
       }
 
       const doc = new jsPDF();
+
       doc.setFontSize(18);
       doc.text("X-Mart Product Report", 14, 20);
       doc.setFontSize(12);
@@ -214,19 +220,19 @@ export default function ProductListPage() {
         <div className="flex gap-2">
           <Button
             color="primary"
-            variant="flat"
             size="sm"
-            onClick={downloadExcel}
             startContent={<DownloadIcon className="w-4 h-4" />}
+            variant="flat"
+            onClick={downloadExcel}
           >
             Excel
           </Button>
           <Button
             color="primary"
-            variant="flat"
             size="sm"
-            onClick={downloadPDF}
             startContent={<DownloadIcon className="w-4 h-4" />}
+            variant="flat"
+            onClick={downloadPDF}
           >
             PDF
           </Button>
@@ -237,16 +243,16 @@ export default function ProductListPage() {
         <CardBody className="p-4">
           <div className="flex flex-col md:flex-row gap-4 mb-6">
             <Input
+              className="max-w-xs"
               placeholder="Search products..."
+              startContent={<SearchIcon className="w-4 h-4 text-default-400" />}
               value={filters.searchTerm}
               onChange={(e) => setFilters({ ...filters, searchTerm: e.target.value })}
-              className="max-w-xs"
-              startContent={<SearchIcon className="w-4 h-4 text-default-400" />}
             />
             <select
+              className="max-w-xs p-2 bg-gray-100 dark:bg-gray-900 border-none rounded-xl text-sm focus:ring-2 focus:ring-blue-500 transition-all outline-none"
               value={filters.category}
               onChange={(e) => setFilters({ ...filters, category: e.target.value })}
-              className="max-w-xs p-2 bg-gray-100 dark:bg-gray-900 border-none rounded-xl text-sm focus:ring-2 focus:ring-blue-500 transition-all outline-none"
             >
               <option value="">All Categories</option>
               {Object.values(PRODUCT_CATEGORY).map((cat) => (
@@ -257,11 +263,11 @@ export default function ProductListPage() {
 
           <Table
             aria-label="Product list table"
-            shadow="none"
             classNames={{
               wrapper: "bg-transparent p-0",
               th: "bg-gray-100/50 dark:bg-gray-900/50 text-default-600",
             }}
+            shadow="none"
           >
             <TableHeader>
               <TableColumn>PRODUCT</TableColumn>
@@ -288,18 +294,18 @@ export default function ProductListPage() {
                   </TableCell>
                   <TableCell>
                     <Chip
+                      color={(product.inventories?.[0]?.stock ?? 0) < 10 ? "danger" : "success"}
                       size="sm"
                       variant="flat"
-                      color={(product.inventories?.[0]?.stock ?? 0) < 10 ? "danger" : "success"}
                     >
                       {product.inventories?.[0]?.stock ?? 0} in stock
                     </Chip>
                   </TableCell>
                   <TableCell>
                     <Chip
+                      color={product.status === "ACTIVE" ? "success" : "warning"}
                       size="sm"
                       variant="dot"
-                      color={product.status === "ACTIVE" ? "success" : "warning"}
                     >
                       {product.status || "N/A"}
                     </Chip>
@@ -310,11 +316,11 @@ export default function ProductListPage() {
                       <Tooltip content="Delete Product">
                         <Button
                           isIconOnly
+                          color="danger"
+                          isDisabled={deleteProductMutation.isPending}
                           size="sm"
                           variant="light"
-                          color="danger"
                           onClick={() => handleDeleteProduct(product._id)}
-                          isDisabled={deleteProductMutation.isPending}
                         >
                           <DeleteIcon className="w-4 h-4" />
                         </Button>
@@ -339,12 +345,12 @@ export default function ProductListPage() {
           <div className="flex justify-center mt-6">
             {totalPages > 1 && (
               <Pagination
-                total={totalPages}
-                page={options.page}
-                onChange={(page) => setOptions({ ...options, page })}
                 showControls
-                variant="flat"
                 color="primary"
+                page={options.page}
+                total={totalPages}
+                variant="flat"
+                onChange={(page) => setOptions({ ...options, page })}
               />
             )}
           </div>

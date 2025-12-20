@@ -9,7 +9,6 @@ import { Button } from "@nextui-org/button";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation"; // Add useSearchParams
-import { toast } from "sonner";
 
 import {
   registerValidationSchema,
@@ -78,10 +77,10 @@ const AuthForm: React.FC<AuthFormProps> = ({ type }) => {
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: -10 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3 }}
       className="flex justify-center items-center min-h-screen"
+      initial={{ opacity: 0, y: -10 }}
+      transition={{ duration: 0.3 }}
     >
       <Card className="w-full max-w-md p-6 rounded-2xl shadow-xl border">
         <h2 className="text-3xl font-bold text-center drop-shadow-lg mb-6">
@@ -90,77 +89,77 @@ const AuthForm: React.FC<AuthFormProps> = ({ type }) => {
 
         {error && <div className="text-red-500 text-center mb-4">{error}</div>}
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+        <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
           {isRegister && (
             <Input
               {...register("name")}
-              label="Full Name"
-              placeholder="Enter your full name"
-              variant="bordered"
-              isInvalid={!!(errors as FieldErrors<RegisterFormData>).name}
               errorMessage={
                 (errors as FieldErrors<RegisterFormData>).name?.message
               }
+              isInvalid={!!(errors as FieldErrors<RegisterFormData>).name}
+              label="Full Name"
+              placeholder="Enter your full name"
+              variant="bordered"
             />
           )}
 
           <Input
             {...register("email")}
-            label="Email"
-            type="email"
-            placeholder="Enter your email"
-            variant="bordered"
-            isInvalid={!!errors.email}
             errorMessage={errors.email?.message}
+            isInvalid={!!errors.email}
+            label="Email"
+            placeholder="Enter your email"
+            type="email"
+            variant="bordered"
           />
 
           {isRegister && (
             <Input
               {...register("mobileNumber")}
-              label="Mobile Number"
-              type="text"
-              placeholder="Enter your mobile number"
-              variant="bordered"
-              isInvalid={
-                !!(errors as FieldErrors<RegisterFormData>).mobileNumber
-              }
               errorMessage={
                 (errors as FieldErrors<RegisterFormData>).mobileNumber?.message
               }
+              isInvalid={
+                !!(errors as FieldErrors<RegisterFormData>).mobileNumber
+              }
+              label="Mobile Number"
+              placeholder="Enter your mobile number"
+              type="text"
+              variant="bordered"
             />
           )}
 
           <Input
             {...register("password")}
-            label="Password"
-            type="password"
-            placeholder="Enter your password"
-            variant="bordered"
-            isInvalid={!!errors.password}
             errorMessage={errors.password?.message}
+            isInvalid={!!errors.password}
+            label="Password"
+            placeholder="Enter your password"
+            type="password"
+            variant="bordered"
           />
 
           {isRegister && (
             <Input
               {...register("profilePhoto")}
-              label="Profile Photo URL"
-              type="text"
-              placeholder="Enter profile photo URL"
-              variant="bordered"
-              isInvalid={
-                !!(errors as FieldErrors<RegisterFormData>).profilePhoto
-              }
               errorMessage={
                 (errors as FieldErrors<RegisterFormData>).profilePhoto?.message
               }
+              isInvalid={
+                !!(errors as FieldErrors<RegisterFormData>).profilePhoto
+              }
+              label="Profile Photo URL"
+              placeholder="Enter profile photo URL"
+              type="text"
+              variant="bordered"
             />
           )}
 
           <Button
-            type="submit"
-            color="primary"
             className="w-full py-3 text-lg font-semibold mt-4 transition-all"
+            color="primary"
             disabled={isSubmitting}
+            type="submit"
           >
             {isSubmitting ? "Processing..." : isRegister ? "Register" : "Login"}
           </Button>
@@ -169,8 +168,8 @@ const AuthForm: React.FC<AuthFormProps> = ({ type }) => {
         <p className={`text-sm text-center mt-6`}>
           {isRegister ? "Already have an account?" : "Don't have an account?"}{" "}
           <Link
-            href={isRegister ? "/auth/login" : "/auth/register"}
             className="text-blue-400 hover:underline"
+            href={isRegister ? "/auth/login" : "/auth/register"}
           >
             {isRegister ? "Login" : "Register"}
           </Link>

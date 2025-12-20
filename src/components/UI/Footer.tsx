@@ -24,22 +24,22 @@ const Footer = () => {
             <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">Customer Support</h3>
             <ul className="text-sm space-y-2">
               <li>
-                <Link href="/help" className="text-gray-600 dark:text-gray-400 hover:text-primary dark:hover:text-primary transition">
+                <Link className="text-gray-600 dark:text-gray-400 hover:text-primary dark:hover:text-primary transition" href="/help">
                   Help Center
                 </Link>
               </li>
               <li>
-                <Link href="/returns" className="text-gray-600 dark:text-gray-400 hover:text-primary dark:hover:text-primary transition">
+                <Link className="text-gray-600 dark:text-gray-400 hover:text-primary dark:hover:text-primary transition" href="/returns">
                   Returns & Refunds
                 </Link>
               </li>
               <li>
-                <Link href="/shipping" className="text-gray-600 dark:text-gray-400 hover:text-primary dark:hover:text-primary transition">
+                <Link className="text-gray-600 dark:text-gray-400 hover:text-primary dark:hover:text-primary transition" href="/shipping">
                   Shipping Policy
                 </Link>
               </li>
               <li>
-                <Link href="/faq" className="text-gray-600 dark:text-gray-400 hover:text-primary dark:hover:text-primary transition">
+                <Link className="text-gray-600 dark:text-gray-400 hover:text-primary dark:hover:text-primary transition" href="/faq">
                   FAQs
                 </Link>
               </li>
@@ -51,22 +51,22 @@ const Footer = () => {
             <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">Quick Links</h3>
             <ul className="text-sm space-y-2">
               <li>
-                <Link href="/about" className="text-gray-600 dark:text-gray-400 hover:text-primary dark:hover:text-primary transition">
+                <Link className="text-gray-600 dark:text-gray-400 hover:text-primary dark:hover:text-primary transition" href="/about">
                   About Us
                 </Link>
               </li>
               <li>
-                <Link href="/products" className="text-gray-600 dark:text-gray-400 hover:text-primary dark:hover:text-primary transition">
+                <Link className="text-gray-600 dark:text-gray-400 hover:text-primary dark:hover:text-primary transition" href="/products">
                   Shop
                 </Link>
               </li>
               <li>
-                <Link href="/careers" className="text-gray-600 dark:text-gray-400 hover:text-primary dark:hover:text-primary transition">
+                <Link className="text-gray-600 dark:text-gray-400 hover:text-primary dark:hover:text-primary transition" href="/careers">
                   Careers
                 </Link>
               </li>
               <li>
-                <Link href="/contact" className="text-gray-600 dark:text-gray-400 hover:text-primary dark:hover:text-primary transition">
+                <Link className="text-gray-600 dark:text-gray-400 hover:text-primary dark:hover:text-primary transition" href="/contact">
                   Contact Us
                 </Link>
               </li>
@@ -81,12 +81,12 @@ const Footer = () => {
             </p>
             <form className="flex flex-col sm:flex-row items-center gap-2">
               <Input
-                type="email"
-                placeholder="Enter your email"
-                className="w-full sm:w-auto shadow-md dark:text-gray-900"
                 required
+                className="w-full sm:w-auto shadow-md dark:text-gray-900"
+                placeholder="Enter your email"
+                type="email"
               />
-              <Button type="submit" className="bg-primary shadow-md text-white px-4 py-2 rounded">
+              <Button className="bg-primary shadow-md text-white px-4 py-2 rounded" type="submit">
                 Subscribe
               </Button>
             </form>
@@ -97,16 +97,16 @@ const Footer = () => {
         <div className="mt-12 border-t border-gray-300 dark:border-gray-700 pt-8 flex flex-col lg:flex-row justify-between items-center gap-4">
           {/* Social Media Links */}
           <div className="flex justify-center lg:justify-start space-x-4">
-            <Link href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="text-gray-600 dark:text-gray-400 hover:text-primary transition">
+            <Link className="text-gray-600 dark:text-gray-400 hover:text-primary transition" href="https://facebook.com" rel="noopener noreferrer" target="_blank">
               <FacebookIcon size={24} />
             </Link>
-            <Link href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="text-gray-600 dark:text-gray-400 hover:text-primary transition">
+            <Link className="text-gray-600 dark:text-gray-400 hover:text-primary transition" href="https://twitter.com" rel="noopener noreferrer" target="_blank">
               <TwitterIcon size={24} />
             </Link>
-            <Link href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="text-gray-600 dark:text-gray-400 hover:text-primary transition">
+            <Link className="text-gray-600 dark:text-gray-400 hover:text-primary transition" href="https://instagram.com" rel="noopener noreferrer" target="_blank">
               <InstagramIcon size={24} />
             </Link>
-            <Link href="https://linkedin.com" target="_blank" rel="noopener noreferrer" className="text-gray-600 dark:text-gray-400 hover:text-primary transition">
+            <Link className="text-gray-600 dark:text-gray-400 hover:text-primary transition" href="https://linkedin.com" rel="noopener noreferrer" target="_blank">
               <LinkedInIcon size={24} />
             </Link>
           </div>

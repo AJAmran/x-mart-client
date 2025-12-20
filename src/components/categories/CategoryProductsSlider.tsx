@@ -94,20 +94,20 @@ const CategoryProductsSlider = ({ category }: CategoryProductsSliderProps) => {
         <div className="flex gap-4 sm:gap-6">
           {/* Category card - hidden on mobile */}
           <div
+            aria-label={`${category} category`}
             className="flex-shrink-0 w-[280px] sm:w-[300px] lg:w-[320px] xl:w-[340px] hidden md:block"
             role="region"
-            aria-label={`${category} category`}
           >
             <CategoryCard category={category} />
           </div>
-          <div className="flex-1 overflow-hidden" ref={emblaRef}>
+          <div ref={emblaRef} className="flex-1 overflow-hidden">
             <div className="flex gap-4 sm:gap-6">
               {products.map((product: TProduct) => (
                 <div
                   key={product._id}
+                  aria-label={`Product ${product.name}`}
                   className="flex-shrink-0 w-[280px] sm:w-[300px] lg:w-[320px] xl:w-[340px] min-w-0 basis-[280px] sm:basis-[300px] lg:basis-[320px] xl:basis-[340px]"
                   role="region"
-                  aria-label={`Product ${product.name}`}
                 >
                   <ProductCard product={product} variant="default" />
                 </div>
@@ -120,14 +120,14 @@ const CategoryProductsSlider = ({ category }: CategoryProductsSliderProps) => {
         {products.length > 1 && (
           <div className="absolute top-1/2 -translate-y-1/2 w-full px-4 sm:px-6 lg:px-8">
             <PrevButton
-              onClick={onPrevButtonClick}
-              disabled={prevBtnDisabled}
               className="absolute -left-4 sm:-left-6 lg:-left-8 p-2 sm:p-3 rounded-full bg-white shadow-md disabled:opacity-30 disabled:cursor-not-allowed hover:bg-gray-100 transition-all z-10"
+              disabled={prevBtnDisabled}
+              onClick={onPrevButtonClick}
             />
             <NextButton
-              onClick={onNextButtonClick}
-              disabled={nextBtnDisabled}
               className="absolute -right-4 sm:-right-6 lg:-right-8 p-2 sm:p-3 rounded-full bg-white shadow-md disabled:opacity-30 disabled:cursor-not-allowed hover:bg-gray-100 transition-all z-10"
+              disabled={nextBtnDisabled}
+              onClick={onNextButtonClick}
             />
           </div>
         )}

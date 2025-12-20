@@ -1,23 +1,29 @@
 import { Skeleton } from "@heroui/skeleton";
-import { Card, CardBody, CardHeader } from "@nextui-org/card";
+import { Card, CardBody } from "@nextui-org/card";
 
 export default function CategoriesSkeleton() {
   return (
-    <section className="py-8" aria-label="Loading Categories">
+    <section
+      aria-label="Loading Categories"
+      className="container mx-auto py-8 px-4 sm:px-6 lg:px-8"
+    >
       <div className="text-center mb-12">
         <Skeleton className="w-40 h-8 mx-auto rounded-lg" />
         <Skeleton className="w-60 h-4 mt-2 mx-auto rounded-lg" />
       </div>
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
-        {Array.from({ length: 5 }).map((_, index) => (
-          <Card key={index} className="h-[150px]" radius="lg">
-            <CardHeader className="flex justify-center items-center p-6">
-              <Skeleton className="w-16 h-16 rounded-full" />
-            </CardHeader>
-            <CardBody className="text-center p-4">
-              <Skeleton className="w-20 h-4 mx-auto rounded-lg" />
-            </CardBody>
-          </Card>
+      <div className="flex overflow-hidden -ml-4">
+        {Array.from({ length: 6 }).map((_, index) => (
+          <div key={index} className="flex-[0_0_50%] sm:flex-[0_0_33.333%] md:flex-[0_0_25%] lg:flex-[0_0_16.666%] min-w-0 pl-4 py-4">
+            <Card className="h-full border-none shadow-sm" radius="lg">
+              <CardBody className="p-4 flex flex-col items-center justify-center gap-4 text-center">
+                <Skeleton className="w-20 h-20 rounded-full" />
+                <div className="space-y-2 flex flex-col items-center">
+                  <Skeleton className="w-24 h-4 rounded-lg" />
+                  <Skeleton className="w-12 h-3 rounded-lg" />
+                </div>
+              </CardBody>
+            </Card>
+          </div>
         ))}
       </div>
     </section>

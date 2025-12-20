@@ -41,42 +41,42 @@ const ChangePasswordForm: React.FC = () => {
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: -10 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3 }}
       className="flex justify-center items-center min-h-screen"
+      initial={{ opacity: 0, y: -10 }}
+      transition={{ duration: 0.3 }}
     >
       <Card className="w-full max-w-md p-6 rounded-2xl shadow-xl border">
         <h2 className="text-3xl font-bold text-center drop-shadow-lg mb-6">
           Change Password
         </h2>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+        <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
           <Input
             {...register("oldPassword")}
-            label="Old Password"
-            type="password"
-            placeholder="Enter your old password"
-            variant="bordered"
-            isInvalid={!!errors.oldPassword}
             errorMessage={errors.oldPassword?.message}
+            isInvalid={!!errors.oldPassword}
+            label="Old Password"
+            placeholder="Enter your old password"
+            type="password"
+            variant="bordered"
           />
 
           <Input
             {...register("newPassword")}
-            label="New Password"
-            type="password"
-            placeholder="Enter your new password"
-            variant="bordered"
-            isInvalid={!!errors.newPassword}
             errorMessage={errors.newPassword?.message}
+            isInvalid={!!errors.newPassword}
+            label="New Password"
+            placeholder="Enter your new password"
+            type="password"
+            variant="bordered"
           />
 
           <Button
-            type="submit"
-            color="primary"
             className="w-full py-3 text-lg font-semibold mt-4 transition-all"
+            color="primary"
             disabled={isSubmitting}
+            type="submit"
           >
             {isSubmitting ? "Processing..." : "Change Password"}
           </Button>

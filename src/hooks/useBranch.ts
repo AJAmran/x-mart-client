@@ -90,6 +90,7 @@ export const useNearbyBranches = (
       if (lat && lng && maxDistance) {
         return branchService.getNearbyBranches(lat, lng, maxDistance, limit);
       }
+
       return null;
     },
     enabled: !!lat && !!lng && !!maxDistance,
