@@ -1,4 +1,5 @@
-// app/not-found.tsx
+"use client";
+
 import Link from "next/link";
 import { Button } from "@nextui-org/button";
 import { Home, Search, ShoppingBag } from "lucide-react";
