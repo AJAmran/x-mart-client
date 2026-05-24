@@ -1,7 +1,7 @@
 // hooks/useWishlist.ts
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { TWishlist, TWishlistItem } from "../types";
+import { TCartItem, TWishlist, TWishlistItem } from "../types";
 
 export const useWishlist = () => {
   const queryClient = useQueryClient();
@@ -77,7 +77,7 @@ export const useWishlist = () => {
   };
 
   // Move item from wishlist to cart
-  const moveToCart = (productId: string, useCart: any) => {
+  const moveToCart = (productId: string, useCart: { addItem: (item: TCartItem) => void }) => {
     if (!wishlist) return;
 
     const item = wishlist.items.find(item => item.productId === productId);

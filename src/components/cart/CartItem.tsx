@@ -6,6 +6,7 @@ import { Image } from "@nextui-org/image";
 import { Minus, Plus, Trash2 } from "lucide-react";
 import { useCart } from "@/src/hooks/useCart";
 import { TCartItem } from "@/src/types";
+import { toast } from "sonner";
 
 interface CartItemProps {
   item: TCartItem;
@@ -23,6 +24,10 @@ export const CartItem = ({ item }: CartItemProps) => {
   };
 
   const handleIncrease = () => {
+    if (item.stock && item.quantity >= item.stock) {
+      toast.error("Maximum stock reached");
+      return;
+    }
     updateQuantity(item.productId, item.quantity + 1);
   };
 

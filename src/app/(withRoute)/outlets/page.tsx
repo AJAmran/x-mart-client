@@ -94,7 +94,10 @@ export default async function OutletsPage() {
               </div>
 
               <div className="mt-12 text-center">
-                <button className="px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors shadow-md">
+                <button
+                  aria-label="Load More Locations"
+                  className="px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors shadow-md"
+                >
                   Load More Locations
                 </button>
               </div>
@@ -121,10 +124,16 @@ export default async function OutletsPage() {
                 directions, and check real-time availability.
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
-                <button className="px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors">
+                <button
+                  aria-label="Open Interactive Map"
+                  className="px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors"
+                >
                   Open Interactive Map
                 </button>
-                <button className="px-6 py-3 border border-blue-600 text-blue-600 font-medium rounded-lg hover:bg-blue-50 transition-colors">
+                <button
+                  aria-label="Download Locations List"
+                  className="px-6 py-3 border border-blue-600 text-blue-600 font-medium rounded-lg hover:bg-blue-50 transition-colors"
+                >
                   Download Locations List
                 </button>
               </div>

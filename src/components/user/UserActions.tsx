@@ -12,9 +12,10 @@ import {
 } from "@nextui-org/dropdown";
 import { USER_STATUS } from "@/src/constants";
 import { Button } from "@nextui-org/button";
+import { IUser } from "@/src/types";
 
 interface UserActionsProps {
-  user: any;
+  user: IUser;
   onEdit: () => void;
   onDelete: () => void;
 }

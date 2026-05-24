@@ -8,6 +8,7 @@ import { Input } from "@nextui-org/input";
 import { Button } from "@nextui-org/button";
 import { motion } from "framer-motion";
 import { z } from "zod";
+import { toast } from "sonner";
 import { useChangePassword } from "@/src/hooks/auth.hook";
 
 // Validation schema for change password
@@ -34,7 +35,10 @@ const ChangePasswordForm: React.FC = () => {
     async (data) => {
       try {
         await changePasswordMutation(data);
-      } catch (error: any) {}
+        toast.success("Password changed successfully!");
+      } catch (error: any) {
+        toast.error(error?.message || "Failed to change password. Please try again.");
+      }
     },
     [changePasswordMutation]
   );

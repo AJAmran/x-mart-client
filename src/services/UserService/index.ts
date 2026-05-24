@@ -1,6 +1,7 @@
 "use server";
 
 import axiosInstance from "@/src/lib/axios";
+import { IUser } from "@/src/types";
 
 export const getAllUsers = async (queryParams?: {
   page?: number;
@@ -18,8 +19,9 @@ export const getAllUsers = async (queryParams?: {
     const response = await axiosInstance.get(`/user?${params.toString()}`);
 
     return response.data;
-  } catch (error: any) {
-    throw new Error(error.response?.data?.message || "Failed to fetch users");
+  } catch (error) {
+    const message = (error as { response?: { data?: { message?: string } } })?.response?.data?.message || (error instanceof Error ? error.message : "Failed to fetch users");
+    throw new Error(message);
   }
 };
 
@@ -28,19 +30,21 @@ export const getUserById = async (id: string) => {
     const { data } = await axiosInstance.get(`/user/${id}`);
 
     return data;
-  } catch (error: any) {
-    throw new Error(error.response?.data?.message || "Failed to fetch user");
+  } catch (error) {
+    const message = (error as { response?: { data?: { message?: string } } })?.response?.data?.message || (error instanceof Error ? error.message : "Failed to fetch user");
+    throw new Error(message);
   }
 };
 
 
-export const updateUser = async (id: string, userData: any) => {
+export const updateUser = async (id: string, userData: Partial<IUser>) => {
   try {
     const { data } = await axiosInstance.patch(`/user/${id}`, userData);
 
     return data;
-  } catch (error: any) {
-    throw new Error(error.response?.data?.message || "Failed to update user");
+  } catch (error) {
+    const message = (error as { response?: { data?: { message?: string } } })?.response?.data?.message || (error instanceof Error ? error.message : "Failed to update user");
+    throw new Error(message);
   }
 };
 
@@ -49,8 +53,9 @@ export const deleteUser = async (id: string) => {
     const { data } = await axiosInstance.delete(`/user/${id}`);
 
     return data;
-  } catch (error: any) {
-    throw new Error(error.response?.data?.message || "Failed to delete user");
+  } catch (error) {
+    const message = (error as { response?: { data?: { message?: string } } })?.response?.data?.message || (error instanceof Error ? error.message : "Failed to delete user");
+    throw new Error(message);
   }
 };
 
@@ -61,8 +66,9 @@ export const updateUserStatus = async (id: string, status: string) => {
     });
 
     return data;
-  } catch (error: any) {
-    throw new Error(error.response?.data?.message || "Failed to update status");
+  } catch (error) {
+    const message = (error as { response?: { data?: { message?: string } } })?.response?.data?.message || (error instanceof Error ? error.message : "Failed to update status");
+    throw new Error(message);
   }
 };
 
@@ -71,7 +77,8 @@ export const updateUserRole = async (id: string, role: string) => {
     const { data } = await axiosInstance.patch(`/user/${id}/role`, { role });
 
     return data;
-  } catch (error: any) {
-    throw new Error(error.response?.data?.message || "Failed to update role");
+  } catch (error) {
+    const message = (error as { response?: { data?: { message?: string } } })?.response?.data?.message || (error instanceof Error ? error.message : "Failed to update role");
+    throw new Error(message);
   }
 };

@@ -3,7 +3,9 @@ import { toast } from "sonner";
 import { useEffect, useState } from "react";
 import { Button } from "@nextui-org/button";
 import { useUser } from "../../../context/user.provider";
+import { Select, SelectItem } from "@heroui/select";
 import { useCart } from "@/src/hooks/useCart";
+import { useBranches } from "@/src/hooks/useBranch";
 
 import OrderSummary from "@/src/components/Order/OrderSummary";
 import ShippingInformation from "@/src/components/Order/ShippingInformation";
@@ -24,6 +26,12 @@ const CheckoutPage = () => {
     phone: user?.mobileNumber || "",
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [selectedBranchId, setSelectedBranchId] = useState("");
+  const { data: branchesData, isLoading: branchesLoading } = useBranches(
+    { status: "active" },
+    { limit: 100 }
+  );
+  const branches = branchesData?.data || [];
 
   useEffect(() => {
     if (user) {
@@ -82,6 +90,7 @@ const CheckoutPage = () => {
     const orderData = {
       items: cart.items,
       shippingInfo,
+      branchId: selectedBranchId || undefined,
       paymentMethod: "CASH_ON_DELIVERY" as "CASH_ON_DELIVERY",
     };
 
@@ -107,6 +116,25 @@ const CheckoutPage = () => {
             handleShippingChange={handleShippingChange}
             shippingInfo={shippingInfo}
           />
+          <div className="space-y-2">
+            <label className="text-sm font-semibold text-gray-600 dark:text-gray-400">
+              Select Branch
+            </label>
+            <Select
+              aria-label="Select branch"
+              isDisabled={branchesLoading}
+              placeholder={branchesLoading ? "Loading branches..." : "Choose a branch"}
+              selectedKeys={selectedBranchId ? [selectedBranchId] : []}
+              onSelectionChange={(keys) => {
+                const val = Array.from(keys)[0] as string;
+                setSelectedBranchId(val || "");
+              }}
+            >
+              {branches.map((branch: { _id: string; name: string }) => (
+                <SelectItem key={branch._id!}>{branch.name}</SelectItem>
+              ))}
+            </Select>
+          </div>
           <Button
             className="w-full"
             color="success"

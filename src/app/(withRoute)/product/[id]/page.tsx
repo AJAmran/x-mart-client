@@ -53,14 +53,16 @@ const ProductDetailsPage = () => {
     }
   }, []);
 
+  const totalStock = (product?.inventories || []).reduce((sum: number, inv: { stock: number }) => sum + inv.stock, 0);
+
   const handleQuantityChange = (value: number) => {
-    if (value >= 1 && value <= (product?.stock || 0)) {
+    if (value >= 1 && value <= totalStock) {
       setQuantity(value);
     }
   };
 
   const handleAddToCart = () => {
-    if (quantity > product.stock) {
+    if (quantity > totalStock) {
       toast.error("Insufficient stock");
 
       return;
@@ -186,7 +188,7 @@ const ProductDetailsPage = () => {
                 priceCurrency: "USD",
                 price: finalPrice.toFixed(2),
                 itemCondition: "https://schema.org/NewCondition",
-                availability: product.stock > 0 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
+                availability: totalStock > 0 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
               },
             }),
           }}
@@ -238,8 +240,8 @@ const ProductDetailsPage = () => {
             >
               <Badge
                 className="absolute top-4 right-4 text-sm"
-                color={product.stock > 0 ? "success" : "warning"}
-                content={product.stock > 0 ? "In Stock" : "Out of Stock"}
+                color={totalStock > 0 ? "success" : "warning"}
+                content={totalStock > 0 ? "In Stock" : "Out of Stock"}
                 variant="flat"
               >
                 <Image
@@ -281,12 +283,12 @@ const ProductDetailsPage = () => {
             {/* Price Section */}
             <div className="flex items-center gap-4">
               <span className="text-2xl font-bold text-green-600 dark:text-green-500 sm:text-3xl">
-                ${finalPrice.toFixed(2)}
+                ৳{finalPrice.toFixed(2)}
               </span>
               {product.discount?.value && (
                 <>
                   <span className="text-lg line-through text-gray-500 dark:text-gray-400">
-                    ${product.price.toFixed(2)}
+                    ৳{product.price.toFixed(2)}
                   </span>
                   <span className="text-sm font-medium text-red-500 dark:text-red-400">
                     -{product.discount.value}%
@@ -296,10 +298,10 @@ const ProductDetailsPage = () => {
             </div>
 
             {/* Stock Info */}
-            {product.stock > 0 && product.stock <= 10 && (
+            {totalStock > 0 && totalStock <= 10 && (
               <div className="flex items-center gap-2 text-sm text-orange-500">
                 <AlertTriangle size={16} />
-                <span>Only {product.stock} left in stock - order soon!</span>
+                <span>Only {totalStock} left in stock - order soon!</span>
               </div>
             )}
 
@@ -322,13 +324,13 @@ const ProductDetailsPage = () => {
               <Button
                 className="h-12 w-full rounded-xl text-base font-medium sm:flex-1 sm:text-lg"
                 color="primary"
-                isDisabled={product.stock <= 0}
+                isDisabled={totalStock <= 0}
                 isLoading={isAddingToCart}
                 startContent={<ShoppingCart size={20} />}
                 variant="solid"
                 onPress={handleAddToCart}
               >
-                {product.stock > 0 ? "Add to Cart" : "Out of Stock"}
+                {totalStock > 0 ? "Add to Cart" : "Out of Stock"}
               </Button>
               <Button
                 className="h-12 w-full rounded-xl text-base font-medium sm:w-auto sm:text-lg"

@@ -2,6 +2,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { TCart, TCartItem } from "../types";
+import { syncCartWithBackend } from "@/src/services/CartService";
 
 export const useCart = () => {
   const queryClient = useQueryClient();
@@ -69,7 +70,11 @@ export const useCart = () => {
       updatedItems = [...cart.items, item];
     }
 
-    updateCartMutation.mutate(updatedItems);
+    updateCartMutation.mutate(updatedItems, {
+      onSuccess: () => {
+        try { syncCartWithBackend(); } catch { /* silently fail */ }
+      }
+    });
     toast.success(`${item.name} added to cart!`);
   };
 
@@ -81,7 +86,11 @@ export const useCart = () => {
       (item) => item.productId !== productId
     );
 
-    updateCartMutation.mutate(updatedItems);
+    updateCartMutation.mutate(updatedItems, {
+      onSuccess: () => {
+        try { syncCartWithBackend(); } catch { /* silently fail */ }
+      }
+    });
     toast.success("Item removed from cart!");
   };
 
@@ -99,12 +108,20 @@ export const useCart = () => {
       item.productId === productId ? { ...item, quantity } : item
     );
 
-    updateCartMutation.mutate(updatedItems);
+    updateCartMutation.mutate(updatedItems, {
+      onSuccess: () => {
+        try { syncCartWithBackend(); } catch { /* silently fail */ }
+      }
+    });
   };
 
   // Clear cart
   const clearCart = () => {
-    updateCartMutation.mutate([]);
+    updateCartMutation.mutate([], {
+      onSuccess: () => {
+        try { syncCartWithBackend(); } catch { /* silently fail */ }
+      }
+    });
     toast.success("Cart cleared!");
   };
 

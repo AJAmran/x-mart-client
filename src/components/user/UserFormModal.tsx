@@ -15,6 +15,7 @@ import {
 import { Input } from "@nextui-org/input";
 import { Button } from "@nextui-org/button";
 import { useUpdateUser } from "@/src/hooks/useUser";
+import { IUser } from "@/src/types";
 
 const userSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -28,7 +29,7 @@ type UserFormValues = z.infer<typeof userSchema>;
 interface UserFormModalProps {
   isOpen: boolean;
   onClose: () => void;
-  user: any; // Made user required since we're only editing now
+  user: IUser | null;
 }
 
 const UserFormModal: React.FC<UserFormModalProps> = ({
@@ -77,11 +78,12 @@ const UserFormModal: React.FC<UserFormModalProps> = ({
         profilePhoto: data.profilePhoto,
       };
 
+      if (!user) return;
       await updateUser.mutateAsync({ id: user._id, userData: updateData });
       toast.success("User updated successfully");
       onClose();
-    } catch (error: any) {
-      toast.error(error.message || "Failed to update user");
+    } catch (error: unknown) {
+      toast.error(error instanceof Error ? error.message : "Failed to update user");
     }
   };
 

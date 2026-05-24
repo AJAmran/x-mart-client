@@ -26,13 +26,14 @@ import {
   SearchIcon,
 } from "lucide-react";
 import React, { useState } from "react";
+import { IUser } from "@/src/types";
 
 const UserManagementPage = () => {
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
   const [search, setSearch] = useState("");
   const [isFormOpen, setIsFormOpen] = useState(false);
-  const [selectedUser, setSelectedUser] = useState<any>(null);
+  const [selectedUser, setSelectedUser] = useState<IUser | null>(null);
 
   const { data, isLoading, refetch } = useUsers({
     page,
@@ -53,7 +54,7 @@ const UserManagementPage = () => {
     exportToPDF(users, "users");
   };
 
-  const handleOpenForm = (user: any = null) => {
+  const handleOpenForm = (user: IUser | null = null) => {
     setSelectedUser(user);
     setIsFormOpen(true);
   };
@@ -131,7 +132,7 @@ const UserManagementPage = () => {
           isLoading={isLoading}
           loadingContent="Loading users..."
         >
-          {users.map((user: any) => (
+          {users.map((user: IUser) => (
             <TableRow key={user._id} className="border-b border-gray-100 dark:border-gray-800 last:border-none">
               <TableCell>
                 <div className="flex items-center gap-3">

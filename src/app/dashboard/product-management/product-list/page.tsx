@@ -191,7 +191,7 @@ export default function ProductListPage() {
       const tableData = allProducts.map((product: TProduct, index: number) => [
         index + 1,
         product.name,
-        `$${product.price}`,
+        `৳${product.price}`,
         product.inventories?.[0]?.stock ?? 0,
         product.status ?? "N/A",
         product.category ?? "N/A",
@@ -290,7 +290,7 @@ export default function ProductListPage() {
                     </div>
                   </TableCell>
                   <TableCell>
-                    <span className="font-bold text-blue-600 dark:text-blue-400">${product.price}</span>
+                    <span className="font-bold text-blue-600 dark:text-blue-400">৳{product.price}</span>
                   </TableCell>
                   <TableCell>
                     <Chip

@@ -1,7 +1,6 @@
-// app/tracking/page.tsx
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@nextui-org/button";
 import { Input } from "@nextui-org/input";
 import { Card, CardBody } from "@nextui-org/card";
@@ -16,174 +15,72 @@ import {
   MapPin,
 } from "lucide-react";
 import { motion } from "framer-motion";
+import { useOrderById } from "@/src/hooks/useOrder";
+import { TOrder, ORDER_STATUS } from "@/src/types";
 
-// Mock data - replace with actual API calls
-const mockTrackingData = {
-  "ORD-123456": {
-    orderId: "ORD-123456",
-    status: "delivered",
-    customer: {
-      name: "John Doe",
-      email: "john.doe@example.com",
-      phone: "+1 234 567 8900",
-    },
-    items: [
-      {
-        name: "Wireless Bluetooth Headphones",
-        quantity: 1,
-        price: 99.99,
-        image: "/images/headphones.jpg",
-      },
-      {
-        name: "Premium Phone Case",
-        quantity: 2,
-        price: 15.99,
-        image: "/images/phone-case.jpg",
-      },
-    ],
-    total: 131.97,
-    shippingAddress: {
-      street: "123 Main Street",
-      city: "New York",
-      state: "NY",
-      zipCode: "10001",
-      country: "USA",
-    },
-    timeline: [
-      {
-        status: "ordered",
-        description: "Order placed successfully",
-        date: "2024-01-15T10:30:00Z",
-        completed: true,
-      },
-      {
-        status: "confirmed",
-        description: "Order confirmed and payment processed",
-        date: "2024-01-15T11:15:00Z",
-        completed: true,
-      },
-      {
-        status: "processing",
-        description: "Items being prepared for shipment",
-        date: "2024-01-15T14:20:00Z",
-        completed: true,
-      },
-      {
-        status: "shipped",
-        description: "Shipped via FedEx Ground",
-        date: "2024-01-16T09:45:00Z",
-        completed: true,
-      },
-      {
-        status: "out_for_delivery",
-        description: "Out for delivery in your area",
-        date: "2024-01-17T08:30:00Z",
-        completed: true,
-      },
-      {
-        status: "delivered",
-        description: "Delivered to recipient at front door",
-        date: "2024-01-17T14:15:00Z",
-        completed: true,
-      },
-    ],
-    carrier: {
-      name: "FedEx",
-      trackingNumber: "789012345678",
-      estimatedDelivery: "2024-01-17",
-      phone: "+1-800-463-3339",
-    },
-  },
+type StatusKey = keyof typeof ORDER_STATUS;
+
+const statusConfig: Record<
+  StatusKey,
+  {
+    label: string;
+    color: string;
+    icon: React.ComponentType<{ className?: string }>;
+    badgeColor: "primary" | "secondary" | "warning" | "success" | "danger";
+  }
+> = {
+  PENDING: { label: "Pending", color: "bg-yellow-500", icon: Clock, badgeColor: "warning" },
+  PROCESSING: { label: "Processing", color: "bg-blue-500", icon: Package, badgeColor: "primary" },
+  SHIPPED: { label: "Shipped", color: "bg-purple-500", icon: Truck, badgeColor: "secondary" },
+  DELIVERED: { label: "Delivered", color: "bg-green-500", icon: CheckCircle, badgeColor: "success" },
+  CANCELLED: { label: "Cancelled", color: "bg-red-500", icon: AlertCircle, badgeColor: "danger" },
 };
 
-const statusConfig = {
-  ordered: {
-    label: "Order Placed",
-    color: "bg-blue-500",
-    icon: Package,
-    badgeColor: "primary",
-  },
-  confirmed: {
-    label: "Confirmed",
-    color: "bg-purple-500",
-    icon: CheckCircle,
-    badgeColor: "secondary",
-  },
-  processing: {
-    label: "Processing",
-    color: "bg-yellow-500",
-    icon: Clock,
-    badgeColor: "warning",
-  },
-  shipped: {
-    label: "Shipped",
-    color: "bg-indigo-500",
-    icon: Truck,
-    badgeColor: "primary",
-  },
-  out_for_delivery: {
-    label: "Out for Delivery",
-    color: "bg-orange-500",
-    icon: Truck,
-    badgeColor: "warning",
-  },
-  delivered: {
-    label: "Delivered",
-    color: "bg-green-500",
-    icon: CheckCircle,
-    badgeColor: "success",
-  },
-  cancelled: {
-    label: "Cancelled",
-    color: "bg-red-500",
-    icon: AlertCircle,
-    badgeColor: "danger",
-  },
-};
+const formatDate = (dateStr: string) =>
+  new Date(dateStr).toLocaleString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+    hour12: true,
+  });
 
 export default function TrackingPage() {
   const [trackingId, setTrackingId] = useState("");
-  const [orderData, setOrderData] = useState<any>(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [submittedId, setSubmittedId] = useState("");
   const [error, setError] = useState("");
 
-  const handleTrackOrder = async (e: React.FormEvent) => {
+  const { data, isLoading: isFetching, error: queryError } = useOrderById(submittedId);
+  const orderData: TOrder | null = data?.data ?? null;
+
+  useEffect(() => {
+    if (submittedId) {
+      if (queryError) {
+        setError("Order not found. Please check your tracking ID and try again.");
+      } else if (orderData) {
+        setError("");
+      }
+    }
+  }, [queryError, orderData, submittedId]);
+
+  const handleTrackOrder = (e: React.FormEvent) => {
     e.preventDefault();
     if (!trackingId.trim()) {
       setError("Please enter a tracking number");
-
       return;
     }
-
-    setIsLoading(true);
     setError("");
-
-    // Simulate API call
-    setTimeout(() => {
-      const data = mockTrackingData[trackingId as keyof typeof mockTrackingData];
-
-      if (data) {
-        setOrderData(data);
-      } else {
-        setError("Order not found. Please check your tracking ID and try again.");
-      }
-      setIsLoading(false);
-    }, 1500);
+    setSubmittedId(trackingId);
   };
 
-  const getStatusIcon = (status: string) => {
-    const IconComponent = statusConfig[status as keyof typeof statusConfig]?.icon || Package;
-
+  const getStatusIcon = (status: StatusKey) => {
+    const IconComponent = statusConfig[status]?.icon || Package;
     return <IconComponent className="w-5 h-5" />;
   };
 
-  const getCurrentStatusIndex = () => {
-    if (!orderData) return -1;
-
-    return orderData.timeline.findIndex((step: any) => !step.completed);
-  };
-
-  const currentStatusIndex = getCurrentStatusIndex();
+  const currentStatusIndex = orderData ? orderData.trackingHistory.length - 1 : -1;
+  const isLoading = isFetching && !!submittedId;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 dark:from-gray-900 dark:to-gray-800 py-8">
@@ -202,7 +99,7 @@ export default function TrackingPage() {
           </p>
         </motion.div>
 
-        {/* Search Form - Fixed Centering */}
+        {/* Search Form */}
         <motion.div
           animate={{ opacity: 1, y: 0 }}
           className="mb-12"
@@ -213,7 +110,6 @@ export default function TrackingPage() {
             <CardBody className="p-6 sm:p-8">
               <form onSubmit={handleTrackOrder}>
                 <div className="flex flex-col lg:flex-row gap-4 w-full">
-                  {/* Input Field - Takes available space */}
                   <div className="flex-1 min-w-0">
                     <Input
                       classNames={{
@@ -233,8 +129,6 @@ export default function TrackingPage() {
                       onChange={(e) => setTrackingId(e.target.value)}
                     />
                   </div>
-
-                  {/* Submit Button - Fixed width */}
                   <div className="flex-shrink-0 lg:w-auto w-full">
                     <Button
                       className="w-full lg:w-[160px] h-14 font-semibold text-base transition-all duration-300 hover:scale-[1.02]"
@@ -264,7 +158,7 @@ export default function TrackingPage() {
           </Card>
         </motion.div>
 
-        {/* Rest of the component remains the same */}
+        {/* Order Details */}
         {orderData && (
           <motion.div
             animate={{ opacity: 1, y: 0 }}
@@ -279,36 +173,31 @@ export default function TrackingPage() {
                   <div className="flex-1">
                     <div className="flex items-center gap-4 mb-4">
                       <Badge
-                        color={statusConfig[orderData.status as keyof typeof statusConfig]?.badgeColor as any}
+                        color={statusConfig[orderData.status]?.badgeColor}
                         size="lg"
                         variant="flat"
                       >
                         <div className="flex items-center gap-2">
                           {getStatusIcon(orderData.status)}
                           <span className="font-semibold">
-                            {statusConfig[orderData.status as keyof typeof statusConfig]?.label}
+                            {statusConfig[orderData.status]?.label}
                           </span>
                         </div>
                       </Badge>
                       <span className="text-sm text-gray-500 dark:text-gray-400">
-                        Order #: {orderData.orderId}
+                        Order #: {orderData._id.slice(0, 8).toUpperCase()}
                       </span>
                     </div>
                     <p className="text-gray-600 dark:text-gray-400">
-                      Estimated delivery:{" "}
+                      Placed on{" "}
                       <span className="font-semibold text-gray-900 dark:text-white">
-                        {new Date(orderData.carrier.estimatedDelivery).toLocaleDateString("en-US", {
-                          weekday: "long",
-                          year: "numeric",
-                          month: "long",
-                          day: "numeric",
-                        })}
+                        {formatDate(orderData.createdAt)}
                       </span>
                     </p>
                   </div>
                   <div className="text-right">
                     <p className="text-2xl font-bold text-green-600">
-                      ${orderData.total}
+                      ৳{orderData.totalPrice.toFixed(2)}
                     </p>
                     <p className="text-sm text-gray-500 dark:text-gray-400">
                       Total Amount
@@ -329,13 +218,13 @@ export default function TrackingPage() {
                     </h2>
 
                     <div className="relative">
-                      {orderData.timeline.map((step: any, index: number) => {
+                      {orderData.trackingHistory.map((step, index) => {
                         const isActive = index === currentStatusIndex;
-                        const isCompleted = step.completed;
+                        const isCompleted = true;
 
                         return (
                           <motion.div
-                            key={step.status}
+                            key={index}
                             animate={{ opacity: 1, x: 0 }}
                             className="flex gap-6 mb-8 last:mb-0"
                             initial={{ opacity: 0, x: -20 }}
@@ -346,19 +235,19 @@ export default function TrackingPage() {
                               <div
                                 className={`w-4 h-4 rounded-full border-2 ${
                                   isCompleted
-                                    ? statusConfig[step.status as keyof typeof statusConfig]?.color +
+                                    ? statusConfig[step.status]?.color +
                                       " border-white dark:border-gray-800"
                                     : isActive
                                     ? "bg-white border-2 " +
-                                      statusConfig[step.status as keyof typeof statusConfig]?.color
+                                      statusConfig[step.status]?.color
                                     : "bg-gray-300 dark:bg-gray-600 border-gray-300 dark:border-gray-600"
                                 }`}
                               />
-                              {index < orderData.timeline.length - 1 && (
+                              {index < orderData.trackingHistory.length - 1 && (
                                 <div
                                   className={`flex-1 w-0.5 ${
                                     isCompleted
-                                      ? statusConfig[step.status as keyof typeof statusConfig]?.color
+                                      ? statusConfig[step.status]?.color
                                       : "bg-gray-300 dark:bg-gray-600"
                                   }`}
                                 />
@@ -376,7 +265,7 @@ export default function TrackingPage() {
                                       : "text-gray-900 dark:text-white"
                                   }`}
                                 >
-                                  {statusConfig[step.status as keyof typeof statusConfig]?.label || step.status}
+                                  {statusConfig[step.status]?.label || step.status}
                                 </h3>
                                 {isCompleted && (
                                   <CheckCircle className="w-4 h-4 text-green-500" />
@@ -385,18 +274,13 @@ export default function TrackingPage() {
                                   <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse" />
                                 )}
                               </div>
-                              <p className="text-gray-600 dark:text-gray-400 mb-1">
-                                {step.description}
-                              </p>
+                              {step.note && (
+                                <p className="text-gray-600 dark:text-gray-400 mb-1">
+                                  {step.note}
+                                </p>
+                              )}
                               <p className="text-sm text-gray-500 dark:text-gray-500">
-                                {new Date(step.date).toLocaleString("en-US", {
-                                  month: "short",
-                                  day: "numeric",
-                                  year: "numeric",
-                                  hour: "numeric",
-                                  minute: "2-digit",
-                                  hour12: true,
-                                })}
+                                {formatDate(step.updatedAt)}
                               </p>
                             </div>
                           </motion.div>
@@ -417,9 +301,9 @@ export default function TrackingPage() {
                       Order Summary
                     </h3>
                     <div className="space-y-3">
-                      {orderData.items.map((item: any, index: number) => (
+                      {orderData.items.map((item, index) => (
                         <div
-                          key={index}
+                          key={item.productId || index}
                           className="flex justify-between items-center py-2"
                         >
                           <div className="flex-1">
@@ -431,7 +315,7 @@ export default function TrackingPage() {
                             </p>
                           </div>
                           <p className="font-semibold text-gray-900 dark:text-white text-sm">
-                            ${item.price}
+                            ৳{item.price.toFixed(2)}
                           </p>
                         </div>
                       ))}
@@ -439,7 +323,7 @@ export default function TrackingPage() {
                         <div className="flex justify-between items-center font-bold">
                           <span>Total</span>
                           <span className="text-green-600">
-                            ${orderData.total}
+                            ৳{orderData.totalPrice.toFixed(2)}
                           </span>
                         </div>
                       </div>
@@ -447,39 +331,16 @@ export default function TrackingPage() {
                   </CardBody>
                 </Card>
 
-                {/* Shipping Information */}
+                {/* Payment Method */}
                 <Card className="bg-white dark:bg-gray-800 border-none shadow-2xl">
                   <CardBody className="p-6">
                     <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
-                      <Truck className="w-5 h-5" />
-                      Shipping Details
+                      <Package className="w-5 h-5" />
+                      Payment
                     </h3>
-                    <div className="space-y-4">
-                      <div>
-                        <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">
-                          Carrier
-                        </p>
-                        <p className="font-medium text-gray-900 dark:text-white">
-                          {orderData.carrier.name}
-                        </p>
-                      </div>
-                      <div>
-                        <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">
-                          Tracking Number
-                        </p>
-                        <p className="font-medium text-gray-900 dark:text-white font-mono">
-                          {orderData.carrier.trackingNumber}
-                        </p>
-                      </div>
-                      <div>
-                        <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">
-                          Customer Service
-                        </p>
-                        <p className="font-medium text-gray-900 dark:text-white">
-                          {orderData.carrier.phone}
-                        </p>
-                      </div>
-                    </div>
+                    <p className="text-gray-900 dark:text-white font-medium capitalize">
+                      {orderData.paymentMethod.replace(/_/g, " ")}
+                    </p>
                   </CardBody>
                 </Card>
 
@@ -492,15 +353,21 @@ export default function TrackingPage() {
                     </h3>
                     <div className="space-y-2 text-sm">
                       <p className="font-medium text-gray-900 dark:text-white">
-                        {orderData.shippingAddress.street}
+                        {orderData.shippingInfo.name}
                       </p>
                       <p className="text-gray-600 dark:text-gray-400">
-                        {orderData.shippingAddress.city},{" "}
-                        {orderData.shippingAddress.state}{" "}
-                        {orderData.shippingAddress.zipCode}
+                        {orderData.shippingInfo.email}
                       </p>
                       <p className="text-gray-600 dark:text-gray-400">
-                        {orderData.shippingAddress.country}
+                        {orderData.shippingInfo.phone}
+                      </p>
+                      <p className="text-gray-600 dark:text-gray-400">
+                        {orderData.shippingInfo.addressLine1}
+                        {orderData.shippingInfo.addressLine2 && `, ${orderData.shippingInfo.addressLine2}`}
+                        <br />
+                        {orderData.shippingInfo.city}, {orderData.shippingInfo.division}
+                        <br />
+                        {orderData.shippingInfo.postalCode}
                       </p>
                     </div>
                   </CardBody>
@@ -531,7 +398,7 @@ export default function TrackingPage() {
         )}
 
         {/* Empty State */}
-        {!orderData && !isLoading && !error && (
+        {!orderData && !isLoading && !error && !submittedId && (
           <motion.div
             animate={{ opacity: 1, scale: 1 }}
             className="text-center py-16"

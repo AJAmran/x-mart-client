@@ -82,6 +82,7 @@ const Footer = () => {
             <form className="flex flex-col sm:flex-row items-center gap-2">
               <Input
                 required
+                aria-label="Email for newsletter"
                 className="w-full sm:w-auto shadow-md dark:text-gray-900"
                 placeholder="Enter your email"
                 type="email"

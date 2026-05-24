@@ -4,7 +4,7 @@ import { toast } from "sonner";
 import { changePassword, loginUser, registerUser } from "../services/AuthService";
 
 export const useUserRegistration = () => {
-  return useMutation<any, Error, FieldValues>({
+  return useMutation<{ message: string; success: boolean }, Error, FieldValues>({
     mutationKey: ["USER_REGISTRATION"],
     mutationFn: async (userData) => await registerUser(userData),
     onSuccess: () => {
@@ -17,7 +17,7 @@ export const useUserRegistration = () => {
 };
 
 export const useUserLogin = (onSuccess?: () => void) => {
-  return useMutation<any, Error, FieldValues>({
+  return useMutation<{ message: string; success: boolean }, Error, FieldValues>({
     mutationKey: ["USER_LOGIN"],
     mutationFn: async (userData) => await loginUser(userData),
     onSuccess: () => {
@@ -32,7 +32,7 @@ export const useUserLogin = (onSuccess?: () => void) => {
 
 
 export const useChangePassword = () => {
-  return useMutation<any, Error, { oldPassword: string; newPassword: string }>({
+  return useMutation<{ message: string; success: boolean }, Error, { oldPassword: string; newPassword: string }>({
     mutationKey: ["CHANGE_PASSWORD"],
     mutationFn: async (passwordData) => await changePassword(passwordData),
     onSuccess: () => {

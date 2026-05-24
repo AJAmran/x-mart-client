@@ -2,7 +2,7 @@ import { utils, writeFile } from "xlsx";
 import { jsPDF } from "jspdf";
 import "jspdf-autotable";
 
-export const exportToExcel = (data: any[], fileName: string) => {
+export const exportToExcel = (data: Record<string, unknown>[], fileName: string) => {
   const worksheet = utils.json_to_sheet(data);
   const workbook = utils.book_new();
 
@@ -11,7 +11,7 @@ export const exportToExcel = (data: any[], fileName: string) => {
   writeFile(workbook, `${fileName}.xlsx`);
 };
 
-export const exportToPDF = (data: any[], fileName: string) => {
+export const exportToPDF = (data: Record<string, unknown>[], fileName: string) => {
   const doc = new jsPDF();
 
   // Add title

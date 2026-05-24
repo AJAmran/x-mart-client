@@ -15,8 +15,8 @@ export const registerUser = async (userData: FieldValues) => {
     }
 
     return data;
-  } catch (error: any) {
-    throw new Error(error.message);
+  } catch (error: unknown) {
+    throw new Error(error instanceof Error ? error.message : "Registration failed");
   }
 };
 
@@ -32,8 +32,8 @@ export const loginUser = async (userData: FieldValues) => {
     }
 
     return data;
-  } catch (error: any) {
-    throw new Error(error.message);
+  } catch (error: unknown) {
+    throw new Error(error instanceof Error ? error.message : "Login failed");
   }
 };
 
@@ -48,8 +48,8 @@ export const changePassword = async (passwordData: {
     );
 
     return data;
-  } catch (error: any) {
-    throw new Error(error.message);
+  } catch (error: unknown) {
+    throw new Error(error instanceof Error ? error.message : "Change password failed");
   }
 };
 

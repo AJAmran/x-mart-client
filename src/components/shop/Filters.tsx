@@ -114,7 +114,7 @@ export default function Filters({ categories, initialFilters }: FiltersProps) {
   );
 
   // Handle filter changes
-  const handleFilterChange = useCallback((key: string, value: any) => {
+  const handleFilterChange = useCallback((key: string, value: string | number) => {
     setFilters((prev) => ({ ...prev, [key]: value }));
   }, []);
 

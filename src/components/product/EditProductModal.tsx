@@ -23,7 +23,7 @@ export default function EditProductModal({ product }: { product: TProduct }) {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const updateProductMutation = useUpdateProduct();
 
-  const { control, handleSubmit, reset } = useForm<Partial<TProduct>>({
+  const { control, handleSubmit, reset, formState: { errors } } = useForm<Partial<TProduct>>({
     resolver: zodResolver(updateProductSchema),
     defaultValues: {
       ...product,
@@ -86,6 +86,8 @@ export default function EditProductModal({ product }: { product: TProduct }) {
                     label="Name"
                     value={field.value}
                     onChange={field.onChange}
+                    errorMessage={errors.name?.message}
+                    isInvalid={!!errors.name}
                   />
                 )}
               />
@@ -99,6 +101,8 @@ export default function EditProductModal({ product }: { product: TProduct }) {
                     label="Description"
                     value={field.value}
                     onChange={field.onChange}
+                    errorMessage={errors.description?.message}
+                    isInvalid={!!errors.description}
                   />
                 )}
               />
@@ -113,6 +117,8 @@ export default function EditProductModal({ product }: { product: TProduct }) {
                     type="number"
                     value={field.value?.toString()}
                     onChange={(e) => field.onChange(Number(e.target.value))}
+                    errorMessage={errors.price?.message}
+                    isInvalid={!!errors.price}
                   />
                 )}
               />
@@ -128,6 +134,8 @@ export default function EditProductModal({ product }: { product: TProduct }) {
                     type="number"
                     value={field.value?.toString()}
                     onChange={(e) => field.onChange(Number(e.target.value))}
+                    errorMessage={errors.inventories?.[0]?.stock?.message}
+                    isInvalid={!!errors.inventories?.[0]?.stock}
                   />
                 )}
               />
@@ -141,6 +149,8 @@ export default function EditProductModal({ product }: { product: TProduct }) {
                     label="Discount Type"
                     selectedKeys={[field.value || ""]}
                     onChange={field.onChange}
+                    errorMessage={errors.discount?.type?.message}
+                    isInvalid={!!errors.discount?.type}
                   >
                     <SelectItem key="percentage" value="percentage">
                       Percentage
@@ -163,6 +173,8 @@ export default function EditProductModal({ product }: { product: TProduct }) {
                     type="number"
                     value={field.value?.toString()}
                     onChange={(e) => field.onChange(Number(e.target.value))}
+                    errorMessage={errors.discount?.value?.message}
+                    isInvalid={!!errors.discount?.value}
                   />
                 )}
               />
@@ -185,6 +197,8 @@ export default function EditProductModal({ product }: { product: TProduct }) {
                         e.target.value ? new Date(e.target.value) : undefined
                       )
                     }
+                    errorMessage={errors.discount?.startDate?.message}
+                    isInvalid={!!errors.discount?.startDate}
                   />
                 )}
               />
@@ -214,6 +228,8 @@ export default function EditProductModal({ product }: { product: TProduct }) {
                         e.target.value ? new Date(e.target.value) : undefined
                       )
                     }
+                    errorMessage={errors.discount?.endDate?.message}
+                    isInvalid={!!errors.discount?.endDate}
                   />
                 )}
               />
