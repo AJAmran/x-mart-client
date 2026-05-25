@@ -85,8 +85,8 @@ const OrderTable = ({
   };
 
   return (
-    <div className="bg-white border border-gray-200 rounded-lg shadow-sm">
-      <div className="grid grid-cols-12 gap-4 px-6 py-3 font-semibold text-sm text-gray-600 border-b border-gray-200">
+    <div className="bg-white border border-gray-200 rounded-lg shadow-sm overflow-x-auto">
+      <div className="min-w-[650px] grid grid-cols-12 gap-4 px-6 py-3 font-semibold text-sm text-gray-600 border-b border-gray-200">
         <button
           className="col-span-3 flex items-center gap-1 cursor-pointer text-left bg-transparent border-none p-0"
           type="button"

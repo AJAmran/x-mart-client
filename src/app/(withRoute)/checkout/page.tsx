@@ -6,15 +6,20 @@ import { useUser } from "../../../context/user.provider";
 import { Select, SelectItem } from "@heroui/select";
 import { useCart } from "@/src/hooks/useCart";
 import { useBranches } from "@/src/hooks/useBranch";
+import { useRouter } from "next/navigation";
 
 import OrderSummary from "@/src/components/Order/OrderSummary";
 import ShippingInformation from "@/src/components/Order/ShippingInformation";
 import { useCreateOrder } from "@/src/hooks/useOrder";
+import { useInitPayment } from "@/src/hooks/usePayment";
 
 const CheckoutPage = () => {
+  const router = useRouter();
   const { cart, clearCart, updateQuantity, removeItem } = useCart();
   const { user } = useUser();
-  const { mutate: createOrder, isPending } = useCreateOrder();
+  const { mutate: createOrder, isPending: isCreating } = useCreateOrder();
+  const { mutate: initPayment, isPending: isPaying } = useInitPayment();
+  const [paymentMethod, setPaymentMethod] = useState<"CASH_ON_DELIVERY" | "ONLINE">("CASH_ON_DELIVERY");
   const [shippingInfo, setShippingInfo] = useState({
     name: user?.name || "",
     email: user?.email || "",
@@ -83,7 +88,6 @@ const CheckoutPage = () => {
   const handlePlaceOrder = () => {
     if (!validateForm()) {
       toast.error("Please fix the errors in the form.");
-
       return;
     }
 
@@ -91,15 +95,38 @@ const CheckoutPage = () => {
       items: cart.items,
       shippingInfo,
       branchId: selectedBranchId || undefined,
-      paymentMethod: "CASH_ON_DELIVERY" as "CASH_ON_DELIVERY",
+      paymentMethod,
     };
 
-    createOrder(orderData, {
-      onSuccess: () => {
-        clearCart();
-      },
-    });
+    if (paymentMethod === "ONLINE") {
+      createOrder(orderData, {
+        onSuccess: (data) => {
+          const orderId = data?.data?._id || data?._id;
+          if (!orderId) {
+            toast.error("Failed to get order ID");
+            return;
+          }
+          initPayment(orderId, {
+            onSuccess: (res) => {
+              if (res?.data?.GatewayPageURL) {
+                window.location.href = res.data.GatewayPageURL;
+              } else {
+                toast.error("Failed to initialize payment gateway");
+              }
+            },
+          });
+        },
+      });
+    } else {
+      createOrder(orderData, {
+        onSuccess: () => {
+          clearCart();
+        },
+      });
+    }
   };
+
+  const isPending = isCreating || isPaying;
 
   return (
     <div className="container mx-auto p-4">
@@ -116,6 +143,43 @@ const CheckoutPage = () => {
             handleShippingChange={handleShippingChange}
             shippingInfo={shippingInfo}
           />
+          <div className="space-y-2">
+            <label className="text-sm font-semibold text-gray-600 dark:text-gray-400">
+              Payment Method
+            </label>
+            <div className="grid grid-cols-2 gap-3">
+              <button
+                type="button"
+                className={`flex items-center gap-3 rounded-lg border-2 p-4 transition-all ${
+                  paymentMethod === "CASH_ON_DELIVERY"
+                    ? "border-success bg-success/10"
+                    : "border-default-200 hover:border-default-400"
+                }`}
+                onClick={() => setPaymentMethod("CASH_ON_DELIVERY")}
+              >
+                <div className="text-2xl">💰</div>
+                <div className="text-left">
+                  <p className="font-semibold">Cash on Delivery</p>
+                  <p className="text-xs text-gray-500">Pay when you receive</p>
+                </div>
+              </button>
+              <button
+                type="button"
+                className={`flex items-center gap-3 rounded-lg border-2 p-4 transition-all ${
+                  paymentMethod === "ONLINE"
+                    ? "border-primary bg-primary/10"
+                    : "border-default-200 hover:border-default-400"
+                }`}
+                onClick={() => setPaymentMethod("ONLINE")}
+              >
+                <div className="text-2xl">💳</div>
+                <div className="text-left">
+                  <p className="font-semibold">Online Payment</p>
+                  <p className="text-xs text-gray-500">Pay via SSL Commerz</p>
+                </div>
+              </button>
+            </div>
+          </div>
           <div className="space-y-2">
             <label className="text-sm font-semibold text-gray-600 dark:text-gray-400">
               Select Branch
@@ -137,13 +201,15 @@ const CheckoutPage = () => {
           </div>
           <Button
             className="w-full"
-            color="success"
+            color={paymentMethod === "ONLINE" ? "primary" : "success"}
             isDisabled={cart.items.length === 0 || isPending}
             isLoading={isPending}
             size="lg"
             onPress={handlePlaceOrder}
           >
-            Place Order (Cash on Delivery)
+            {paymentMethod === "ONLINE"
+              ? "Proceed to Payment"
+              : "Place Order (Cash on Delivery)"}
           </Button>
         </div>
       </div>

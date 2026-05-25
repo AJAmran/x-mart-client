@@ -43,10 +43,18 @@ axiosInstance.interceptors.response.use(
 
       return axiosInstance(config);
     } else {
-      const errorMessage =
-        error.response?.data?.message ||
-        error.message ||
-        "An unexpected error occurred";
+      const data = error.response?.data;
+      let errorMessage = "An unexpected error occurred";
+
+      if (data?.errorSources?.length > 0) {
+        errorMessage = data.errorSources
+          .map((es: { path: string; message: string }) => es.message)
+          .join(". ");
+      } else if (data?.message) {
+        errorMessage = data.message;
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
 
       return Promise.reject(new Error(errorMessage));
     }

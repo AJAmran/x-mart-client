@@ -17,9 +17,6 @@ interface UserActionsProps {
 }
 
 export default function UserActions({ user }: UserActionsProps) {
-
-
-
   return (
     <>
       {/* Wishlist Modal */}

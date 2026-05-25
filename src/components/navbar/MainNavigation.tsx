@@ -17,7 +17,7 @@ export default function MainNavigation({ categories }: MainNavigationProps) {
   const isActive = (href: string) => pathname === href;
 
   return (
-    <div className="sticky top-[73px] z-50 bg-primary shadow-sm hidden md:block text-primary-foreground">
+    <div className="bg-primary shadow-sm hidden md:block text-primary-foreground">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between py-3">
           <div className="flex items-center gap-6 sm:gap-8">

@@ -1,6 +1,6 @@
 "use client";
 
-import { FC } from "react";
+import { FC, useMemo } from "react";
 import { Card, CardHeader, CardBody } from "@nextui-org/card";
 import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from "@heroui/table";
 import { Skeleton } from "@heroui/skeleton";
@@ -8,6 +8,17 @@ import { ChartIcon, FunnelIcon, ProfileIcon } from "@/src/components/icons";
 import { useUsers } from "@/src/hooks/useUser";
 import { useOrders } from "@/src/hooks/useOrder";
 import { useProducts } from "@/src/hooks/useProducts";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  LineChart,
+  Line,
+} from "recharts";
 
 const statusColor: Record<string, string> = {
   PENDING: "text-yellow-500",
@@ -20,7 +31,7 @@ const statusColor: Record<string, string> = {
 
 const DashboardHome: FC = () => {
   const { data: usersRes, isLoading: usersLoading } = useUsers({ limit: 1 });
-  const { data: ordersRes, isLoading: ordersLoading } = useOrders({}, { limit: 5, sortBy: "createdAt", sortOrder: "desc" });
+  const { data: ordersRes, isLoading: ordersLoading } = useOrders({}, { limit: 100, sortBy: "createdAt", sortOrder: "desc" });
   const { data: productsRes, isLoading: productsLoading } = useProducts({}, { limit: 1, page: 1, sortBy: "createdAt", sortOrder: "desc" });
 
   const totalUsers = usersRes?.meta?.total ?? usersRes?.data?.length ?? 0;
@@ -29,9 +40,26 @@ const DashboardHome: FC = () => {
   const orders = ordersRes?.data ?? [];
   const totalRevenue = orders.reduce((sum: number, o: any) => sum + (o.totalAmount || o.total || 0), 0);
 
+  const recentOrders = useMemo(() => {
+    return [...orders].sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()).slice(0, 5);
+  }, [orders]);
+
+  const chartData = useMemo(() => {
+    const map: Record<string, { revenue: number; orders: number }> = {};
+    orders.forEach((o: any) => {
+      const date = new Date(o.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric" });
+      if (!map[date]) map[date] = { revenue: 0, orders: 0 };
+      map[date].revenue += o.totalAmount || o.total || 0;
+      map[date].orders += 1;
+    });
+    return Object.entries(map)
+      .map(([date, val]) => ({ date, ...val }))
+      .slice(-7);
+  }, [orders]);
+
   return (
-    <div className="p-6">
-      <h1 className="text-3xl font-extrabold mb-8">Dashboard Overview</h1>
+    <div className="space-y-6">
+      <h1 className="text-xl sm:text-2xl lg:text-3xl font-extrabold">Dashboard Overview</h1>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         <Card className="relative overflow-hidden group shadow-md hover:shadow-xl transition-all duration-300 border-none bg-gradient-to-br from-blue-500/10 to-transparent dark:from-blue-500/20">
@@ -106,18 +134,46 @@ const DashboardHome: FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-8">
         <Card className="shadow-md hover:shadow-lg transition-all">
           <CardHeader>
-            <h3 className="text-lg font-bold">Sales Chart</h3>
+            <h3 className="text-lg font-bold">Revenue (Last 7 Days)</h3>
           </CardHeader>
           <CardBody>
-            <p className="text-default-400 text-sm">Chart component coming soon</p>
+            {ordersLoading ? (
+              <Skeleton className="h-60 rounded-lg" />
+            ) : chartData.length === 0 ? (
+              <p className="text-default-400 text-sm text-center py-16">No data available</p>
+            ) : (
+              <ResponsiveContainer width="100%" height={250}>
+                <BarChart data={chartData}>
+                  <CartesianGrid strokeDasharray="3 3" opacity={0.3} />
+                  <XAxis dataKey="date" tick={{ fontSize: 11 }} />
+                  <YAxis tick={{ fontSize: 11 }} />
+                  <Tooltip formatter={(value) => [`৳${Number(value).toLocaleString()}`, "Revenue"]} />
+                  <Bar dataKey="revenue" fill="#3b82f6" radius={[4, 4, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            )}
           </CardBody>
         </Card>
         <Card className="shadow-md hover:shadow-lg transition-all">
           <CardHeader>
-            <h3 className="text-lg font-bold">Revenue Chart</h3>
+            <h3 className="text-lg font-bold">Orders (Last 7 Days)</h3>
           </CardHeader>
           <CardBody>
-            <p className="text-default-400 text-sm">Chart component coming soon</p>
+            {ordersLoading ? (
+              <Skeleton className="h-60 rounded-lg" />
+            ) : chartData.length === 0 ? (
+              <p className="text-default-400 text-sm text-center py-16">No data available</p>
+            ) : (
+              <ResponsiveContainer width="100%" height={250}>
+                <LineChart data={chartData}>
+                  <CartesianGrid strokeDasharray="3 3" opacity={0.3} />
+                  <XAxis dataKey="date" tick={{ fontSize: 11 }} />
+                  <YAxis tick={{ fontSize: 11 }} />
+                  <Tooltip />
+                  <Line type="monotone" dataKey="orders" stroke="#10b981" strokeWidth={2} dot={{ fill: "#10b981" }} />
+                </LineChart>
+              </ResponsiveContainer>
+            )}
           </CardBody>
         </Card>
       </div>
@@ -126,7 +182,8 @@ const DashboardHome: FC = () => {
         <h3 className="text-xl font-bold mb-4">Recent Orders</h3>
         <Card className="shadow-md hover:shadow-lg transition-all">
           <CardBody>
-            <Table aria-label="Recent Orders">
+            <div className="overflow-x-auto -mx-1">
+            <Table aria-label="Recent Orders" className="min-w-[500px]">
               <TableHeader>
                 <TableColumn>Order ID</TableColumn>
                 <TableColumn>Customer</TableColumn>
@@ -141,12 +198,12 @@ const DashboardHome: FC = () => {
                     <TableCell><Skeleton className="h-5 w-20 rounded" /></TableCell>
                     <TableCell><Skeleton className="h-5 w-16 rounded" /></TableCell>
                   </TableRow>
-                ) : orders.length === 0 ? (
+                ) : recentOrders.length === 0 ? (
                   <TableRow>
                     <TableCell colSpan={4} className="text-center text-default-400">No orders yet</TableCell>
                   </TableRow>
                 ) : (
-                  orders.map((order: any) => (
+                  recentOrders.map((order: any) => (
                     <TableRow key={order._id}>
                       <TableCell>#{order._id?.slice(-6).toUpperCase() || order.orderId}</TableCell>
                       <TableCell>{order.user?.name || order.customerName || "N/A"}</TableCell>
@@ -161,6 +218,7 @@ const DashboardHome: FC = () => {
                 )}
               </TableBody>
             </Table>
+            </div>
           </CardBody>
         </Card>
       </div>

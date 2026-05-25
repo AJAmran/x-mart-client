@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback } from "react";
 import { useForm, SubmitHandler, FieldErrors } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Card } from "@nextui-org/card";
@@ -27,7 +27,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ type }) => {
   const isRegister = type === "register";
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [error, setError] = useState<string | null>(null);
+
   const { setIsLoading } = useUser();
 
   const {
@@ -49,8 +49,6 @@ const AuthForm: React.FC<AuthFormProps> = ({ type }) => {
   const onSubmit: SubmitHandler<RegisterFormData | LoginFormData> = useCallback(
     async (data) => {
       try {
-        setError(null);
-
         if (isRegister) {
           const response = await registerMutation(data as RegisterFormData);
 
@@ -68,8 +66,8 @@ const AuthForm: React.FC<AuthFormProps> = ({ type }) => {
             router.push(redirectUrl || "/");
           }
         }
-      } catch (error: any) {
-        setError(error.message);
+      } catch {
+        // Toast error is handled by React Query onError
       }
     },
     [isRegister, registerMutation, loginMutation, router, searchParams]
@@ -86,8 +84,6 @@ const AuthForm: React.FC<AuthFormProps> = ({ type }) => {
         <h2 className="text-3xl font-bold text-center drop-shadow-lg mb-6">
           {isRegister ? "Create a New Account" : "Login to Your Account"}
         </h2>
-
-        {error && <div className="text-red-500 text-center mb-4">{error}</div>}
 
         <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
           {isRegister && (

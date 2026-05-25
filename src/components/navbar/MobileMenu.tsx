@@ -4,6 +4,7 @@ import React from "react";
 import { NavbarMenu } from "@nextui-org/navbar";
 import { Link } from "@nextui-org/link";
 import NextLink from "next/link";
+import { useRouter } from "next/navigation";
 import {
   ShoppingBagIcon,
   HeartIcon,
@@ -17,6 +18,7 @@ import CategoriesDropdownClient from "./CategoriesDropdownClient";
 import SearchBar from "../SearchBar";
 import { ThemeSwitch } from "../theme-switch";
 import { IUser } from "@/src/types";
+import { logout } from "@/src/services/AuthService";
 
 import BranchSelector from "./BranchSelection";
 import { Category } from "@/src/data/CategoriesData";
@@ -32,6 +34,7 @@ export default function MobileMenu({
   categories,
   onSearch,
 }: MobileMenuProps) {
+  const router = useRouter();
   return (
     <NavbarMenu className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl pt-6 pb-12">
       <div className="p-4">
@@ -120,15 +123,9 @@ export default function MobileMenu({
               className="flex items-center gap-3 w-full py-3 text-base font-semibold text-danger"
               href="#"
               size="lg"
-              onClick={async () => {
-                try {
-                  await import("@/src/services/AuthService").then((module) =>
-                    module.logout()
-                  );
-                  window.location.href = "/auth/login";
-                } catch {
-                  // Ignore logout errors
-                }
+              onClick={() => {
+                logout();
+                router.push("/auth/login");
               }}
             >
               Logout

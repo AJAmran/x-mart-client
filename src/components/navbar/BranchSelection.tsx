@@ -205,7 +205,7 @@ export default function BranchSelector({ isMobile = false }: BranchSelectorProps
       const params = new URLSearchParams(searchParams.toString());
 
       params.set("branch", id);
-      router.push(`/? ${params.toString()} `);
+      router.push(`/?${params.toString()}`);
     }
     onClose();
   };
@@ -315,7 +315,7 @@ export default function BranchSelector({ isMobile = false }: BranchSelectorProps
                           <div
                             key={branch._id}
                             className={`
-                                            group relative p - 4 rounded - 2xl border transition - all cursor - pointer text - left
+                                            group relative p-4 rounded-2xl border transition-all cursor-pointer text-left
                                             ${isSelected
                                 ? "border-primary bg-primary/5 shadow-md"
                                 : "border-zinc-200 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700 hover:shadow-lg bg-white dark:bg-zinc-900"
@@ -332,11 +332,11 @@ export default function BranchSelector({ isMobile = false }: BranchSelectorProps
                           >
                             <div className="flex justify-between items-start mb-2">
                               <div className="flex items-center gap-2">
-                                <div className={`p - 2 rounded - lg ${isSelected ? 'bg-primary text-white' : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-500 group-hover:text-primary transition-colors'} `}>
+                                <div className={`p-2 rounded-lg ${isSelected ? 'bg-primary text-white' : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-500 group-hover:text-primary transition-colors'}`}>
                                   <Store size={18} />
                                 </div>
                                 <div>
-                                  <h3 className={`font - bold ${isSelected ? 'text-primary' : 'text-zinc-900 dark:text-zinc-100 group-hover:text-primary transition-colors'} `}>
+                                  <h3 className={`font-bold ${isSelected ? 'text-primary' : 'text-zinc-900 dark:text-zinc-100 group-hover:text-primary transition-colors'}`}>
                                     {branch.name}
                                   </h3>
                                   {dist !== undefined && dist !== Infinity && (
@@ -359,7 +359,7 @@ export default function BranchSelector({ isMobile = false }: BranchSelectorProps
                               </div>
 
                               <div className="flex items-center justify-between pt-2 border-t border-dashed border-zinc-200 dark:border-zinc-800">
-                                <div className={`flex items - center gap - 1.5 text - xs font - semibold ${isOpen ? 'text-green-600' : 'text-red-500'} `}>
+                                <div className={`flex items-center gap-1.5 text-xs font-semibold ${isOpen ? 'text-green-600' : 'text-red-500'}`}>
                                   <Clock size={12} />
                                   {isOpen ? 'Open Now' : 'Closed'}
                                 </div>

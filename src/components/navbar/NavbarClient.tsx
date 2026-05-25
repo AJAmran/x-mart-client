@@ -46,11 +46,8 @@ export default function NavbarClient({ user }: NavbarClientProps) {
         maxWidth="2xl"
         onMenuOpenChange={setIsMenuOpen}
       >
-        <NavbarContent
-          className="flex items-center justify-between w-full py-2"
-          justify="center"
-        >
-          <NavbarBrand as="li" className="gap-3">
+        <NavbarContent justify="start">
+          <NavbarBrand>
             <NextLink
               aria-label="X-mart Home"
               className="flex items-center gap-2"
@@ -62,30 +59,28 @@ export default function NavbarClient({ user }: NavbarClientProps) {
               </p>
             </NextLink>
           </NavbarBrand>
-
-          <NavbarContent className="hidden sm:flex">
+          <div className="hidden sm:block">
             <BranchSelector />
-          </NavbarContent>
+          </div>
+        </NavbarContent>
 
+        <NavbarContent className="hidden sm:flex" justify="center">
           <SearchBar
-            className="hidden sm:block w-96"
+            className="w-96"
             debounceDelay={300}
             placeholder="Search products..."
             value={searchParams.get("search") || ""}
             onChange={() => {}}
             onSearch={handleSearch}
           />
+        </NavbarContent>
 
-          <NavbarContent
-            className="flex items-center gap-2 sm:gap-3"
-            justify="end"
-          >
-            <UserActions user={user} />
-            <NavbarMenuToggle
-              aria-label={isMenuOpen ? "Close menu" : "Open menu"}
-              className="sm:hidden text-gray-900 dark:text-white p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700"
-            />
-          </NavbarContent>
+        <NavbarContent justify="end">
+          <UserActions user={user} />
+          <NavbarMenuToggle
+            aria-label={isMenuOpen ? "Close menu" : "Open menu"}
+            className="sm:hidden"
+          />
         </NavbarContent>
 
         <MobileMenu
