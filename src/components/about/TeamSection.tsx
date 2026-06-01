@@ -3,7 +3,7 @@
 import { Card, CardBody } from "@nextui-org/card";
 import { Image } from "@nextui-org/image";
 import { Tooltip } from "@nextui-org/tooltip";
-import { motion } from "framer-motion";
+import { motion, Variants } from "framer-motion";
 import { Github, Linkedin, Twitter } from "lucide-react";
 import { useMemo } from "react";
 
@@ -25,7 +25,7 @@ interface TeamSectionProps {
 
 export default function TeamSection({ team }: TeamSectionProps) {
   // Animation variants for staggered entrance
-  const containerVariants = {
+  const containerVariants: Variants = {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
@@ -35,7 +35,7 @@ export default function TeamSection({ team }: TeamSectionProps) {
     },
   };
 
-  const cardVariants = {
+  const cardVariants: Variants = {
     hidden: { opacity: 0, y: 20 },
     visible: {
       opacity: 1,

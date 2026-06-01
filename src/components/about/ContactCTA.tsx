@@ -2,11 +2,11 @@
 
 import { Button } from "@nextui-org/button";
 import { Link } from "@nextui-org/link";
-import { motion } from "framer-motion";
+import { motion, Variants } from "framer-motion";
 import { Mail } from "lucide-react";
 
 export default function ContactCTA() {
-  const containerVariants = {
+  const containerVariants: Variants = {
     hidden: { opacity: 0, y: 20 },
     visible: {
       opacity: 1,

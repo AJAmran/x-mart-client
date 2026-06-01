@@ -12,7 +12,7 @@ const ROLE_BASED_ROUTES = {
   ADMIN: [/^\/profile(\/.*)?$/, /^\/dashboard(\/.*)?$/],
 };
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // Get the current user
@@ -54,7 +54,7 @@ export async function middleware(request: NextRequest) {
   return NextResponse.redirect(new URL("/", request.url));
 }
 
-// Define the routes to apply the middleware
+// Define the routes to apply the proxy
 export const config = {
   matcher: [
     "/dashboard/:path*",

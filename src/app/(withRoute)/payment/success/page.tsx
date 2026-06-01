@@ -1,12 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { Button } from "@nextui-org/button";
 import Link from "next/link";
 import { usePaymentStatus } from "@/src/hooks/usePayment";
 
-const PaymentSuccessPage = () => {
+const PaymentSuccess = () => {
   const searchParams = useSearchParams();
   const router = useRouter();
   const tranId = searchParams.get("tranId");
@@ -84,6 +84,18 @@ const PaymentSuccessPage = () => {
         )}
       </div>
     </div>
+  );
+};
+
+const PaymentSuccessPage = () => {
+  return (
+    <Suspense fallback={
+      <div className="flex min-h-[60vh] items-center justify-center">
+        <p className="text-gray-500">Loading payment details...</p>
+      </div>
+    }>
+      <PaymentSuccess />
+    </Suspense>
   );
 };
 

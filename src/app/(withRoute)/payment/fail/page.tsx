@@ -1,11 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { Button } from "@nextui-org/button";
 import Link from "next/link";
 
-const PaymentFailPage = () => {
+const PaymentFail = () => {
   const searchParams = useSearchParams();
   const tranId = searchParams.get("tranId");
   const [countdown, setCountdown] = useState(5);
@@ -51,6 +51,18 @@ const PaymentFailPage = () => {
         </div>
       </div>
     </div>
+  );
+};
+
+const PaymentFailPage = () => {
+  return (
+    <Suspense fallback={
+      <div className="flex min-h-[60vh] items-center justify-center">
+        <p className="text-gray-500">Loading...</p>
+      </div>
+    }>
+      <PaymentFail />
+    </Suspense>
   );
 };
 

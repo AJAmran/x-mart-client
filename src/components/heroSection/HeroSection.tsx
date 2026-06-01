@@ -1,128 +1,267 @@
 "use client";
 
 import React from "react";
-import { Flame, Clock, Tag, Truck, ShieldCheck, Headphones } from "lucide-react";
+import { Flame, Clock, Tag, Truck, ShieldCheck, Headphones, ArrowUpRight } from "lucide-react";
 import { Card } from "@nextui-org/card";
 import Link from "next/link";
+import { motion, Variants } from "framer-motion";
 import Carousel from "./Carousel";
 
 interface PromoCard {
   id: number;
   icon: React.ReactNode;
   title: string;
+  badge?: string;
   description: string;
   gradient: string;
+  glowColor: string;
   href: string;
 }
 
 const promoCards: PromoCard[] = [
   {
     id: 1,
-    icon: <Flame className="w-5 h-5 sm:w-6 sm:h-6 text-white" />,
+    icon: <Flame className="w-6 h-6 text-white" />,
     title: "Hot Deals",
-    description: "Up to 50% off on top picks",
-    gradient: "from-orange-500 to-red-600",
+    badge: "50% OFF",
+    description: "Unbeatable discounts on top category picks",
+    gradient: "from-primary-600 via-primary-500 to-rose-500",
+    glowColor: "rgba(244, 63, 94, 0.35)",
     href: "/deals",
   },
   {
     id: 2,
-    icon: <Clock className="w-5 h-5 sm:w-6 sm:h-6 text-white" />,
+    icon: <Clock className="w-6 h-6 text-white" />,
     title: "Flash Sale",
-    description: "Limited time offers",
-    gradient: "from-purple-500 to-indigo-600",
+    badge: "LIMITED TIME",
+    description: "Hurry up! Incredible hourly lightning deals",
+    gradient: "from-primary-700 via-primary-600 to-indigo-500",
+    glowColor: "rgba(124, 58, 237, 0.35)",
     href: "/deals",
   },
   {
     id: 3,
-    icon: <Tag className="w-5 h-5 sm:w-6 sm:h-6 text-white" />,
+    icon: <Tag className="w-6 h-6 text-white" />,
     title: "Daily Discounts",
-    description: "Fresh deals every day",
-    gradient: "from-emerald-500 to-green-600",
+    badge: "NEW EVERYDAY",
+    description: "Fresh coupons & daily bargains added daily",
+    gradient: "from-primary-600 via-primary-500 to-cyan-500",
+    glowColor: "rgba(6, 182, 212, 0.35)",
     href: "/shop",
   },
 ];
 
 const features = [
-  { icon: <Truck className="w-4 h-4" />, label: "Free Delivery", desc: "Orders over ৳999" },
-  { icon: <ShieldCheck className="w-4 h-4" />, label: "Secure Payment", desc: "100% safe checkout" },
-  { icon: <Headphones className="w-4 h-4" />, label: "24/7 Support", desc: "Dedicated help" },
+  { 
+    icon: <Truck className="w-5 h-5" />, 
+    label: "Express Shipping", 
+    desc: "Free on orders over ৳999",
+    color: "text-primary dark:text-primary-400",
+    bg: "bg-primary/10 dark:bg-primary-950/40"
+  },
+  { 
+    icon: <ShieldCheck className="w-5 h-5" />, 
+    label: "Secured Gateway", 
+    desc: "100% verified SSL checkout",
+    color: "text-primary dark:text-primary-400",
+    bg: "bg-primary/10 dark:bg-primary-950/40"
+  },
+  { 
+    icon: <Headphones className="w-5 h-5" />, 
+    label: "Premium Support", 
+    desc: "Dedicated 24/7 expert help",
+    color: "text-primary dark:text-primary-400",
+    bg: "bg-primary/10 dark:bg-primary-950/40"
+  },
 ];
+
+// Framer Motion Animation Variants
+const containerVariants: Variants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.15,
+    },
+  },
+};
+
+const cardVariants: Variants = {
+  hidden: { opacity: 0, y: 25 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      type: "spring",
+      stiffness: 100,
+      damping: 15,
+    },
+  },
+};
+
+const featureVariants: Variants = {
+  hidden: { opacity: 0, scale: 0.95 },
+  visible: {
+    opacity: 1,
+    scale: 1,
+    transition: {
+      type: "spring",
+      stiffness: 80,
+      damping: 12,
+    },
+  },
+};
 
 const HeroSection: React.FC = () => {
   return (
-    <section className="relative w-full overflow-hidden bg-gradient-to-b from-gray-50 via-white to-gray-50 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950">
-      {/* Background Pattern */}
+    <section className="relative w-full overflow-hidden bg-gradient-to-b from-gray-50 via-white to-gray-50 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950 py-4 sm:py-6 lg:py-8">
+      {/* Dynamic Background Gradients / Ambient Lights */}
+      <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] rounded-full bg-primary-200/30 dark:bg-primary-900/10 blur-[120px] pointer-events-none" />
+      <div className="absolute bottom-[-10%] right-[-10%] w-[45%] h-[45%] rounded-full bg-secondary-200/20 dark:bg-secondary-900/10 blur-[120px] pointer-events-none" />
+
+      {/* Decorative Grid Pattern */}
       <div
-        className="absolute inset-0 opacity-[0.03] dark:opacity-[0.05]"
+        className="absolute inset-0 opacity-[0.02] dark:opacity-[0.04] pointer-events-none"
         style={{
-          backgroundImage: `linear-gradient(rgba(17,24,39,1) 1px, transparent 1px), linear-gradient(90deg, rgba(17,24,39,1) 1px, transparent 1px)`,
-          backgroundSize: '40px 40px',
+          backgroundImage: `linear-gradient(rgba(17,24,39,1) 1.5px, transparent 1.5px), linear-gradient(90deg, rgba(17,24,39,1) 1.5px, transparent 1.5px)`,
+          backgroundSize: '48px 48px',
         }}
       />
 
-      <div className="relative container mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 lg:py-10">
-        {/* Hero Main Layout */}
-        <div className="flex flex-col lg:flex-row gap-4 sm:gap-6">
-          {/* Promo Cards - Left sidebar on desktop, horizontal row on mobile */}
-          <div className="grid grid-cols-3 lg:grid-cols-1 gap-3 sm:gap-4 lg:w-1/4">
-            {promoCards.map((card, index) => (
-              <Link key={card.id} href={card.href}>
-                <Card
-                  isPressable
-                  className={`
-                    relative overflow-hidden rounded-xl border-none shadow-md hover:shadow-xl
-                    transition-all duration-300 group cursor-pointer
-                    bg-gradient-to-br ${card.gradient}
-                    animate-fade-in-up opacity-0 [animation-fill-mode:forwards]
-                  `}
-                  style={{ animationDelay: `${150 * index}ms` }}
-                >
-                  <div className="absolute inset-0 bg-white/0 group-hover:bg-white/10 transition-colors duration-300" />
-                  <div className="relative flex lg:flex-col items-center lg:items-start gap-3 lg:gap-2 p-3 sm:p-4">
-                    <div className="shrink-0 p-2 sm:p-2.5 bg-white/20 backdrop-blur-sm rounded-full group-hover:scale-110 group-hover:rotate-[-8deg] transition-all duration-300">
-                      {card.icon}
-                    </div>
-                    <div className="min-w-0">
-                      <h3 className="text-xs sm:text-sm font-bold text-white tracking-wide truncate">
-                        {card.title}
-                      </h3>
-                      <p className="text-[10px] sm:text-xs text-white/80 mt-0.5 truncate">
-                        {card.description}
-                      </p>
-                    </div>
-                  </div>
-                </Card>
-              </Link>
-            ))}
-          </div>
+      <div className="relative container mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Main Grid Layout */}
+        <div className="flex flex-col lg:flex-row gap-6">
+          
+          {/* Promo Sidebar Cards (Left sidebar on desktop, horizontal flex row on mobile) */}
+          <motion.div 
+            className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-1 gap-4 lg:w-[28%]"
+            initial="hidden"
+            animate="visible"
+            variants={containerVariants}
+          >
+            {promoCards.map((card) => (
+              <motion.div
+                key={card.id}
+                variants={cardVariants}
+                whileHover="hover"
+                whileTap="tap"
+                className="relative group cursor-pointer h-full"
+              >
+                <Link href={card.href} className="block h-full">
+                  <Card
+                    isPressable
+                    className={`
+                      relative overflow-hidden rounded-2xl border-none shadow-[0_4px_20px_rgba(0,0,0,0.06)] 
+                      dark:shadow-[0_4px_30px_rgba(0,0,0,0.2)] h-full w-full
+                      bg-gradient-to-br ${card.gradient} transition-all duration-300
+                    `}
+                    style={{
+                      contentVisibility: "auto",
+                    }}
+                  >
+                    {/* Ambient Glow Backplate on Hover */}
+                    <div 
+                      className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-xl pointer-events-none scale-105"
+                      style={{
+                        background: `radial-gradient(circle, ${card.glowColor} 0%, transparent 70%)`
+                      }}
+                    />
 
-          {/* Main Carousel */}
-          <div className="w-full lg:w-3/4 animate-fade-in opacity-0 [animation-fill-mode:forwards] [animation-delay:300ms]">
+                    {/* High-fidelity Frosted Glass Border Overlay */}
+                    <div className="absolute inset-0 border border-white/20 rounded-2xl pointer-events-none z-10" />
+
+                    {/* Smooth Light Sweep Ray Effect on Hover */}
+                    <motion.div 
+                      className="absolute inset-0 bg-gradient-to-r from-transparent via-white/25 to-transparent -translate-x-full pointer-events-none z-20"
+                      variants={{
+                        hover: {
+                          x: ["-100%", "150%"],
+                          transition: { duration: 1.2, ease: "easeInOut" }
+                        }
+                      }}
+                    />
+
+                    {/* Card Content Layout */}
+                    <div className="relative flex flex-col justify-between p-5 sm:p-6 h-full min-h-[140px] z-10">
+                      {/* Header row: Icon & Arrow */}
+                      <div className="flex justify-between items-start">
+                        <div className="shrink-0 p-3 bg-white/15 backdrop-blur-md rounded-xl border border-white/10 group-hover:scale-110 group-hover:rotate-[-6deg] transition-all duration-300 shadow-md">
+                          {card.icon}
+                        </div>
+                        {card.badge && (
+                          <span className="text-[9px] font-black tracking-widest bg-white/20 backdrop-blur-md text-white px-2.5 py-1 rounded-full border border-white/15 shadow-sm uppercase">
+                            {card.badge}
+                          </span>
+                        )}
+                      </div>
+
+                      {/* Footer row: Title, Description, and Link indicator */}
+                      <div className="mt-6 flex justify-between items-end gap-2">
+                        <div className="min-w-0 flex-1">
+                          <h3 className="text-base sm:text-lg font-extrabold text-white tracking-wide truncate">
+                            {card.title}
+                          </h3>
+                          <p className="text-xs text-white/85 mt-1 leading-normal font-medium line-clamp-2">
+                            {card.description}
+                          </p>
+                        </div>
+                        
+                        {/* Mini glass arrow pointer */}
+                        <div className="shrink-0 p-1.5 rounded-lg bg-white/15 border border-white/10 text-white shadow-sm opacity-0 group-hover:opacity-100 group-hover:translate-x-1 group-hover:-translate-y-1 transition-all duration-300">
+                          <ArrowUpRight className="w-4 h-4" />
+                        </div>
+                      </div>
+                    </div>
+                  </Card>
+                </Link>
+              </motion.div>
+            ))}
+          </motion.div>
+
+          {/* Main Carousel Display (Right on desktop, full width on mobile) */}
+          <motion.div 
+            className="w-full lg:w-[72%] rounded-3xl overflow-hidden shadow-[0_10px_35px_rgba(0,0,0,0.08)] dark:shadow-[0_10px_45px_rgba(0,0,0,0.35)]"
+            initial={{ opacity: 0, scale: 0.98 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.6, ease: "easeOut", delay: 0.1 }}
+          >
             <Carousel />
-          </div>
+          </motion.div>
         </div>
 
-        {/* Features Strip */}
-        <div className="mt-6 sm:mt-8 grid grid-cols-3 gap-3 sm:gap-4 animate-fade-in-up opacity-0 [animation-fill-mode:forwards] [animation-delay:600ms]">
+        {/* Features Strip - Perfectly aligned, premium micro-interactive grid */}
+        <motion.div 
+          className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4"
+          initial="hidden"
+          animate="visible"
+          variants={containerVariants}
+        >
           {features.map((f) => (
-            <div
+            <motion.div
               key={f.label}
-              className="flex items-center gap-2 sm:gap-3 bg-white dark:bg-gray-800/80 rounded-xl px-3 sm:px-4 py-3 sm:py-3.5 shadow-sm border border-gray-100 dark:border-gray-700 hover:shadow-md hover:border-primary/20 transition-all duration-300"
+              variants={featureVariants}
+              whileHover={{ 
+                y: -4, 
+                boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05)",
+                borderColor: "rgba(var(--primary-color-rgb), 0.25)"
+              }}
+              className="flex items-center gap-4 bg-white/70 dark:bg-gray-900/60 backdrop-blur-md rounded-2xl px-5 py-4 border border-gray-100 dark:border-gray-800 shadow-[0_2px_12px_rgba(0,0,0,0.02)] transition-all duration-300 group cursor-default"
             >
-              <div className="p-1.5 sm:p-2 rounded-lg bg-primary/10 text-primary shrink-0">
+              {/* Rounded soft-glow background for icons */}
+              <div className={`p-3 rounded-xl ${f.bg} ${f.color} shrink-0 group-hover:scale-110 group-hover:rotate-6 transition-transform duration-300 shadow-sm`}>
                 {f.icon}
               </div>
               <div className="min-w-0">
-                <p className="text-xs sm:text-sm font-bold text-gray-800 dark:text-gray-100 truncate">
+                <p className="text-sm sm:text-base font-extrabold text-gray-800 dark:text-gray-100 truncate tracking-wide">
                   {f.label}
                 </p>
-                <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 truncate">
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5 truncate leading-relaxed">
                   {f.desc}
                 </p>
               </div>
-            </div>
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
       </div>
     </section>
   );

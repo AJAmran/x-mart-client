@@ -3,7 +3,7 @@
 import { Button } from "@nextui-org/button";
 import { Link } from "@nextui-org/link";
 import { Image } from "@nextui-org/image";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { motion, useScroll, useTransform, Variants } from "framer-motion";
 import { ArrowRight, ShoppingBag } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
@@ -22,7 +22,7 @@ export default function HeroSection() {
   const y = useTransform(scrollY, [0, 300], [0, 50]);
 
   // Animation variants for staggered entrance
-  const containerVariants = {
+  const containerVariants: Variants = {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
@@ -32,7 +32,7 @@ export default function HeroSection() {
     },
   };
 
-  const childVariants = {
+  const childVariants: Variants = {
     hidden: { opacity: 0, y: 20 },
     visible: {
       opacity: 1,
@@ -41,7 +41,7 @@ export default function HeroSection() {
     },
   };
 
-  const buttonVariants = {
+  const buttonVariants: Variants = {
     hover: { scale: 1.05, boxShadow: "0 4px 12px rgba(0, 0, 0, 0.2)" },
     tap: { scale: 0.95 },
   };
