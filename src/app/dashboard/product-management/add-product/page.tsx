@@ -4,18 +4,12 @@ import { useForm, SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useCreateProduct } from "@/src/hooks/useProducts";
 import { toast } from "sonner";
-import { TProduct } from "@/src/types";
-import { productSchema } from "@/src/validations/productSchema";
-import { Input, Textarea } from "@nextui-org/input";
-import { Select, SelectItem } from "@nextui-org/select";
-import { Button } from "@nextui-org/button";
+import { productSchema, ProductFormValues } from "@/src/validations/productSchema";
+import { Input, Textarea } from "@heroui/input";
+import { Select, SelectItem } from "@heroui/select";
+import { Button } from "@heroui/button";
 import { categoriesData } from "@/src/data/CategoriesData";
-import { PRODUCT_CATEGORY } from "@/src/constants";
-
-// Create a form-specific type that includes the stock field
-type ProductFormData = Omit<TProduct, "inventories"> & {
-  stock: number;
-};
+import { useBranches } from "@/src/hooks/useBranch";
 
 const AddProductForm = () => {
   const {
@@ -23,33 +17,25 @@ const AddProductForm = () => {
     handleSubmit,
     formState: { errors, isSubmitting },
     reset,
-  } = useForm<ProductFormData>({
+  } = useForm<ProductFormValues>({
     resolver: zodResolver(productSchema),
+    defaultValues: {
+      status: "ACTIVE",
+      availability: "ALL_BRANCHES",
+      operationType: "REGULAR",
+      sku: `SKU-${Date.now()}`,
+      inventories: [{ stock: 0, branchId: "", lowStockThreshold: 5 }],
+      images: [""],
+    }
   });
 
   const { mutate: createProduct, isPending } = useCreateProduct();
+  const { data: branchesResponse } = useBranches();
+  const branches = branchesResponse?.data || [];
 
-  const onSubmit: SubmitHandler<ProductFormData> = async (data) => {
+  const onSubmit: SubmitHandler<ProductFormValues> = async (data) => {
     try {
-      // Transform data to match TProduct type
-      const productData: TProduct = {
-        ...data,
-        category: data.category.toLowerCase() as keyof typeof PRODUCT_CATEGORY,
-        inventories: [
-          {
-            stock: Number(data.stock),
-            lowStockThreshold: 5, // Set your default threshold
-            branchId: "main-branch", // Set your default branch ID
-          },
-        ],
-        images: data.images?.[0] ? [data.images[0]] : [],
-        status: "ACTIVE", // Match your PRODUCT_STATUS enum
-        availability: "ALL_BRANCHES", // Set default availability
-        operationType: "REGULAR", // Set default operation type
-        sku: `SKU-${Date.now()}`, // Generate a default SKU or make this a required field
-      };
-
-      createProduct(productData, {
+      createProduct(data as any, {
         onSuccess: () => {
           toast.success("Product created successfully");
           reset();
@@ -118,16 +104,40 @@ const AddProductForm = () => {
         ))}
       </Select>
 
+      {/* SKU */}
+      <Input
+        {...register("sku")}
+        errorMessage={errors.sku?.message}
+        isInvalid={!!errors.sku}
+        label="SKU"
+        placeholder="Enter product SKU"
+      />
+
       {/* Stock */}
       <Input
-        {...register("stock", { valueAsNumber: true })}
-        errorMessage={errors.stock?.message}
-        isInvalid={!!errors.stock}
+        {...register("inventories.0.stock", { valueAsNumber: true })}
+        errorMessage={errors.inventories?.[0]?.stock?.message}
+        isInvalid={!!errors.inventories?.[0]?.stock}
         label="Stock"
         min="0"
         placeholder="Enter product stock"
         type="number"
       />
+
+      {/* Branch */}
+      <Select
+        {...register("inventories.0.branchId")}
+        errorMessage={errors.inventories?.[0]?.branchId?.message}
+        isInvalid={!!errors.inventories?.[0]?.branchId}
+        label="Branch"
+        placeholder="Select a branch"
+      >
+        {branches.map((branch: any) => (
+          <SelectItem key={branch._id} value={branch._id}>
+            {branch.name}
+          </SelectItem>
+        ))}
+      </Select>
 
       {/* Image URL */}
       <Input

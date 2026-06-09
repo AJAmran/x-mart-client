@@ -3,16 +3,16 @@
 
 import React, { useState, useEffect, useMemo } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Modal, ModalContent, ModalHeader, ModalBody, useDisclosure } from "@nextui-org/modal";
-import { Button } from "@nextui-org/button";
-import { Input } from "@nextui-org/input";
-import { Chip } from "@nextui-org/chip";
+import { Modal, ModalContent, ModalHeader, ModalBody, useDisclosure } from "@heroui/modal";
+import { Button } from "@heroui/button";
+import { Input } from "@heroui/input";
+import { Chip } from "@heroui/chip";
 import { MapPinIcon, ChevronDownIcon, Navigation, Search, Clock, Store } from "lucide-react";
 import { Skeleton } from "@heroui/skeleton";
 import { useBranches } from "@/src/hooks/useBranch";
 import { TBranch, TBranchOperatingHours } from "@/src/interface/branch";
 import { toast } from "sonner";
-import { ScrollShadow } from "@nextui-org/scroll-shadow";
+import { ScrollShadow } from "@heroui/scroll-shadow";
 
 interface BranchSelectorProps {
   isMobile?: boolean;
@@ -54,6 +54,19 @@ const isOpenNow = (operatingHours: TBranchOperatingHours[]): boolean => {
   const closeTime = closeHour * 60 + closeMin;
 
   return currentTime >= openTime && currentTime <= closeTime;
+};
+
+const getGeolocationErrorMessage = (error: GeolocationPositionError) => {
+  switch (error.code) {
+    case error.PERMISSION_DENIED:
+      return "Location permission was denied";
+    case error.POSITION_UNAVAILABLE:
+      return "Location information is unavailable";
+    case error.TIMEOUT:
+      return "Location request timed out";
+    default:
+      return "Could not retrieve location";
+  }
 };
 
 export default function BranchSelector({ isMobile = false }: BranchSelectorProps) {
@@ -156,10 +169,12 @@ export default function BranchSelector({ isMobile = false }: BranchSelectorProps
         setIsLocating(false);
       },
       (error) => {
-        console.error(error);
-        if (!isAuto) toast.error("Could not retrieve location");
+        const message = getGeolocationErrorMessage(error);
+
+        if (!isAuto) toast.error(message);
         setIsLocating(false);
-      }
+      },
+      { enableHighAccuracy: false, maximumAge: 5 * 60 * 1000, timeout: 10000 }
     );
   };
 
@@ -212,19 +227,19 @@ export default function BranchSelector({ isMobile = false }: BranchSelectorProps
 
   const TriggerButton = (
     <Button
-      variant="flat"
       className={`
          bg-white/80 dark:bg-zinc-800/80 backdrop-blur-md border border-zinc-200 dark:border-zinc-700
          ${isMobile ? "w-full h-12 justify-start px-4" : "h-10 px-4 min-w-[200px] justify-between"}
          group hover:border-primary/50 hover:bg-white dark:hover:bg-zinc-800 transition-all rounded-full
        `}
-      onPress={onOpen}
+      endContent={!isMobile && <ChevronDownIcon className="text-zinc-400 group-hover:text-primary transition-colors" size={14} />}
       startContent={
         <div className="p-1.5 bg-primary/10 rounded-full text-primary group-hover:scale-110 transition-transform">
           <Store size={isMobile ? 18 : 16} />
         </div>
       }
-      endContent={!isMobile && <ChevronDownIcon size={14} className="text-zinc-400 group-hover:text-primary transition-colors" />}
+      variant="flat"
+      onPress={onOpen}
     >
       <div className="flex flex-col items-start text-left mx-2">
         <span className="text-[10px] text-zinc-500 font-semibold uppercase tracking-wider leading-none mb-0.5">

@@ -5,9 +5,9 @@ import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { TProduct } from "@/src/types";
 import { discountSchema } from "@/src/validations/productSchema";
-import { Button } from "@nextui-org/button";
-import { Select, SelectItem } from "@nextui-org/select";
-import { Input } from "@nextui-org/input";
+import { Button } from "@heroui/button";
+import { Select, SelectItem } from "@heroui/select";
+import { Input } from "@heroui/input";
 import {
   Modal,
   ModalBody,

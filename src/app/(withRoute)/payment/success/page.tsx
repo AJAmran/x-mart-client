@@ -2,7 +2,7 @@
 
 import { useEffect, useState, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import { Button } from "@nextui-org/button";
+import { Button } from "@heroui/button";
 import Link from "next/link";
 import { usePaymentStatus } from "@/src/hooks/usePayment";
 
@@ -20,6 +20,7 @@ const PaymentSuccess = () => {
   useEffect(() => {
     if (isVerified && countdown > 0) {
       const timer = setTimeout(() => setCountdown(countdown - 1), 1000);
+
       return () => clearTimeout(timer);
     }
   }, [isVerified, countdown]);
@@ -45,11 +46,11 @@ const PaymentSuccess = () => {
           <div className={`flex h-24 w-24 items-center justify-center rounded-full ${isVerified ? "bg-success/20" : "bg-warning/20"}`}>
             {isVerified ? (
               <svg className="h-12 w-12 text-success" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                <path d="M5 13l4 4L19 7" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} />
               </svg>
             ) : (
               <svg className="h-12 w-12 text-warning" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                <path d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} />
               </svg>
             )}
           </div>
@@ -73,10 +74,10 @@ const PaymentSuccess = () => {
               Redirecting to orders page in {countdown} seconds...
             </p>
             <div className="flex justify-center gap-4">
-              <Button as={Link} href="/orders" color="primary" size="lg">
+              <Button as={Link} color="primary" href="/orders" size="lg">
                 View My Orders
               </Button>
-              <Button as={Link} href="/shop" variant="flat" size="lg">
+              <Button as={Link} href="/shop" size="lg" variant="flat">
                 Continue Shopping
               </Button>
             </div>

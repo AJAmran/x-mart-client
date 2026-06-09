@@ -1,15 +1,26 @@
 "use client";
 
-import { Card, CardBody, CardFooter } from "@nextui-org/card";
-import { Button } from "@nextui-org/button";
-import { Image } from "@nextui-org/image";
 import { useState } from "react";
-import { TProduct } from "@/src/types";
-import { ShoppingCart, Eye, Tag, Heart } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
+import { Eye, Heart, ShoppingCart, Tag, CheckCircle } from "lucide-react";
+
+import { Button } from "@heroui/button";
+import { Card, CardBody, CardFooter } from "@heroui/card";
+import { Chip } from "@heroui/chip";
+import { Image } from "@heroui/image";
+
 import { useCart } from "@/src/hooks/useCart";
 import { useWishlist } from "@/src/hooks/useWishlist";
+import {
+  formatCurrency,
+  getDiscountedPrice,
+  getDiscountLabel,
+  getProductStock,
+  getStockStatus,
+} from "@/src/lib/productUtils";
+import { TProduct } from "@/src/types";
 
 type ProductCardProps = {
   product: TProduct;
@@ -26,107 +37,95 @@ const ProductCard = ({
   const [isWishlistLoading, setIsWishlistLoading] = useState(false);
   const router = useRouter();
   const { addItem, isInCart } = useCart();
-  const { addItem: addToWishlist, removeItem: removeFromWishlist, isInWishlist } = useWishlist();
+  const {
+    addItem: addToWishlist,
+    removeItem: removeFromWishlist,
+    isInWishlist,
+  } = useWishlist();
 
-  const handleAddToCart = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-
-    setIsLoading(true);
-    if (!product._id) {
-      setIsLoading(false);
-
-      return;
-    }
-
-    const cartItem = {
-      productId: product._id,
-      quantity: 1,
-      price: product.price,
-      name: product.name,
-      image: product.images?.[0] || "/placeholder.jpg",
-      stock: product.inventories?.[0]?.stock,
-    };
-
-    addItem(cartItem);
-    setTimeout(() => {
-      setIsLoading(false);
-    }, 500);
-  };
-
-  const handleWishlistToggle = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-
-    setIsWishlistLoading(true);
-
-    if (!product._id) {
-      setIsWishlistLoading(false);
-
-      return;
-    }
-
-    const wishlistItem = {
-      productId: product._id,
-      price: product.price,
-      name: product.name,
-      image: product.images?.[0] || "/placeholder.jpg",
-      stock: product.inventories?.[0]?.stock,
-    };
-
-    if (isInWishlist(product._id)) {
-      removeFromWishlist(product._id);
-    } else {
-      addToWishlist(wishlistItem);
-    }
-
-    setTimeout(() => {
-      setIsWishlistLoading(false);
-    }, 500);
-  };
-
-  const handleCardClick = () => {
-    if (onPress) onPress();
-  };
-
-  const discountedPrice = product?.discount?.value
-    ? product.discount.type === "percentage"
-      ? (product.price * (1 - product.discount.value / 100)).toFixed(2)
-      : (product.price - product.discount.value).toFixed(2)
-    : product.price;
-
+  const stock = getProductStock(product);
+  const stockStatus = getStockStatus(stock);
+  const finalPrice = getDiscountedPrice(product.price, product.discount);
+  const hasDiscount = finalPrice < product.price;
   const isProductInCart = isInCart(product._id);
   const isProductInWishlist = isInWishlist(product._id);
+  const isOutOfStock = !stockStatus.canAddToCart;
+
+  const handleAddToCart = (event: React.MouseEvent) => {
+    event.preventDefault();
+    event.stopPropagation();
+    if (!product._id) return;
+    if (isOutOfStock) {
+      toast.error(`${product.name} is out of stock.`);
+
+      return;
+    }
+    setIsLoading(true);
+    addItem({
+      productId: product._id,
+      quantity: 1,
+      price: finalPrice,
+      name: product.name,
+      image: product.images?.[0] || "/placeholder.jpg",
+      stock,
+    });
+    setTimeout(() => setIsLoading(false), 500);
+  };
+
+  const handleWishlistToggle = (event: React.MouseEvent) => {
+    event.preventDefault();
+    event.stopPropagation();
+    if (!product._id) return;
+    setIsWishlistLoading(true);
+    if (isProductInWishlist) {
+      removeFromWishlist(product._id);
+    } else {
+      addToWishlist({
+        productId: product._id,
+        price: finalPrice,
+        name: product.name,
+        image: product.images?.[0] || "/placeholder.jpg",
+        stock,
+      });
+    }
+    setTimeout(() => setIsWishlistLoading(false), 500);
+  };
+
+  const handleDetailsClick = (event: React.MouseEvent) => {
+    event.preventDefault();
+    event.stopPropagation();
+    router.push(`/product/${product._id}`);
+  };
 
   if (variant === "category") {
     return (
       <Link
         aria-label={`Explore ${product.name} category`}
-        className="block w-[280px] sm:w-[300px] lg:w-[320px] xl:w-[340px] h-[420px]"
+        className="block h-[420px] w-[280px] sm:w-[300px] lg:w-[320px] xl:w-[340px]"
         href={`/category/${product.category}`}
       >
         <Card
-          className="h-full border rounded-xl overflow-hidden hover:shadow-lg transition-shadow duration-300"
+          className="h-full overflow-hidden rounded-2xl border-0 transition-all duration-300 hover:scale-[1.02] hover:shadow-xl"
           role="presentation"
-          onClick={handleCardClick}
+          onClick={onPress}
         >
           <div className="relative h-full">
             <Image
               removeWrapper
               alt={product.name}
-              className="w-full h-full object-cover"
+              className="h-full w-full object-cover"
               src={product.images?.[0] || "/placeholder.jpg"}
             />
-            <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-6">
-              <h3 className="text-xl font-bold text-white truncate">
+            <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/85 via-black/40 to-transparent p-6">
+              <h3 className="truncate text-xl font-bold text-white">
                 {product.name}
               </h3>
               <Button
-                className="mt-3 bg-primary-600 text-white hover:bg-primary-700"
+                className="mt-3 bg-primary text-white"
                 color="primary"
                 size="sm"
-                variant="flat"
-                onClick={(e) => e.stopPropagation()}
+                variant="solid"
+                onClick={(event) => event.stopPropagation()}
               >
                 Shop Now
               </Button>
@@ -140,108 +139,149 @@ const ProductCard = ({
   return (
     <Link
       aria-label={`View details for ${product.name}`}
-      className="block w-[280px] sm:w-[300px] lg:w-[320px] xl:w-[340px] h-[420px]"
+      className="block h-[440px] w-[280px] sm:w-[300px] lg:w-[310px] xl:w-[320px]"
       href={`/product/${product._id}`}
     >
       <Card
-        className="h-full border rounded-xl overflow-hidden hover:shadow-lg transition-shadow duration-300 bg-white relative"
+        className={`group relative h-full overflow-hidden rounded-2xl border-2 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl
+          bg-white dark:bg-gray-900
+          border-gray-100 dark:border-gray-800
+          ${isOutOfStock ? "opacity-80" : ""}`}
         role="presentation"
-        shadow="sm"
-        onClick={handleCardClick}
+        shadow="none"
+        onClick={onPress}
       >
-        {/* Discount Badge */}
-        {(product?.discount?.value ?? 0) > 0 && (
-          <div className="absolute top-3 left-3 z-40 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full flex items-center">
-            <Tag className="mr-1" size={12} />
-            {product.discount?.value}
-            {product.discount?.type === "percentage" ? "%" : "৳"} OFF
-          </div>
-        )}
+        {/* ── Badges top-left ─────────────────────────────── */}
+        <div className="absolute left-3 top-3 z-40 flex flex-col gap-1.5">
+          {hasDiscount && (
+            <Chip
+              className="h-6 px-2 text-[11px] font-bold"
+              color="danger"
+              size="sm"
+              startContent={<Tag size={10} />}
+              variant="solid"
+            >
+              {getDiscountLabel(product.discount)}
+            </Chip>
+          )}
+          {isOutOfStock ? (
+            <Chip
+              className="h-6 px-2 text-[11px] font-semibold"
+              color="default"
+              size="sm"
+              variant="flat"
+            >
+              Out of Stock
+            </Chip>
+          ) : stock <= 5 ? (
+            <Chip
+              className="h-6 px-2 text-[11px] font-semibold"
+              color="warning"
+              size="sm"
+              variant="flat"
+            >
+              Only {stock} left
+            </Chip>
+          ) : null}
+        </div>
 
-        {/* Wishlist Button */}
+        {/* ── Wishlist button top-right ───────────────────── */}
         <Button
           isIconOnly
-          className="absolute top-3 right-3 z-40 bg-white/90 backdrop-blur-sm"
+          aria-label={
+            isProductInWishlist ? "Remove from wishlist" : "Add to wishlist"
+          }
+          className="absolute right-3 top-3 z-40 h-8 w-8 min-w-8 bg-white/90 shadow-sm backdrop-blur-sm transition-transform duration-200 group-hover:scale-105 dark:bg-gray-900/90"
           isLoading={isWishlistLoading}
+          radius="full"
           size="sm"
           variant="flat"
-          onClick={handleWishlistToggle} // ✅ FIXED
+          onClick={handleWishlistToggle}
         >
           <Heart
-            className={isProductInWishlist ? "fill-red-500 text-red-500" : ""}
-            size={16}
+            className={`transition-colors duration-200 ${
+              isProductInWishlist
+                ? "fill-red-500 text-red-500"
+                : "text-gray-400 hover:text-red-400"
+            }`}
+            size={15}
           />
         </Button>
 
-        {/* Image Section */}
-        <div className="relative flex justify-center items-center bg-gray-50 p-4">
+        {/* ── Product Image ───────────────────────────────── */}
+        <div className="relative flex h-52 items-center justify-center overflow-hidden bg-gray-50 dark:bg-gray-950/60">
           <Image
-            isZoomed
             alt={product.name}
-            className="w-full h-48 object-contain"
+            className="h-48 w-full object-contain transition-transform duration-500"
             height={192}
+            isZoomed={!isOutOfStock}
             src={product.images?.[0] || "/placeholder.jpg"}
             width={240}
           />
         </div>
 
-        {/* Product Details */}
-        <CardBody className="p-4 flex-1 flex flex-col justify-between">
-          <div className="space-y-2">
-            <h3 className="text-lg font-semibold text-gray-900 truncate">
-              {product.name}
-            </h3>
-          </div>
-          <div className="space-y-2">
-            <div className="flex items-center gap-2">
-              <span className="text-lg font-bold text-green-600">
-                ৳{discountedPrice}
+        {/* ── Card Body ───────────────────────────────────── */}
+        <CardBody className="flex flex-1 flex-col gap-3 px-4 py-3">
+          {/* Product name */}
+          <h3 className="line-clamp-2 min-h-[3rem] text-sm font-semibold leading-snug text-gray-900 dark:text-gray-50">
+            {product.name}
+          </h3>
+
+          {/* Price row */}
+          <div className="flex items-baseline gap-2">
+            <span className="text-xl font-bold text-primary dark:text-primary-400">
+              {formatCurrency(finalPrice)}
+            </span>
+            {hasDiscount && (
+              <span className="text-xs text-gray-400 line-through dark:text-gray-500">
+                {formatCurrency(product.price)}
               </span>
-              {(product?.discount?.value ?? 0) > 0 && (
-                <span className="text-sm text-gray-500 line-through">
-                  ৳{product.price}
-                </span>
-              )}
-            </div>
-            <div>
-              {product.inventories?.[0]?.stock > 0 ? (
-                <span className="text-xs text-green-500">In Stock</span>
-              ) : (
-                <span className="text-xs text-red-500">Out of Stock</span>
-              )}
-            </div>
+            )}
           </div>
         </CardBody>
 
-        {/* Action Buttons */}
-        <CardFooter className="p-4 pt-0 flex gap-2">
+        {/* ── Footer Actions ──────────────────────────────── */}
+        <CardFooter className="gap-2 px-4 pb-4 pt-0">
+          {/* Details button */}
           <Button
-            className="flex-1 bg-gray-100 text-gray-800 hover:bg-gray-200 text-sm"
+            className="h-9 flex-1 border border-gray-200 bg-transparent text-xs font-medium text-gray-600 hover:border-primary hover:bg-primary/5 hover:text-primary dark:border-gray-700 dark:text-gray-300 dark:hover:border-primary dark:hover:text-primary"
+            radius="lg"
             size="sm"
-            startContent={<Eye size={16} />}
-            variant="flat"
-            onClick={(e) => {
-              e.preventDefault(); // Stop Link navigation
-              e.stopPropagation();
-              router.push(`/product/${product._id}`);
-            }}
+            startContent={<Eye size={14} />}
+            variant="bordered"
+            onClick={handleDetailsClick}
           >
             Details
           </Button>
+
+          {/* Add to Cart / In Cart / Out of Stock */}
           <Button
-            color={isProductInCart ? "success" : "primary"}
-            isDisabled={!product.inventories?.[0]?.stock}
+            className={`h-9 flex-1 text-xs font-semibold transition-all duration-200 ${
+              isOutOfStock
+                ? "cursor-not-allowed opacity-50"
+                : isProductInCart
+                  ? "bg-success-50 text-success-700 dark:bg-success-900/30 dark:text-success-400"
+                  : "bg-primary text-white hover:bg-primary-600 hover:shadow-md hover:shadow-primary/30"
+            }`}
+            isDisabled={isOutOfStock}
             isLoading={isLoading}
+            radius="lg"
             size="sm"
-            startContent={isProductInCart ? null : <ShoppingCart size={16} />}
-            variant="solid"
-            onClick={handleAddToCart} // ✅ FIXED
+            startContent={
+              isLoading ? null : isProductInCart ? (
+                <CheckCircle size={14} />
+              ) : isOutOfStock ? null : (
+                <ShoppingCart size={14} />
+              )
+            }
+            variant="flat"
+            onClick={handleAddToCart}
           >
             {isProductInCart
               ? "In Cart"
-              : product.inventories?.[0]?.stock > 0
-                ? "Add to Cart"
-                : "Out of Stock"}
+              : isOutOfStock
+                ? "Out of Stock"
+                : "Add to Cart"}
           </Button>
         </CardFooter>
       </Card>

@@ -1,5 +1,5 @@
 import { Skeleton } from "@heroui/skeleton";
-import { Card, CardBody } from "@nextui-org/card";
+import { Card, CardBody } from "@heroui/card";
 
 export default function CategoriesSkeleton() {
   return (

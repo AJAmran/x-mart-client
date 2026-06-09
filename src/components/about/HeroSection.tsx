@@ -1,8 +1,8 @@
 "use client";
 
-import { Button } from "@nextui-org/button";
-import { Link } from "@nextui-org/link";
-import { Image } from "@nextui-org/image";
+import { Button } from "@heroui/button";
+import { Link } from "@heroui/link";
+import { Image } from "@heroui/image";
 import { motion, useScroll, useTransform, Variants } from "framer-motion";
 import { ArrowRight, ShoppingBag } from "lucide-react";
 import { useTheme } from "next-themes";

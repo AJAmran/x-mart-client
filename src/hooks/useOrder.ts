@@ -9,6 +9,7 @@ import {
   updateOrderStatus,
   cancelOrder,
 } from "@/src/services/OrderService";
+import { getErrorMessage } from "@/src/lib/getErrorMessage";
 
 // Fetch all orders (Admin)
 export const useOrders = (
@@ -60,7 +61,7 @@ export const useCreateOrder = () => {
       toast.success("Order created successfully");
     },
     onError: (error) => {
-      toast.error(error.message);
+      toast.error(getErrorMessage(error, "Could not create the order."));
     },
   });
 };
@@ -78,7 +79,7 @@ export const useUpdateOrderStatus = () => {
       toast.success("Order status updated successfully");
     },
     onError: (error) => {
-      toast.error(error.message);
+      toast.error(getErrorMessage(error, "Could not update order status."));
     },
   });
 };
@@ -95,7 +96,7 @@ export const useCancelOrder = () => {
       toast.success("Order cancelled successfully");
     },
     onError: (error) => {
-      toast.error(error.message);
+      toast.error(getErrorMessage(error, "Could not cancel the order."));
     },
   });
 };

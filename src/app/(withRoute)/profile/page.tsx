@@ -4,11 +4,11 @@ import { Suspense, useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Card, CardBody, CardHeader } from "@nextui-org/card";
-import { Button } from "@nextui-org/button";
-import { Divider } from "@nextui-org/divider";
-import { Spinner } from "@nextui-org/spinner";
-import { Input } from "@nextui-org/input";
+import { Card, CardBody, CardHeader } from "@heroui/card";
+import { Button } from "@heroui/button";
+import { Divider } from "@heroui/divider";
+import { Spinner } from "@heroui/spinner";
+import { Input } from "@heroui/input";
 
 import { useUser } from "@/src/context/user.provider";
 import { logout } from "@/src/services/AuthService";
@@ -62,6 +62,7 @@ const ProfilePage = () => {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
+
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 

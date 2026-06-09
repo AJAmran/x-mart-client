@@ -2,7 +2,7 @@
 
 import React from "react";
 import { Flame, Clock, Tag, Truck, ShieldCheck, Headphones, ArrowUpRight } from "lucide-react";
-import { Card } from "@nextui-org/card";
+import { Card } from "@heroui/card";
 import Link from "next/link";
 import { motion, Variants } from "framer-motion";
 import Carousel from "./Carousel";
@@ -134,20 +134,20 @@ const HeroSection: React.FC = () => {
           
           {/* Promo Sidebar Cards (Left sidebar on desktop, horizontal flex row on mobile) */}
           <motion.div 
+            animate="visible"
             className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-1 gap-4 lg:w-[28%]"
             initial="hidden"
-            animate="visible"
             variants={containerVariants}
           >
             {promoCards.map((card) => (
               <motion.div
                 key={card.id}
+                className="relative group cursor-pointer h-full"
                 variants={cardVariants}
                 whileHover="hover"
                 whileTap="tap"
-                className="relative group cursor-pointer h-full"
               >
-                <Link href={card.href} className="block h-full">
+                <Link className="block h-full" href={card.href}>
                   <Card
                     isPressable
                     className={`
@@ -220,9 +220,9 @@ const HeroSection: React.FC = () => {
 
           {/* Main Carousel Display (Right on desktop, full width on mobile) */}
           <motion.div 
+            animate={{ opacity: 1, scale: 1 }}
             className="w-full lg:w-[72%] rounded-3xl overflow-hidden shadow-[0_10px_35px_rgba(0,0,0,0.08)] dark:shadow-[0_10px_45px_rgba(0,0,0,0.35)]"
             initial={{ opacity: 0, scale: 0.98 }}
-            animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.6, ease: "easeOut", delay: 0.1 }}
           >
             <Carousel />
@@ -231,21 +231,21 @@ const HeroSection: React.FC = () => {
 
         {/* Features Strip - Perfectly aligned, premium micro-interactive grid */}
         <motion.div 
+          animate="visible"
           className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4"
           initial="hidden"
-          animate="visible"
           variants={containerVariants}
         >
           {features.map((f) => (
             <motion.div
               key={f.label}
+              className="flex items-center gap-4 bg-white/70 dark:bg-gray-900/60 backdrop-blur-md rounded-2xl px-5 py-4 border border-gray-100 dark:border-gray-800 shadow-[0_2px_12px_rgba(0,0,0,0.02)] transition-all duration-300 group cursor-default"
               variants={featureVariants}
               whileHover={{ 
                 y: -4, 
                 boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05)",
                 borderColor: "rgba(var(--primary-color-rgb), 0.25)"
               }}
-              className="flex items-center gap-4 bg-white/70 dark:bg-gray-900/60 backdrop-blur-md rounded-2xl px-5 py-4 border border-gray-100 dark:border-gray-800 shadow-[0_2px_12px_rgba(0,0,0,0.02)] transition-all duration-300 group cursor-default"
             >
               {/* Rounded soft-glow background for icons */}
               <div className={`p-3 rounded-xl ${f.bg} ${f.color} shrink-0 group-hover:scale-110 group-hover:rotate-6 transition-transform duration-300 shadow-sm`}>

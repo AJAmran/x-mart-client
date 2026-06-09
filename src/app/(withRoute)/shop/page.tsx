@@ -6,7 +6,6 @@ import FiltersSkeleton from "@/src/components/shop/FiltersSkeleton";
 import Filters from "@/src/components/shop/Filters";
 import ProductGridSkeleton from "@/src/components/shop/ProductGridSkeleton";
 import ProductGrid from "@/src/components/shop/ProductGrid";
-import PaginationControls from "@/src/components/shop/PaginationControls";
 
 import { siteConfig } from "@/src/config/site";
 
@@ -48,7 +47,6 @@ export default async function ShopPage() {
         <div className="col-span-1 lg:col-span-3">
           <Suspense fallback={<ProductGridSkeleton />}>
             <ProductGrid initialFilters={initialFilters} />
-            <PaginationControls />
           </Suspense>
         </div>
       </div>

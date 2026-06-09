@@ -1,8 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
-import { Card, CardBody, CardHeader } from "@nextui-org/card";
-import { Chip } from "@heroui/chip";
+import { Card, CardBody, CardHeader } from "@heroui/card";
 import { Skeleton } from "@heroui/skeleton";
 import {
   TrendingUp,
@@ -53,16 +52,20 @@ export default function InsightsPage() {
     const cancellationRate = totalOrders > 0 ? (cancelled / totalOrders) * 100 : 0;
 
     const statusCounts: Record<string, number> = {};
+
     orders.forEach((o: any) => {
       const s = o.status || "UNKNOWN";
+
       statusCounts[s] = (statusCounts[s] || 0) + 1;
     });
     const statusData = Object.entries(statusCounts).map(([name, value]) => ({ name, value }));
 
     const topProducts: Record<string, { qty: number; revenue: number }> = {};
+
     orders.forEach((o: any) => {
       (o.items || []).forEach((item: any) => {
         const name = item.name || item.productId || "Unknown";
+
         if (!topProducts[name]) topProducts[name] = { qty: 0, revenue: 0 };
         topProducts[name].qty += item.quantity || 1;
         topProducts[name].revenue += (item.price || 0) * (item.quantity || 1);
@@ -175,9 +178,9 @@ export default function InsightsPage() {
             <Card className="shadow-sm">
               <CardHeader><h3 className="text-lg font-bold">Order Status Distribution</h3></CardHeader>
               <CardBody>
-                <ResponsiveContainer width="100%" height={300}>
+                <ResponsiveContainer height={300} width="100%">
                   <PieChart>
-                    <Pie data={insights.statusData} cx="50%" cy="50%" outerRadius={100} paddingAngle={3} dataKey="value" label={({ name, percent }) => `${name} ${((percent ?? 0) * 100).toFixed(0)}%`}>
+                    <Pie cx="50%" cy="50%" data={insights.statusData} dataKey="value" label={({ name, percent }) => `${name} ${((percent ?? 0) * 100).toFixed(0)}%`} outerRadius={100} paddingAngle={3}>
                       {insights.statusData.map((_, i) => (<Cell key={i} fill={COLORS[i % COLORS.length]} />))}
                     </Pie>
                     <Tooltip />
@@ -193,11 +196,11 @@ export default function InsightsPage() {
                 {insights.topSelling.length === 0 ? (
                   <p className="text-default-400 text-center py-10">No data available</p>
                 ) : (
-                  <ResponsiveContainer width="100%" height={300}>
+                  <ResponsiveContainer height={300} width="100%">
                     <BarChart data={insights.topSelling} layout="vertical">
-                      <CartesianGrid strokeDasharray="3 3" opacity={0.3} />
+                      <CartesianGrid opacity={0.3} strokeDasharray="3 3" />
                       <XAxis type="number" />
-                      <YAxis type="category" dataKey="name" width={120} tick={{ fontSize: 11 }} />
+                      <YAxis dataKey="name" tick={{ fontSize: 11 }} type="category" width={120} />
                       <Tooltip />
                       <Bar dataKey="qty" fill="#3b82f6" radius={[0, 4, 4, 0]} />
                     </BarChart>

@@ -1,11 +1,11 @@
-import { nextui } from '@nextui-org/theme';
+import { heroui } from '@heroui/theme';
 
 /** @type {import('tailwindcss').Config} */
 export default {
   content: [
     './src/components/**/*.{js,ts,jsx,tsx,mdx}',
     './src/app/**/*.{js,ts,jsx,tsx,mdx}',
-    './node_modules/@nextui-org/theme/dist/**/*.{js,ts,jsx,tsx}',
+    './node_modules/@heroui/theme/dist/**/*.{js,ts,jsx,tsx,mjs,cjs}',
   ],
   theme: {
     extend: {
@@ -31,12 +31,12 @@ export default {
     },
   },
   darkMode: 'class',
-plugins: [
-  nextui(),
-  function ({ addVariant }) {
-    addVariant("products-gt-1", '[data-products="1"] &');
-    addVariant("sm:products-gt-2", '[data-products>="2"] &');
-    addVariant("lg:products-gt-3", '[data-products>="3"] &');
-  },
-],
+  plugins: [
+    heroui(),
+    function ({ addVariant }) {
+      addVariant("products-gt-1", '[data-products="1"] &');
+      addVariant("sm:products-gt-2", '[data-products>="2"] &');
+      addVariant("lg:products-gt-3", '[data-products>="3"] &');
+    },
+  ],
 };

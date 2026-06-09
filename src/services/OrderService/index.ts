@@ -1,6 +1,6 @@
 "use server";
 
-import axiosInstance from "@/src/lib/axios";
+import axiosInstance from "@/src/lib/serverAxios";
 import { TOrder } from "@/src/types";
 
 // Create an order

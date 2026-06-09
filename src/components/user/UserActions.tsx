@@ -9,9 +9,9 @@ import {
   DropdownItem,
   DropdownMenu,
   DropdownTrigger,
-} from "@nextui-org/dropdown";
+} from "@heroui/dropdown";
 import { USER_STATUS } from "@/src/constants";
-import { Button } from "@nextui-org/button";
+import { Button } from "@heroui/button";
 import { IUser } from "@/src/types";
 
 interface UserActionsProps {

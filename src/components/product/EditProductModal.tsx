@@ -5,7 +5,7 @@ import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { TProduct } from "@/src/types";
 import { updateProductSchema } from "@/src/validations/productSchema";
-import { Button } from "@nextui-org/button";
+import { Button } from "@heroui/button";
 import { EditIcon } from "@/src/components/icons";
 import {
   Modal,
@@ -15,8 +15,8 @@ import {
   ModalHeader,
   useDisclosure,
 } from "@heroui/modal";
-import { Input, Textarea } from "@nextui-org/input";
-import { Select, SelectItem } from "@nextui-org/select";
+import { Input, Textarea } from "@heroui/input";
+import { Select, SelectItem } from "@heroui/select";
 import { useEffect } from "react";
 
 export default function EditProductModal({ product }: { product: TProduct }) {
@@ -83,11 +83,11 @@ export default function EditProductModal({ product }: { product: TProduct }) {
                 name="name"
                 render={({ field }) => (
                   <Input
+                    errorMessage={errors.name?.message}
+                    isInvalid={!!errors.name}
                     label="Name"
                     value={field.value}
                     onChange={field.onChange}
-                    errorMessage={errors.name?.message}
-                    isInvalid={!!errors.name}
                   />
                 )}
               />
@@ -98,11 +98,11 @@ export default function EditProductModal({ product }: { product: TProduct }) {
                 name="description"
                 render={({ field }) => (
                   <Textarea
+                    errorMessage={errors.description?.message}
+                    isInvalid={!!errors.description}
                     label="Description"
                     value={field.value}
                     onChange={field.onChange}
-                    errorMessage={errors.description?.message}
-                    isInvalid={!!errors.description}
                   />
                 )}
               />
@@ -113,12 +113,12 @@ export default function EditProductModal({ product }: { product: TProduct }) {
                 name="price"
                 render={({ field }) => (
                   <Input
+                    errorMessage={errors.price?.message}
+                    isInvalid={!!errors.price}
                     label="Price"
                     type="number"
                     value={field.value?.toString()}
                     onChange={(e) => field.onChange(Number(e.target.value))}
-                    errorMessage={errors.price?.message}
-                    isInvalid={!!errors.price}
                   />
                 )}
               />
@@ -129,13 +129,13 @@ export default function EditProductModal({ product }: { product: TProduct }) {
                 name="inventories.0.stock"
                 render={({ field }) => (
                   <Input
+                    errorMessage={errors.inventories?.[0]?.stock?.message}
+                    isInvalid={!!errors.inventories?.[0]?.stock}
                     label="Stock"
                     min={0}
                     type="number"
                     value={field.value?.toString()}
                     onChange={(e) => field.onChange(Number(e.target.value))}
-                    errorMessage={errors.inventories?.[0]?.stock?.message}
-                    isInvalid={!!errors.inventories?.[0]?.stock}
                   />
                 )}
               />
@@ -146,11 +146,11 @@ export default function EditProductModal({ product }: { product: TProduct }) {
                 name="discount.type"
                 render={({ field }) => (
                   <Select
+                    errorMessage={errors.discount?.type?.message}
+                    isInvalid={!!errors.discount?.type}
                     label="Discount Type"
                     selectedKeys={[field.value || ""]}
                     onChange={field.onChange}
-                    errorMessage={errors.discount?.type?.message}
-                    isInvalid={!!errors.discount?.type}
                   >
                     <SelectItem key="percentage" value="percentage">
                       Percentage
@@ -168,13 +168,13 @@ export default function EditProductModal({ product }: { product: TProduct }) {
                 name="discount.value"
                 render={({ field }) => (
                   <Input
+                    errorMessage={errors.discount?.value?.message}
+                    isInvalid={!!errors.discount?.value}
                     label="Discount Value"
                     min={0}
                     type="number"
                     value={field.value?.toString()}
                     onChange={(e) => field.onChange(Number(e.target.value))}
-                    errorMessage={errors.discount?.value?.message}
-                    isInvalid={!!errors.discount?.value}
                   />
                 )}
               />
@@ -185,6 +185,8 @@ export default function EditProductModal({ product }: { product: TProduct }) {
                 name="discount.startDate"
                 render={({ field }) => (
                   <Input
+                    errorMessage={errors.discount?.startDate?.message}
+                    isInvalid={!!errors.discount?.startDate}
                     label="Start Date"
                     type="date"
                     value={
@@ -197,8 +199,6 @@ export default function EditProductModal({ product }: { product: TProduct }) {
                         e.target.value ? new Date(e.target.value) : undefined
                       )
                     }
-                    errorMessage={errors.discount?.startDate?.message}
-                    isInvalid={!!errors.discount?.startDate}
                   />
                 )}
               />
@@ -209,6 +209,8 @@ export default function EditProductModal({ product }: { product: TProduct }) {
                 name="discount.endDate"
                 render={({ field }) => (
                   <Input
+                    errorMessage={errors.discount?.endDate?.message}
+                    isInvalid={!!errors.discount?.endDate}
                     label="End Date"
                     min={
                       control._formValues.discount?.startDate
@@ -228,8 +230,6 @@ export default function EditProductModal({ product }: { product: TProduct }) {
                         e.target.value ? new Date(e.target.value) : undefined
                       )
                     }
-                    errorMessage={errors.discount?.endDate?.message}
-                    isInvalid={!!errors.discount?.endDate}
                   />
                 )}
               />

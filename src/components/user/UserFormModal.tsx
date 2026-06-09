@@ -12,8 +12,8 @@ import {
   ModalFooter,
   ModalHeader,
 } from "@heroui/modal";
-import { Input } from "@nextui-org/input";
-import { Button } from "@nextui-org/button";
+import { Input } from "@heroui/input";
+import { Button } from "@heroui/button";
 import { useUpdateUser } from "@/src/hooks/useUser";
 import { IUser } from "@/src/types";
 

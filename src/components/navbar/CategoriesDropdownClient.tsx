@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import Image from "next/image";
-import { Button } from "@nextui-org/button";
+import { Button } from "@heroui/button";
 import { useRouter } from "next/navigation";
 import { Category } from "@/src/data/CategoriesData";
 import { AlignJustify, ChevronDown, ChevronRight } from "lucide-react";

@@ -3,7 +3,7 @@
 import React, { useCallback, useEffect, useState, useRef } from "react";
 import Autoplay from "embla-carousel-autoplay";
 import useEmblaCarousel from "embla-carousel-react";
-import { Button } from "@nextui-org/button";
+import { Button } from "@heroui/button";
 import { Chip } from "@heroui/chip";
 import { ChevronLeft, ChevronRight, ArrowRight } from "lucide-react";
 import Image from "next/image";
@@ -91,7 +91,9 @@ const Carousel: React.FC = () => {
   useEffect(() => {
     if (!emblaApi) return;
     const onSelect = () => setSelectedIndex(emblaApi.selectedScrollSnap());
+
     emblaApi.on("select", onSelect);
+
     return () => { emblaApi.off("select", onSelect); };
   }, [emblaApi]);
 
@@ -129,11 +131,11 @@ const Carousel: React.FC = () => {
   return (
     <div
       className="relative w-full overflow-hidden rounded-2xl md:rounded-3xl shadow-2xl group border border-gray-200/10"
-      onMouseEnter={() => { setIsHovered(true); autoplayRef.current?.stop(); }}
-      onMouseLeave={() => { setIsHovered(false); autoplayRef.current?.play(); }}
       style={{
         contentVisibility: "auto",
       }}
+      onMouseEnter={() => { setIsHovered(true); autoplayRef.current?.stop(); }}
+      onMouseLeave={() => { setIsHovered(false); autoplayRef.current?.play(); }}
     >
       <div ref={emblaRef} className="overflow-hidden">
         <div className="flex">
@@ -170,9 +172,10 @@ const Carousel: React.FC = () => {
                         {isActive && (
                           <motion.div
                             key={`slide-content-${selectedIndex}`}
-                            initial="hidden"
                             animate="visible"
+                            className={`flex flex-col ${alignClasses[slide.align]}`}
                             exit="hidden"
+                            initial="hidden"
                             variants={{
                               hidden: { opacity: 0 },
                               visible: {
@@ -182,7 +185,6 @@ const Carousel: React.FC = () => {
                                 }
                               }
                             }}
-                            className={`flex flex-col ${alignClasses[slide.align]}`}
                           >
                             {/* Slide Badge */}
                             {slide.badge && (
@@ -204,11 +206,11 @@ const Carousel: React.FC = () => {
 
                             {/* Dynamic Title with animated spring text */}
                             <motion.h2
+                              className={`text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-black text-white leading-tight tracking-tight drop-shadow-xl mt-3 ${textAlignClasses[slide.align]}`}
                               variants={{
                                 hidden: { opacity: 0, y: 15 },
                                 visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } }
                               }}
-                              className={`text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-black text-white leading-tight tracking-tight drop-shadow-xl mt-3 ${textAlignClasses[slide.align]}`}
                             >
                               {slide.title.split("\n").map((line, i) => (
                                 <React.Fragment key={i}>
@@ -222,30 +224,30 @@ const Carousel: React.FC = () => {
 
                             {/* Slide Subtitle */}
                             <motion.p
+                              className={`text-xs sm:text-sm md:text-base lg:text-lg text-gray-200 leading-relaxed font-medium drop-shadow-md mt-4 max-w-lg ${textAlignClasses[slide.align]}`}
                               variants={{
                                 hidden: { opacity: 0, y: 15 },
                                 visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } }
                               }}
-                              className={`text-xs sm:text-sm md:text-base lg:text-lg text-gray-200 leading-relaxed font-medium drop-shadow-md mt-4 max-w-lg ${textAlignClasses[slide.align]}`}
                             >
                               {slide.subtitle}
                             </motion.p>
 
                             {/* Slide CTA Button with spring glow on hover */}
                             <motion.div
+                              className="mt-6 sm:mt-8"
                               variants={{
                                 hidden: { opacity: 0, y: 15 },
                                 visible: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 100 } }
                               }}
-                              className="mt-6 sm:mt-8"
                             >
                               <Button
                                 as={Link}
                                 className="font-extrabold px-6 sm:px-8 py-3 bg-gradient-to-r from-primary-500 via-indigo-600 to-primary-600 hover:from-primary-600 hover:via-indigo-700 hover:to-primary-700 text-white shadow-xl hover:shadow-primary-500/20 hover:scale-105 active:scale-95 transition-all duration-300 rounded-full border border-white/10"
+                                endContent={<ArrowRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />}
                                 href={slide.href}
                                 radius="full"
                                 size="lg"
-                                endContent={<ArrowRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />}
                               >
                                 {slide.cta}
                               </Button>

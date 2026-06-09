@@ -1,6 +1,6 @@
 "use server";
 
-import axiosInstance from "@/src/lib/axios";
+import axiosInstance from "@/src/lib/serverAxios";
 import { TCartItem } from "@/src/types";
 
 export const getCart = async (_userId: string) => {
@@ -33,12 +33,4 @@ export const deleteCart = async (userId: string) => {
   }
 };
 
-// Sync local storage cart with backend
-export const syncCartWithBackend = async () => {
-  const localCart = JSON.parse(localStorage.getItem("cart") || "[]");
 
-  if (localCart.length > 0) {
-    await axiosInstance.post(`/cart/sync`, { items: localCart });
-    localStorage.removeItem("cart");
-  }
-};

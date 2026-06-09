@@ -10,9 +10,9 @@ import {
   useDisclosure,
 } from "@heroui/modal";
 import { Heart, ShoppingCart, Trash2, Eye } from "lucide-react";
-import { Button } from "@nextui-org/button";
-import { Image } from "@nextui-org/image";
-import { Badge } from "@nextui-org/badge";
+import { Button } from "@heroui/button";
+import { Image } from "@heroui/image";
+import { Badge } from "@heroui/badge";
 import { useWishlist } from "@/src/hooks/useWishlist";
 import { useCart } from "@/src/hooks/useCart";
 import Link from "next/link";
@@ -26,6 +26,10 @@ export const WishlistModal = () => {
     const item = wishlist.items.find(item => item.productId === productId);
 
     if (item) {
+      if (typeof item.stock === "number" && item.stock <= 0) {
+        return;
+      }
+
       const cartItem = {
         productId: item.productId,
         quantity: 1,

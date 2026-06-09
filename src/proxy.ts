@@ -1,66 +1,93 @@
-import { NextResponse } from "next/server";
-import { NextRequest } from "next/server";
+import { NextResponse, type NextRequest } from "next/server";
+import { jwtVerify } from "jose";
 
-import { getCurrentUser } from "./services/AuthService";
+// C-03 FIX: verify the JWT signature locally on the Edge runtime using jose.
+// The previous implementation decoded the JWT with jwt-decode (no signature
+// check), which meant any forged token with the right shape passed the gate.
 
-// Public routes that don't require authentication
-const PUBLIC_ROUTES = ["/auth/login", "/auth/register"];
+const PUBLIC_ROUTES = new Set<string>(["/auth/login", "/auth/register"]);
+const PUBLIC_PREFIXES = ["/_next", "/api/auth", "/favicon", "/site.webmanifest", "/robots.txt", "/sitemap.xml"];
 
-// Role-based route access
-const ROLE_BASED_ROUTES = {
-  USER: [/^\/profile(\/.*)?$/],
-  ADMIN: [/^\/profile(\/.*)?$/, /^\/dashboard(\/.*)?$/],
-};
+const ROLE_RULES: Array<{ roles: string[]; match: RegExp }> = [
+  { roles: ["USER", "ADMIN"], match: /^\/profile(\/.*)?$/ },
+  { roles: ["USER", "ADMIN"], match: /^\/checkout(\/.*)?$/ },
+  { roles: ["USER", "ADMIN"], match: /^\/orders(\/.*)?$/ },
+  { roles: ["USER", "ADMIN"], match: /^\/payment(\/.*)?$/ },
+  { roles: ["ADMIN"], match: /^\/dashboard(\/.*)?$/ },
+];
 
-export async function proxy(request: NextRequest) {
-  const { pathname } = request.nextUrl;
+const secret = process.env.JWT_SECRET;
 
-  // Get the current user
-  const user = await getCurrentUser();
-
-  // If the user is not authenticated
-  if (!user) {
-    // Allow access to public routes
-    if (PUBLIC_ROUTES.includes(pathname)) {
-      return NextResponse.next();
-    }
-    // Redirect to login for protected routes
-
-    return NextResponse.redirect(
-      new URL(`/auth/login?redirect=${pathname}`, request.url)
+if (!secret) {
+  // Deny-by-default in production: refuse to start. In development, fall back
+  // to a placeholder so the dev server stays alive — signature verification
+  // will still reject every cookie-issued token, so unauthenticated access is
+  // the only "leak" (which is correct: the user must log in).
+  if (process.env.NODE_ENV === "production") {
+    throw new Error(
+      "JWT_SECRET is required by middleware. Set it in your environment (must match the backend's JWT_SECRET)."
     );
   }
+  console.warn(
+    "[proxy] JWT_SECRET is not set — using a dev-only placeholder. Add JWT_SECRET to .env.local to match the backend."
+  );
+}
+const key = new TextEncoder().encode(secret ?? "dev-only-placeholder-do-not-use-in-prod");
 
-  // If the user is authenticated, check role-based access
-  if (
-    user?.role &&
-    ROLE_BASED_ROUTES[user.role as keyof typeof ROLE_BASED_ROUTES]
-  ) {
-    const allowedRoutes =
-      ROLE_BASED_ROUTES[user.role as keyof typeof ROLE_BASED_ROUTES];
+// Next.js 16 reads either a default export or the named `proxy` export.
+export default async function proxy(request: NextRequest) {
+  const { pathname } = request.nextUrl;
 
-    // Check if the current route is allowed for the user's role
-    if (allowedRoutes.some((route) => pathname.match(route))) {
-      return NextResponse.next();
-    }
-  }
-
-  // If the user is authenticated and trying to access the checkout page
-  if (pathname.startsWith("/checkout")) {
+  if (PUBLIC_ROUTES.has(pathname) || PUBLIC_PREFIXES.some((p) => pathname.startsWith(p))) {
     return NextResponse.next();
   }
 
-  // Redirect to the default route if the user is not authorized
-  return NextResponse.redirect(new URL("/", request.url));
+  const accessToken = request.cookies.get("accessToken")?.value;
+
+  if (!accessToken) {
+    return redirectToLogin(request, pathname);
+  }
+
+  let payload: { role?: string; status?: string; exp?: number } = {};
+
+  try {
+    const verified = await jwtVerify(accessToken, key, { algorithms: ["HS256"] });
+
+    payload = verified.payload as typeof payload;
+  } catch {
+    return redirectToLogin(request, pathname);
+  }
+
+  if (payload.status === "BLOCKED") {
+    return NextResponse.redirect(new URL("/auth/login?error=blocked", request.url));
+  }
+
+  if (payload.exp && payload.exp * 1000 < Date.now()) {
+    return redirectToLogin(request, pathname);
+  }
+
+  const rule = ROLE_RULES.find((r) => r.match.test(pathname));
+
+  if (rule && !rule.roles.includes(payload.role ?? "")) {
+    return NextResponse.redirect(new URL("/", request.url));
+  }
+
+  return NextResponse.next();
 }
 
-// Define the routes to apply the proxy
+function redirectToLogin(request: NextRequest, pathname: string) {
+  return NextResponse.redirect(
+    new URL(`/auth/login?redirect=${encodeURIComponent(pathname)}`, request.url)
+  );
+}
+
 export const config = {
   matcher: [
     "/dashboard/:path*",
     "/profile/:path*",
-    "/checkout",
-    "/auth/login",
-    "/auth/register",
+    "/checkout/:path*",
+    "/orders/:path*",
+    "/payment/:path*",
+    "/auth/:path*",
   ],
 };

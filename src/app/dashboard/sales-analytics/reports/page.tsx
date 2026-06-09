@@ -1,21 +1,17 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { Card, CardBody, CardHeader } from "@nextui-org/card";
-import { Button } from "@nextui-org/button";
-import { Chip } from "@heroui/chip";
+import { Card, CardBody, CardHeader } from "@heroui/card";
+import { Button } from "@heroui/button";
 import { Skeleton } from "@heroui/skeleton";
 import { toast } from "sonner";
 import {
-  Download,
   FileSpreadsheet,
   FileText,
   RefreshCw,
   Calendar,
 } from "lucide-react";
-import * as XLSX from "xlsx";
-import jsPDF from "jspdf";
-import autoTable from "jspdf-autotable";
+import { exportToCSV, exportToPDF } from "@/src/utils/exportUtils";
 import {
   BarChart,
   Bar,
@@ -38,12 +34,15 @@ export default function ReportsPage() {
 
     if (period === "weekly") {
       const weekAgo = new Date(now.getTime() - 7 * 86400000);
+
       filtered = orders.filter((o: any) => new Date(o.createdAt) >= weekAgo);
     } else if (period === "monthly") {
       const monthAgo = new Date(now.getTime() - 30 * 86400000);
+
       filtered = orders.filter((o: any) => new Date(o.createdAt) >= monthAgo);
     } else {
       const yearAgo = new Date(now.getTime() - 365 * 86400000);
+
       filtered = orders.filter((o: any) => new Date(o.createdAt) >= yearAgo);
     }
 
@@ -53,8 +52,10 @@ export default function ReportsPage() {
     const cancelled = filtered.filter((o: any) => o.status === "CANCELLED").length;
 
     const dailyMap: Record<string, { revenue: number; orders: number }> = {};
+
     filtered.forEach((o: any) => {
       const d = new Date(o.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric" });
+
       if (!dailyMap[d]) dailyMap[d] = { revenue: 0, orders: 0 };
       dailyMap[d].revenue += o.totalAmount || o.totalPrice || 0;
       dailyMap[d].orders += 1;
@@ -69,6 +70,7 @@ export default function ReportsPage() {
   const downloadExcel = () => {
     if (!ordersRes?.data?.length) {
       toast.error("No data to export");
+
       return;
     }
     const data = ordersRes.data.map((o: any, i: number) => ({
@@ -79,39 +81,19 @@ export default function ReportsPage() {
       Amount: o.totalAmount || o.totalPrice || 0,
       Date: new Date(o.createdAt).toLocaleDateString(),
     }));
-    const ws = XLSX.utils.json_to_sheet(data);
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "Orders");
-    XLSX.writeFile(wb, `sales_report_${new Date().toISOString().split("T")[0]}.xlsx`);
+
+    exportToCSV(data, `sales_report_${new Date().toISOString().split("T")[0]}`);
     toast.success("Report downloaded");
   };
 
   const downloadPDF = () => {
     if (!ordersRes?.data?.length) {
       toast.error("No data to export");
+
       return;
     }
-    const doc = new jsPDF();
-    doc.setFontSize(18);
-    doc.text("X-Mart Sales Report", 14, 20);
-    doc.setFontSize(10);
-    doc.text(`Generated: ${new Date().toLocaleDateString()}`, 14, 30);
-    const rows = ordersRes.data.map((o: any, i: number) => [
-      i + 1,
-      o._id?.slice(-8).toUpperCase(),
-      o.user?.name || "N/A",
-      o.status,
-      `৳${(o.totalAmount || o.totalPrice || 0).toFixed(2)}`,
-    ]);
-    autoTable(doc, {
-      head: [["#", "Order", "Customer", "Status", "Amount"]],
-      body: rows,
-      startY: 38,
-      theme: "striped",
-      headStyles: { fillColor: [59, 130, 246] },
-    });
-    doc.save(`sales_report_${new Date().toISOString().split("T")[0]}.pdf`);
-    toast.success("PDF report downloaded");
+    exportToPDF([], "sales_report");
+    toast.success("PDF dialog opened — use the print menu to save as PDF");
   };
 
   return (
@@ -123,7 +105,7 @@ export default function ReportsPage() {
         </div>
         <div className="flex gap-2">
           {(["weekly", "monthly", "yearly"] as const).map((p) => (
-            <Button key={p} size="sm" variant={period === p ? "solid" : "flat"} color={period === p ? "primary" : "default"} onPress={() => setPeriod(p)}>
+            <Button key={p} color={period === p ? "primary" : "default"} size="sm" variant={period === p ? "solid" : "flat"} onPress={() => setPeriod(p)}>
               <Calendar className="w-3.5 h-3.5 mr-1" />
               {p.charAt(0).toUpperCase() + p.slice(1)}
             </Button>
@@ -181,9 +163,9 @@ export default function ReportsPage() {
           {isLoading ? (
             <Skeleton className="h-72 rounded-lg" />
           ) : (
-            <ResponsiveContainer width="100%" height={350}>
+            <ResponsiveContainer height={350} width="100%">
               <BarChart data={reportData}>
-                <CartesianGrid strokeDasharray="3 3" opacity={0.3} />
+                <CartesianGrid opacity={0.3} strokeDasharray="3 3" />
                 <XAxis dataKey="date" tick={{ fontSize: 11 }} />
                 <YAxis tick={{ fontSize: 11 }} />
                 <Tooltip formatter={(value) => [`৳${Number(value).toLocaleString()}`, "Revenue"]} />

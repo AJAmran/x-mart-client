@@ -1,19 +1,17 @@
 "use client";
 
 import { useState } from "react";
-import { Card, CardBody, CardHeader } from "@nextui-org/card";
-import { Input, Textarea } from "@nextui-org/input";
-import { Button } from "@nextui-org/button";
-import { Switch } from "@nextui-org/switch";
-import { Divider } from "@nextui-org/divider";
+import { Card, CardBody, CardHeader } from "@heroui/card";
+import { Input, Textarea } from "@heroui/input";
+import { Button } from "@heroui/button";
+import { Switch } from "@heroui/switch";
+import { Divider } from "@heroui/divider";
 import { toast } from "sonner";
 import {
   Save,
-  User,
   Store,
   Bell,
   Shield,
-  Palette,
 } from "lucide-react";
 
 export default function SettingsPage() {
@@ -120,8 +118,8 @@ export default function SettingsPage() {
         <Divider />
         <CardBody className="space-y-4 pt-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Input label="Current Password" type="password" placeholder="Enter current password" />
-            <Input label="New Password" type="password" placeholder="Enter new password" />
+            <Input label="Current Password" placeholder="Enter current password" type="password" />
+            <Input label="New Password" placeholder="Enter new password" type="password" />
           </div>
           <div className="flex justify-end pt-2">
             <Button color="primary" variant="flat" onPress={() => toast.success("Password changed successfully")}>

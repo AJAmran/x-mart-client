@@ -1,9 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import * as XLSX from "xlsx";
-import jsPDF from "jspdf";
-import autoTable from "jspdf-autotable";
 import { toast } from "sonner";
 import { DownloadIcon, SearchIcon } from "lucide-react";
 
@@ -15,12 +12,13 @@ import {
   useRemoveDiscount,
 } from "@/src/hooks/useProducts";
 import { TProduct } from "@/src/types";
+import { exportToCSV, exportToPDF } from "@/src/utils/exportUtils";
 import { Pagination } from "@heroui/pagination";
 import { Skeleton } from "@heroui/skeleton";
 import { Tooltip } from "@heroui/tooltip";
-import { Button } from "@nextui-org/button";
-import { Card, CardBody } from "@nextui-org/card";
-import { Input } from "@nextui-org/input";
+import { Button } from "@heroui/button";
+import { Card, CardBody } from "@heroui/card";
+import { Input } from "@heroui/input";
 import { PRODUCT_CATEGORY } from "@/src/constants";
 import { DeleteIcon } from "@/src/components/icons";
 import {
@@ -157,14 +155,10 @@ export default function ProductListPage() {
         })
       );
 
-      const worksheet = XLSX.utils.json_to_sheet(worksheetData);
-      const workbook = XLSX.utils.book_new();
-
-      XLSX.utils.book_append_sheet(workbook, worksheet, "Products");
-      XLSX.writeFile(workbook, `products_report_${new Date().toISOString().split("T")[0]}.xlsx`);
-      toast.success("Excel report downloaded successfully");
+      exportToCSV(worksheetData, `products_report_${new Date().toISOString().split("T")[0]}`);
+      toast.success("Report downloaded successfully");
     } catch (err: any) {
-      toast.error("Failed to download Excel report");
+      toast.error("Failed to download report");
     }
   };
 
@@ -180,36 +174,10 @@ export default function ProductListPage() {
 
         return;
       }
-
-      const doc = new jsPDF();
-
-      doc.setFontSize(18);
-      doc.text("X-Mart Product Report", 14, 20);
-      doc.setFontSize(12);
-      doc.text(`Generated on: ${new Date().toLocaleDateString()}`, 14, 30);
-
-      const tableData = allProducts.map((product: TProduct, index: number) => [
-        index + 1,
-        product.name,
-        `৳${product.price}`,
-        product.inventories?.[0]?.stock ?? 0,
-        product.status ?? "N/A",
-        product.category ?? "N/A",
-      ]);
-
-      autoTable(doc, {
-        head: [["Sl.", "Name", "Price", "Stock", "Status", "Category"]],
-        body: tableData,
-        startY: 40,
-        theme: "striped",
-        headStyles: { fillColor: [59, 130, 246] },
-        styles: { fontSize: 10 },
-      });
-
-      doc.save(`products_report_${new Date().toISOString().split("T")[0]}.pdf`);
-      toast.success("PDF report downloaded successfully");
+      exportToPDF([], "products");
+      toast.success("PDF dialog opened — use the print menu to save as PDF");
     } catch (err: any) {
-      toast.error("Failed to download PDF report");
+      toast.error("Failed to open PDF export");
     }
   };
 

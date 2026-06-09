@@ -1,10 +1,10 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Button } from "@nextui-org/button";
-import { Input } from "@nextui-org/input";
-import { Card, CardBody } from "@nextui-org/card";
-import { Badge } from "@nextui-org/badge";
+import { Button } from "@heroui/button";
+import { Input } from "@heroui/input";
+import { Card, CardBody } from "@heroui/card";
+import { Badge } from "@heroui/badge";
 import {
   Search,
   Package,
@@ -68,6 +68,7 @@ export default function TrackingPage() {
     e.preventDefault();
     if (!trackingId.trim()) {
       setError("Please enter a tracking number");
+
       return;
     }
     setError("");
@@ -76,6 +77,7 @@ export default function TrackingPage() {
 
   const getStatusIcon = (status: StatusKey) => {
     const IconComponent = statusConfig[status]?.icon || Package;
+
     return <IconComponent className="w-5 h-5" />;
   };
 

@@ -1,7 +1,13 @@
 "use server";
 
 import { BranchFilters, PaginationOptions, TBranch } from "@/src/interface/branch";
-import axiosInstance from "@/src/lib/axios";
+import axiosInstance from "@/src/lib/serverAxios";
+
+type BranchListResponse = {
+  data: TBranch[];
+  meta?: unknown;
+  message?: string;
+};
 
 
 export async function createBranch(data: TBranch) {
@@ -13,7 +19,7 @@ export async function createBranch(data: TBranch) {
 export async function getAllBranches(
   filters: BranchFilters = {},
   options: PaginationOptions = {}
-) {
+): Promise<BranchListResponse> {
   const params = {
     ...filters,
     page: options.page || 1,
@@ -24,7 +30,7 @@ export async function getAllBranches(
 
   const response = await axiosInstance.get("/branches", { params });
 
-  return response.data;
+  return response.data as BranchListResponse;
 }
 
 export async function getBranchById(id: string) {
@@ -50,10 +56,10 @@ export async function getNearbyBranches(
   lng: number,
   maxDistance: number,
   limit: number = 5
-) {
+): Promise<BranchListResponse> {
   const response = await axiosInstance.get("/branches/nearby/locations", {
     params: { lat, lng, maxDistance, limit },
   });
 
-  return response.data;
+  return response.data as BranchListResponse;
 }

@@ -62,6 +62,7 @@ const Sidebar: FC = () => {
 
   useEffect(() => {
     document.body.style.overflow = mobileOpen ? "hidden" : "";
+
     return () => { document.body.style.overflow = ""; };
   }, [mobileOpen]);
 
@@ -83,9 +84,9 @@ const Sidebar: FC = () => {
           <div className="flex items-center gap-2">
             <ThemeSwitch />
             <button
+              aria-label="Close sidebar"
               className="lg:hidden p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
               onClick={() => setMobileOpen(false)}
-              aria-label="Close sidebar"
             >
               <X className="w-5 h-5 text-gray-500" />
             </button>
@@ -164,9 +165,9 @@ const Sidebar: FC = () => {
   return (
     <>
       <button
+        aria-label="Open sidebar menu"
         className="fixed bottom-4 left-4 z-50 lg:hidden bg-blue-600 text-white p-3 rounded-full shadow-lg hover:bg-blue-700 transition-all active:scale-95"
         onClick={() => setMobileOpen(true)}
-        aria-label="Open sidebar menu"
       >
         <Menu className="w-5 h-5" />
       </button>

@@ -6,7 +6,7 @@ import {
   NavbarContent,
   NavbarMenuToggle,
   NavbarBrand,
-} from "@nextui-org/navbar";
+} from "@heroui/navbar";
 import NextLink from "next/link";
 import { Logo } from "../icons";
 import { useRouter, useSearchParams } from "next/navigation";

@@ -1,9 +1,9 @@
 "use client";
 
-import { Link } from "@nextui-org/link";
+import { Link } from "@heroui/link";
 import { FacebookIcon, InstagramIcon, LinkedInIcon, TwitterIcon } from "../icons";
-import { Button } from "@nextui-org/button";
-import { Input } from "@nextui-org/input";
+import { Button } from "@heroui/button";
+import { Input } from "@heroui/input";
 
 const Footer = () => {
   return (

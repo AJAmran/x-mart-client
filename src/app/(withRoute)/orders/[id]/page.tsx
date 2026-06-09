@@ -1,13 +1,13 @@
 "use client";
 import { useOrderById } from "@/src/hooks/useOrder";
 import { TOrder, ORDER_STATUS } from "@/src/types";
-import { Card, CardBody, CardHeader, CardFooter } from "@nextui-org/card";
-import { Button } from "@nextui-org/button";
-import { Image } from "@nextui-org/image";
-import { Spinner } from "@nextui-org/spinner";
+import { Card, CardBody, CardHeader, CardFooter } from "@heroui/card";
+import { Button } from "@heroui/button";
+import { Image } from "@heroui/image";
+import { Spinner } from "@heroui/spinner";
 import { Chip } from "@heroui/chip";
-import { Badge } from "@nextui-org/badge";
-import { Divider } from "@nextui-org/divider";
+import { Badge } from "@heroui/badge";
+import { Divider } from "@heroui/divider";
 import { useRouter } from "next/navigation";
 import { format } from "date-fns";
 import { ArrowLeft, Package, Truck, CheckCircle, Clock, XCircle } from "lucide-react";
@@ -54,8 +54,8 @@ const OrderDetailsPage = ({ params }: { params: Promise<{ id: string }> }) => {
 
   if (error) return (
     <div className="flex justify-center items-center min-h-screen">
-      <Card className="max-w-md w-full bg-red-50 border border-red-200">
-        <CardBody className="text-red-600 text-center p-6">
+      <Card className="max-w-md w-full bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-900/30">
+        <CardBody className="text-red-600 dark:text-red-400 text-center p-6">
           <p className="text-lg font-semibold mb-2">Error loading order</p>
           <p>{error.message}</p>
           <Button 
@@ -73,9 +73,9 @@ const OrderDetailsPage = ({ params }: { params: Promise<{ id: string }> }) => {
 
   if (!order) return (
     <div className="flex justify-center items-center min-h-screen">
-      <Card className="max-w-md w-full bg-gray-50 border border-gray-200">
-        <CardBody className="text-gray-600 text-center p-6">
-          <p className="text-lg font-semibold mb-2">Order not found</p>
+      <Card className="max-w-md w-full bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-800">
+        <CardBody className="text-gray-600 dark:text-gray-400 text-center p-6">
+          <p className="text-lg font-semibold mb-2 text-gray-900 dark:text-gray-50">Order not found</p>
           <p>The requested order could not be located.</p>
           <Button 
             className="mt-4" 
@@ -91,7 +91,7 @@ const OrderDetailsPage = ({ params }: { params: Promise<{ id: string }> }) => {
   );
 
   return (
-    <div className="py-8">
+    <div className="container mx-auto py-8">
       <div className="mb-6">
         <Button
           className="mb-4"
@@ -104,8 +104,8 @@ const OrderDetailsPage = ({ params }: { params: Promise<{ id: string }> }) => {
         
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div>
-            <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Order Details</h1>
-            <p className="text-gray-500 mt-1">
+            <h1 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-gray-50">Order Details</h1>
+            <p className="text-gray-500 dark:text-gray-400 mt-1">
               #{order._id.slice(0, 8).toUpperCase()} • Placed on {format(new Date(order.createdAt), "MMMM d, yyyy")}
             </p>
           </div>
@@ -130,13 +130,13 @@ const OrderDetailsPage = ({ params }: { params: Promise<{ id: string }> }) => {
         {/* Main Order Content */}
         <div className="lg:col-span-2 space-y-6">
           {/* Order Items */}
-          <Card className="border border-gray-200">
-            <CardHeader className="border-b border-gray-200">
-              <h2 className="text-lg font-semibold">Items Ordered</h2>
+          <Card className="border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900">
+            <CardHeader className="border-b border-gray-200 dark:border-gray-800">
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-50">Items Ordered</h2>
             </CardHeader>
-            <CardBody className="p-0 divide-y divide-gray-100">
+            <CardBody className="p-0 divide-y divide-gray-100 dark:divide-gray-800">
               {order.items.map((item) => (
-                <div key={item.productId} className="p-4 hover:bg-gray-50 transition-colors">
+                <div key={item.productId} className="p-4 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
                   <div className="flex gap-4">
                     <Badge 
                       className="border-2 border-white" 
@@ -153,8 +153,8 @@ const OrderDetailsPage = ({ params }: { params: Promise<{ id: string }> }) => {
                       />
                     </Badge>
                     <div className="flex-1">
-                      <h3 className="font-medium text-gray-900">{item.name}</h3>
-                      <p className="text-gray-500 mt-1">৳{item.price.toFixed(2)} each</p>
+                      <h3 className="font-medium text-gray-900 dark:text-gray-50">{item.name}</h3>
+                      <p className="text-gray-500 dark:text-gray-400 mt-1">৳{item.price.toFixed(2)} each</p>
                       <div className="mt-3 flex gap-2">
                         <Button
                           size="sm"
@@ -178,25 +178,25 @@ const OrderDetailsPage = ({ params }: { params: Promise<{ id: string }> }) => {
                 </div>
               ))}
             </CardBody>
-            <CardFooter className="flex justify-between items-center border-t border-gray-200">
-              <span className="text-sm font-medium text-gray-500">
+            <CardFooter className="flex justify-between items-center border-t border-gray-200 dark:border-gray-800">
+              <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
                 {order.items.length} {order.items.length === 1 ? 'item' : 'items'}
               </span>
               <div className="flex items-center gap-4">
-                <span className="text-sm font-medium text-gray-700">Subtotal:</span>
-                <span className="text-lg font-semibold">৳{order.totalPrice.toFixed(2)}</span>
+                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Subtotal:</span>
+                <span className="text-lg font-semibold text-gray-900 dark:text-gray-50">৳{order.totalPrice.toFixed(2)}</span>
               </div>
             </CardFooter>
           </Card>
 
           {/* Tracking History */}
-          <Card className="border border-gray-200">
-            <CardHeader className="border-b border-gray-200">
-              <h2 className="text-lg font-semibold">Order Timeline</h2>
+          <Card className="border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900">
+            <CardHeader className="border-b border-gray-200 dark:border-gray-800">
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-50">Order Timeline</h2>
             </CardHeader>
             <CardBody>
               <div className="relative">
-                <div className="absolute left-4 h-full w-0.5 bg-gray-200" />
+                <div className="absolute left-4 h-full w-0.5 bg-gray-200 dark:bg-gray-800" />
                 <ul className="space-y-6">
                   {order.trackingHistory.map((history, index) => (
                     <li key={index} className="relative pl-10">
@@ -206,17 +206,17 @@ const OrderDetailsPage = ({ params }: { params: Promise<{ id: string }> }) => {
                         history.status === "SHIPPED" ? "bg-purple-500" :
                         history.status === "DELIVERED" ? "bg-green-500" : "bg-red-500"
                       }`} />
-                      <div className="bg-gray-50 p-4 rounded-lg border border-gray-100">
+                      <div className="bg-gray-50 dark:bg-gray-800/50 p-4 rounded-lg border border-gray-100 dark:border-gray-800">
                         <div className="flex justify-between items-start">
                           <div>
-                            <h4 className="font-medium text-gray-900">{history.status}</h4>
-                            <p className="text-sm text-gray-500 mt-1">
+                            <h4 className="font-medium text-gray-900 dark:text-gray-50">{history.status}</h4>
+                            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
                               {format(new Date(history.updatedAt), "MMMM d, yyyy 'at' h:mm a")}
                             </p>
                           </div>
                         </div>
                         {history.note && (
-                          <p className="text-sm text-gray-600 mt-2">{history.note}</p>
+                          <p className="text-sm text-gray-600 dark:text-gray-300 mt-2">{history.note}</p>
                         )}
                       </div>
                     </li>
@@ -230,27 +230,27 @@ const OrderDetailsPage = ({ params }: { params: Promise<{ id: string }> }) => {
         {/* Order Summary Sidebar */}
         <div className="space-y-6">
           {/* Shipping Information */}
-          <Card className="border border-gray-200">
-            <CardHeader className="border-b border-gray-200">
-              <h2 className="text-lg font-semibold">Shipping Information</h2>
+          <Card className="border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900">
+            <CardHeader className="border-b border-gray-200 dark:border-gray-800">
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-50">Shipping Information</h2>
             </CardHeader>
             <CardBody>
               <div className="space-y-3">
                 <div>
-                  <h4 className="text-sm font-medium text-gray-500">Name</h4>
-                  <p className="text-gray-900">{order.shippingInfo.name}</p>
+                  <h4 className="text-sm font-medium text-gray-500 dark:text-gray-400">Name</h4>
+                  <p className="text-gray-900 dark:text-gray-50">{order.shippingInfo.name}</p>
                 </div>
                 <div>
-                  <h4 className="text-sm font-medium text-gray-500">Email</h4>
-                  <p className="text-gray-900">{order.shippingInfo.email}</p>
+                  <h4 className="text-sm font-medium text-gray-500 dark:text-gray-400">Email</h4>
+                  <p className="text-gray-900 dark:text-gray-50">{order.shippingInfo.email}</p>
                 </div>
                 <div>
-                  <h4 className="text-sm font-medium text-gray-500">Phone</h4>
-                  <p className="text-gray-900">{order.shippingInfo.phone}</p>
+                  <h4 className="text-sm font-medium text-gray-500 dark:text-gray-400">Phone</h4>
+                  <p className="text-gray-900 dark:text-gray-50">{order.shippingInfo.phone}</p>
                 </div>
                 <div>
-                  <h4 className="text-sm font-medium text-gray-500">Address</h4>
-                  <p className="text-gray-900">
+                  <h4 className="text-sm font-medium text-gray-500 dark:text-gray-400">Address</h4>
+                  <p className="text-gray-900 dark:text-gray-50">
                     {order.shippingInfo.addressLine1}
                     {order.shippingInfo.addressLine2 && (
                       <>, {order.shippingInfo.addressLine2}</>
@@ -266,28 +266,28 @@ const OrderDetailsPage = ({ params }: { params: Promise<{ id: string }> }) => {
           </Card>
 
           {/* Payment Information */}
-          <Card className="border border-gray-200">
-            <CardHeader className="border-b border-gray-200">
-              <h2 className="text-lg font-semibold">Payment</h2>
+          <Card className="border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900">
+            <CardHeader className="border-b border-gray-200 dark:border-gray-800">
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-50">Payment</h2>
             </CardHeader>
             <CardBody>
               <div className="space-y-4">
                 <div>
-                  <h4 className="text-sm font-medium text-gray-500">Method</h4>
-                  <p className="text-gray-900 capitalize">{order.paymentMethod}</p>
+                  <h4 className="text-sm font-medium text-gray-500 dark:text-gray-400">Method</h4>
+                  <p className="text-gray-900 dark:text-gray-50 capitalize">{order.paymentMethod}</p>
                 </div>
                 <Divider />
                 <div className="space-y-2">
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Subtotal</span>
-                    <span className="text-gray-900">৳{order.totalPrice.toFixed(2)}</span>
+                    <span className="text-gray-600 dark:text-gray-400">Subtotal</span>
+                    <span className="text-gray-900 dark:text-gray-50">৳{order.totalPrice.toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Shipping</span>
-                    <span className="text-gray-900">৳0.00</span>
+                    <span className="text-gray-600 dark:text-gray-400">Shipping</span>
+                    <span className="text-gray-900 dark:text-gray-50">৳0.00</span>
                   </div>
                   <Divider />
-                  <div className="flex justify-between font-semibold">
+                  <div className="flex justify-between font-semibold text-gray-900 dark:text-gray-50">
                     <span>Total</span>
                     <span>৳{order.totalPrice.toFixed(2)}</span>
                   </div>
@@ -297,9 +297,9 @@ const OrderDetailsPage = ({ params }: { params: Promise<{ id: string }> }) => {
           </Card>
 
           {/* Order Actions */}
-          <Card className="border border-gray-200">
-            <CardHeader className="border-b border-gray-200">
-              <h2 className="text-lg font-semibold">Order Actions</h2>
+          <Card className="border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900">
+            <CardHeader className="border-b border-gray-200 dark:border-gray-800">
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-50">Order Actions</h2>
             </CardHeader>
             <CardBody>
               <div className="space-y-3">

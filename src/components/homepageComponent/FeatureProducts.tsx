@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import ProductCard from "@/src/components/UI/ProductCard";
 import { useFeaturedProducts } from "@/src/hooks/useFeaturedProducts";
 import { TProduct } from "@/src/types";
-import { Button } from "@nextui-org/button";
+import { Button } from "@heroui/button";
 import FeatureProductSkeleton from "@/src/components/homepageComponent/FeatureProductSkeleton";
 import { MyButton } from "../UI/MyButton";
 

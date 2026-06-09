@@ -2,7 +2,7 @@
 
 import { useEffect, useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
-import { Button } from "@nextui-org/button";
+import { Button } from "@heroui/button";
 import Link from "next/link";
 
 const PaymentFail = () => {
@@ -13,6 +13,7 @@ const PaymentFail = () => {
   useEffect(() => {
     if (countdown > 0) {
       const timer = setTimeout(() => setCountdown(countdown - 1), 1000);
+
       return () => clearTimeout(timer);
     }
   }, [countdown]);
@@ -23,7 +24,7 @@ const PaymentFail = () => {
         <div className="mb-6 flex justify-center">
           <div className="flex h-24 w-24 items-center justify-center rounded-full bg-danger/20">
             <svg className="h-12 w-12 text-danger" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              <path d="M6 18L18 6M6 6l12 12" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} />
             </svg>
           </div>
         </div>
@@ -42,10 +43,10 @@ const PaymentFail = () => {
           Redirecting to checkout in {countdown} seconds...
         </p>
         <div className="flex justify-center gap-4">
-          <Button as={Link} href="/checkout" color="primary" size="lg">
+          <Button as={Link} color="primary" href="/checkout" size="lg">
             Try Again
           </Button>
-          <Button as={Link} href="/shop" variant="flat" size="lg">
+          <Button as={Link} href="/shop" size="lg" variant="flat">
             Continue Shopping
           </Button>
         </div>

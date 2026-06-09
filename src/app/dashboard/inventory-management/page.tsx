@@ -1,12 +1,12 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { Card, CardBody, CardHeader } from "@nextui-org/card";
+import { Card, CardBody } from "@heroui/card";
 import { Chip } from "@heroui/chip";
 import { Skeleton } from "@heroui/skeleton";
 import { Tooltip } from "@heroui/tooltip";
-import { Button } from "@nextui-org/button";
-import { Input } from "@nextui-org/input";
+import { Button } from "@heroui/button";
+import { Input } from "@heroui/input";
 import { Pagination } from "@heroui/pagination";
 import {
   Table,
@@ -27,7 +27,7 @@ import {
 } from "lucide-react";
 import { useProducts } from "@/src/hooks/useProducts";
 import { TProduct } from "@/src/types";
-import * as XLSX from "xlsx";
+import { exportToCSV } from "@/src/utils/exportUtils";
 import { toast } from "sonner";
 
 export default function InventoryManagementPage() {
@@ -43,14 +43,17 @@ export default function InventoryManagementPage() {
   const products = useMemo(() => {
     if (!data?.data) return [];
     let items = [...data.data] as TProduct[];
+
     if (stockFilter === "low") {
       items = items.filter((p) => {
         const stock = p.inventories?.[0]?.stock ?? 0;
+
         return stock > 0 && stock < 10;
       });
     } else if (stockFilter === "out") {
       items = items.filter((p) => (p.inventories?.[0]?.stock ?? 0) === 0);
     }
+
     return items;
   }, [data, stockFilter]);
 
@@ -73,6 +76,7 @@ export default function InventoryManagementPage() {
   const downloadReport = () => {
     if (!products.length) {
       toast.error("No products to export");
+
       return;
     }
     const wsData = products.map((p: TProduct, i: number) => ({
@@ -84,10 +88,8 @@ export default function InventoryManagementPage() {
       Status: p.status,
       Price: p.price,
     }));
-    const ws = XLSX.utils.json_to_sheet(wsData);
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "Inventory");
-    XLSX.writeFile(wb, `inventory_${new Date().toISOString().split("T")[0]}.xlsx`);
+
+    exportToCSV(wsData, `inventory_${new Date().toISOString().split("T")[0]}`);
     toast.success("Inventory report downloaded");
   };
 
@@ -189,9 +191,9 @@ export default function InventoryManagementPage() {
               {(["all", "low", "out"] as const).map((filter) => (
                 <Button
                   key={filter}
+                  color={stockFilter === filter ? "primary" : "default"}
                   size="sm"
                   variant={stockFilter === filter ? "solid" : "flat"}
-                  color={stockFilter === filter ? "primary" : "default"}
                   onPress={() => { setStockFilter(filter); setPage(1); }}
                 >
                   {filter === "all" ? "All" : filter === "low" ? "Low Stock" : "Out of Stock"}
@@ -234,7 +236,7 @@ export default function InventoryManagementPage() {
                       <span className="font-semibold text-sm">{product.name}</span>
                     </TableCell>
                     <TableCell>
-                      <Chip size="sm" variant="flat" className="capitalize">{product.category}</Chip>
+                      <Chip className="capitalize" size="sm" variant="flat">{product.category}</Chip>
                     </TableCell>
                     <TableCell>
                       <span className={`font-bold ${isOut ? "text-red-500" : isLow ? "text-yellow-500" : "text-green-500"}`}>
@@ -248,10 +250,10 @@ export default function InventoryManagementPage() {
                       <Chip
                         color={isOut ? "danger" : isLow ? "warning" : "success"}
                         size="sm"
-                        variant="flat"
                         startContent={
                           isOut || isLow ? <AlertTriangle className="w-3 h-3" /> : undefined
                         }
+                        variant="flat"
                       >
                         {isOut ? "Out of Stock" : isLow ? "Low Stock" : "In Stock"}
                       </Chip>

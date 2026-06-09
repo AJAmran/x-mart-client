@@ -1,6 +1,6 @@
 "use server";
 
-import axiosInstance from "@/src/lib/axios";
+import axiosInstance from "@/src/lib/serverAxios";
 import { IUser } from "@/src/types";
 
 export const getAllUsers = async (queryParams?: {
@@ -21,6 +21,7 @@ export const getAllUsers = async (queryParams?: {
     return response.data;
   } catch (error) {
     const message = (error as { response?: { data?: { message?: string } } })?.response?.data?.message || (error instanceof Error ? error.message : "Failed to fetch users");
+
     throw new Error(message);
   }
 };
@@ -32,6 +33,7 @@ export const getUserById = async (id: string) => {
     return data;
   } catch (error) {
     const message = (error as { response?: { data?: { message?: string } } })?.response?.data?.message || (error instanceof Error ? error.message : "Failed to fetch user");
+
     throw new Error(message);
   }
 };
@@ -44,6 +46,7 @@ export const updateUser = async (id: string, userData: Partial<IUser>) => {
     return data;
   } catch (error) {
     const message = (error as { response?: { data?: { message?: string } } })?.response?.data?.message || (error instanceof Error ? error.message : "Failed to update user");
+
     throw new Error(message);
   }
 };
@@ -55,6 +58,7 @@ export const deleteUser = async (id: string) => {
     return data;
   } catch (error) {
     const message = (error as { response?: { data?: { message?: string } } })?.response?.data?.message || (error instanceof Error ? error.message : "Failed to delete user");
+
     throw new Error(message);
   }
 };
@@ -68,6 +72,7 @@ export const updateUserStatus = async (id: string, status: string) => {
     return data;
   } catch (error) {
     const message = (error as { response?: { data?: { message?: string } } })?.response?.data?.message || (error instanceof Error ? error.message : "Failed to update status");
+
     throw new Error(message);
   }
 };
@@ -79,6 +84,7 @@ export const updateUserRole = async (id: string, role: string) => {
     return data;
   } catch (error) {
     const message = (error as { response?: { data?: { message?: string } } })?.response?.data?.message || (error instanceof Error ? error.message : "Failed to update role");
+
     throw new Error(message);
   }
 };

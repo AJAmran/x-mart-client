@@ -3,12 +3,12 @@
 import React, { useCallback } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Card, CardBody } from "@nextui-org/card";
+import { Card, CardBody } from "@heroui/card";
 import { Category } from "@/src/data/CategoriesData";
 import { motion } from "framer-motion";
 import useEmblaCarousel from "embla-carousel-react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { Button } from "@nextui-org/button";
+import { Button } from "@heroui/button";
 
 interface CategoriesClientProps {
   categories: Category[];

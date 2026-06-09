@@ -1,7 +1,7 @@
 "use client";
 import { TShippingInfo } from "@/src/types";
-import { Card, CardBody, CardHeader } from "@nextui-org/card";
-import { Input } from "@nextui-org/input";
+import { Card, CardBody, CardHeader } from "@heroui/card";
+import { Input } from "@heroui/input";
 import { ChangeEvent } from "react";
 
 

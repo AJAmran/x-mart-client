@@ -1,37 +1,45 @@
-import { utils, writeFile } from "xlsx";
-import { jsPDF } from "jspdf";
-import "jspdf-autotable";
+const escapeCSVCell = (value: unknown): string => {
+  if (value === null || value === undefined) return "";
+  const str = String(value);
 
-export const exportToExcel = (data: Record<string, unknown>[], fileName: string) => {
-  const worksheet = utils.json_to_sheet(data);
-  const workbook = utils.book_new();
+  if (/[",\n\r]/.test(str)) {
+    return `"${str.replace(/"/g, '""')}"`;
+  }
 
-  utils.book_append_sheet(workbook, worksheet, "Sheet1");
-
-  writeFile(workbook, `${fileName}.xlsx`);
+  return str;
 };
 
+export const exportToCSV = (data: Record<string, unknown>[], fileName: string) => {
+  if (!data || data.length === 0) {
+    download(`${fileName}.csv`, new Blob([""], { type: "text/csv;charset=utf-8;" }));
+
+    return;
+  }
+  const headers = Object.keys(data[0]);
+  const lines = [headers.join(",")];
+
+  for (const row of data) {
+    lines.push(headers.map((h) => escapeCSVCell(row[h])).join(","));
+  }
+  download(`${fileName}.csv`, new Blob([lines.join("\n")], { type: "text/csv;charset=utf-8;" }));
+};
+
+export const exportToExcel = exportToCSV;
+
 export const exportToPDF = (data: Record<string, unknown>[], fileName: string) => {
-  const doc = new jsPDF();
+  if (typeof window === "undefined") return;
+  window.print();
+};
 
-  // Add title
-  doc.text(`${fileName.toUpperCase()} LIST`, 14, 15);
+const download = (name: string, blob: Blob) => {
+  if (typeof window === "undefined") return;
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
 
-  // Prepare data for the table
-  const tableData = data.map((item) => [
-    item.name,
-    item.email,
-    item.mobileNumber,
-    item.role,
-    item.status,
-  ]);
-
-  // Add table
-  (doc as any).autoTable({
-    head: [['Name', 'Email', 'Phone', 'Role', 'Status']],
-    body: tableData,
-    startY: 20,
-  });
-
-  doc.save(`${fileName}.pdf`);
+  a.href = url;
+  a.download = name;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
 };

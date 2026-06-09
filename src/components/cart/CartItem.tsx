@@ -1,8 +1,8 @@
 // components/cart/CartItem.tsx
 "use client";
 
-import { Button } from "@nextui-org/button";
-import { Image } from "@nextui-org/image";
+import { Button } from "@heroui/button";
+import { Image } from "@heroui/image";
 import { Minus, Plus, Trash2 } from "lucide-react";
 import { useCart } from "@/src/hooks/useCart";
 import { TCartItem } from "@/src/types";
@@ -26,6 +26,7 @@ export const CartItem = ({ item }: CartItemProps) => {
   const handleIncrease = () => {
     if (item.stock && item.quantity >= item.stock) {
       toast.error("Maximum stock reached");
+
       return;
     }
     updateQuantity(item.productId, item.quantity + 1);

@@ -1,63 +1,62 @@
-import axios from "axios";
-
+import axios, { AxiosError, InternalAxiosRequestConfig } from "axios";
 import envConfig from "@/src/config/envConfig";
-import { getNewAccessToken } from "@/src/services/AuthService";
-import { cookies } from "next/headers";
 
 const axiosInstance = axios.create({
   baseURL: envConfig.baseApi,
+  withCredentials: true, // send httpOnly cookies on every request
 });
 
+type RetryConfig = InternalAxiosRequestConfig & { _retry?: boolean };
+
 axiosInstance.interceptors.request.use(
-  async function (config) {
-    const cookieStore = await cookies();
-    const accessToken = cookieStore.get("accessToken")?.value;
-
-    if (accessToken) {
-      config.headers.Authorization = `Bearer ${accessToken}`;
-    }
-
+  (config) => {
+    // C-10 FIX: access token is now httpOnly. We do NOT read it from JS.
+    // The browser sends it automatically as a cookie. The Authorization
+    // header is reserved for backend-to-backend or service tokens.
     return config;
   },
-  function (error) {
-    return Promise.reject(error);
-  }
+  (error) => Promise.reject(error)
 );
 
 axiosInstance.interceptors.response.use(
-  function (response) {
-    return response;
-  },
-  async function (error) {
-    const config = error.config;
+  (response) => response,
+  async (error: AxiosError) => {
+    const config = error.config as RetryConfig | undefined;
+    const status = error.response?.status;
 
-    if (error?.response?.status === 401 && !config?.sent) {
-      config.sent = true;
-      const res = await getNewAccessToken();
-      const accessToken = res.data.accessToken;
+    if (status === 401 && config && !config._retry) {
+      config._retry = true;
+      try {
+        // Hit the same-origin server action (NOT the backend directly), so the
+        // httpOnly cookie is read by Next.js and used to mint a new access
+        // token that is set as a fresh httpOnly cookie.
+        const res = await fetch("/api/auth/refresh", {
+          method: "POST",
+          credentials: "include",
+        });
 
-      config.headers["Authorization"] = `Bearer ${accessToken}`;
-      const cookieStore = await cookies();
-
-      cookieStore.set("accessToken", accessToken);
-
-      return axiosInstance(config);
-    } else {
-      const data = error.response?.data;
-      let errorMessage = "An unexpected error occurred";
-
-      if (data?.errorSources?.length > 0) {
-        errorMessage = data.errorSources
-          .map((es: { path: string; message: string }) => es.message)
-          .join(". ");
-      } else if (data?.message) {
-        errorMessage = data.message;
-      } else if (error.message) {
-        errorMessage = error.message;
+        if (res.ok) {
+          return axiosInstance(config);
+        }
+      } catch {
+        // fall through to reject
       }
-
-      return Promise.reject(new Error(errorMessage));
     }
+
+    const data = error.response?.data as
+      | { message?: string; errorSources?: Array<{ message: string }> }
+      | undefined;
+    let errorMessage = "An unexpected error occurred";
+
+    if (data?.errorSources?.length) {
+      errorMessage = data.errorSources.map((e) => e.message).join(". ");
+    } else if (data?.message) {
+      errorMessage = data.message;
+    } else if (error.message) {
+      errorMessage = error.message;
+    }
+
+    return Promise.reject(new Error(errorMessage));
   }
 );
 

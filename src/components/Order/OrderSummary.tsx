@@ -1,17 +1,17 @@
 "use client";
-import { Card, CardBody, CardHeader } from "@nextui-org/card";
-import { Button } from "@nextui-org/button";
-import { Image } from "@nextui-org/image";
+
+import { Button } from "@heroui/button";
+import { Card, CardBody, CardHeader } from "@heroui/card";
+import { Image } from "@heroui/image";
+import { Minus, Plus, Trash2 } from "lucide-react";
 
 import { TCartItem } from "@/src/types";
 
-// Define the type for the cart
 interface Cart {
   items: TCartItem[];
   totalPrice: number;
 }
 
-// Define the props for the OrderSummary component
 interface OrderSummaryProps {
   cart: Cart;
   updateQuantity: (productId: string, quantity: number) => void;
@@ -23,69 +23,103 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({
   updateQuantity,
   removeItem,
 }) => {
+  const totalItems = cart.items.reduce((sum, item) => sum + item.quantity, 0);
+
   return (
-    <Card className="shadow-lg">
-      <CardHeader>
-        <h2 className="text-xl font-semibold">Order Summary</h2>
+    <Card className="shadow-sm">
+      <CardHeader className="flex items-center justify-between border-b border-gray-100 dark:border-gray-800">
+        <div>
+          <h2 className="text-xl font-semibold">Order Summary</h2>
+          <p className="text-sm text-gray-500">
+            {totalItems} {totalItems === 1 ? "item" : "items"} in your cart
+          </p>
+        </div>
       </CardHeader>
-      <CardBody>
+      <CardBody className="gap-4">
         {cart.items.length > 0 ? (
           <>
             {cart.items.map((item) => (
               <div
                 key={item.productId}
-                className="flex justify-between items-center mb-4"
+                className="grid grid-cols-[64px_minmax(0,1fr)] gap-4 rounded-lg border border-gray-100 p-3 dark:border-gray-800"
               >
-                <div className="flex items-center gap-4">
-                  <Image
-                    alt={item.name}
-                    className="w-16 h-16 object-cover rounded-lg"
-                    src={item.image || "/placeholder.jpg"}
-                  />
-                  <div>
-                    <h4 className="font-bold">{item.name}</h4>
-                    <p className="text-sm text-gray-500">
-                      ৳{item.price.toFixed(2)}
+                <Image
+                  removeWrapper
+                  alt={item.name}
+                  className="h-16 w-16 rounded-lg object-cover"
+                  src={item.image || "/placeholder.jpg"}
+                />
+                <div className="min-w-0 space-y-3">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <h4 className="truncate font-semibold">{item.name}</h4>
+                      <p className="text-sm text-gray-500">
+                        Tk {item.price.toFixed(2)}
+                      </p>
+                    </div>
+                    <p className="shrink-0 font-semibold">
+                      Tk {(item.price * item.quantity).toFixed(2)}
                     </p>
                   </div>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Button
-                    isDisabled={item.quantity <= 1}
-                    size="sm"
-                    onPress={() =>
-                      updateQuantity(item.productId, item.quantity - 1)
-                    }
-                  >
-                    -
-                  </Button>
-                  <span>{item.quantity}</span>
-                  <Button
-                    size="sm"
-                    onPress={() =>
-                      updateQuantity(item.productId, item.quantity + 1)
-                    }
-                  >
-                    +
-                  </Button>
-                  <Button
-                    color="danger"
-                    size="sm"
-                    variant="light"
-                    onPress={() => removeItem(item.productId)}
-                  >
-                    Remove
-                  </Button>
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="grid h-9 w-28 grid-cols-3 overflow-hidden rounded-md border border-gray-200 dark:border-gray-800">
+                      <Button
+                        isIconOnly
+                        className="h-full min-w-0 rounded-none"
+                        isDisabled={item.quantity <= 1}
+                        size="sm"
+                        variant="light"
+                        onPress={() => updateQuantity(item.productId, item.quantity - 1)}
+                      >
+                        <Minus size={14} />
+                      </Button>
+                      <span className="flex items-center justify-center border-x border-gray-200 text-sm font-semibold dark:border-gray-800">
+                        {item.quantity}
+                      </span>
+                      <Button
+                        isIconOnly
+                        className="h-full min-w-0 rounded-none"
+                        isDisabled={!!item.stock && item.quantity >= item.stock}
+                        size="sm"
+                        variant="light"
+                        onPress={() => updateQuantity(item.productId, item.quantity + 1)}
+                      >
+                        <Plus size={14} />
+                      </Button>
+                    </div>
+                    <Button
+                      isIconOnly
+                      aria-label={`Remove ${item.name}`}
+                      color="danger"
+                      size="sm"
+                      variant="light"
+                      onPress={() => removeItem(item.productId)}
+                    >
+                      <Trash2 size={16} />
+                    </Button>
+                  </div>
                 </div>
               </div>
             ))}
-            <div className="flex justify-between items-center pt-4 border-t dark:border-gray-700">
-              <h4 className="font-bold">Total</h4>
-              <p className="text-lg font-bold">৳{cart.totalPrice.toFixed(2)}</p>
+            <div className="space-y-3 border-t border-gray-100 pt-4 dark:border-gray-800">
+              <div className="flex items-center justify-between text-sm text-gray-500">
+                <span>Subtotal</span>
+                <span>Tk {cart.totalPrice.toFixed(2)}</span>
+              </div>
+              <div className="flex items-center justify-between text-sm text-gray-500">
+                <span>Delivery</span>
+                <span>Calculated after review</span>
+              </div>
+              <div className="flex items-center justify-between pt-2">
+                <h4 className="font-bold">Total</h4>
+                <p className="text-xl font-bold">Tk {cart.totalPrice.toFixed(2)}</p>
+              </div>
             </div>
           </>
         ) : (
-          <p>Your cart is empty.</p>
+          <p className="rounded-lg bg-gray-50 p-4 text-center text-sm text-gray-500 dark:bg-gray-900">
+            Your cart is empty.
+          </p>
         )}
       </CardBody>
     </Card>

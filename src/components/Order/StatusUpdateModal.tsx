@@ -10,8 +10,8 @@ import {
   ModalHeader,
 } from "@heroui/modal";
 import { Chip } from "@heroui/chip";
-import { Button } from "@nextui-org/button";
-import { Input } from "@nextui-org/input";
+import { Button } from "@heroui/button";
+import { Input } from "@heroui/input";
 
 import { ORDER_STATUS, TOrder } from "@/src/types";
 

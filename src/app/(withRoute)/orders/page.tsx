@@ -1,14 +1,14 @@
 "use client";
 import { useUserOrders, useCancelOrder } from "@/src/hooks/useOrder";
 import { TOrder, ORDER_STATUS } from "@/src/types";
-import { Card, CardBody, CardHeader, CardFooter } from "@nextui-org/card";
-import { Button } from "@nextui-org/button";
-import { Image } from "@nextui-org/image";
-import { Spinner } from "@nextui-org/spinner";
-import { Divider } from "@nextui-org/divider";
+import { Card, CardBody, CardHeader, CardFooter } from "@heroui/card";
+import { Button } from "@heroui/button";
+import { Image } from "@heroui/image";
+import { Spinner } from "@heroui/spinner";
+import { Divider } from "@heroui/divider";
 import { useRouter } from "next/navigation";
-import { Badge } from "@nextui-org/badge";
-import { Tooltip } from "@nextui-org/tooltip";
+import { Badge } from "@heroui/badge";
+import { Tooltip } from "@heroui/tooltip";
 import {Chip} from "@heroui/chip";
 import { format } from "date-fns";
 
@@ -24,17 +24,17 @@ const OrderHistoryPage = () => {
 
     switch (status) {
       case "PENDING":
-        return `${baseStyles} bg-yellow-50 text-yellow-800 border border-yellow-200`;
+        return `${baseStyles} bg-yellow-50 dark:bg-yellow-900/20 text-yellow-800 dark:text-yellow-400 border border-yellow-200 dark:border-yellow-900/30`;
       case "PROCESSING":
-        return `${baseStyles} bg-blue-50 text-blue-800 border border-blue-200`;
+        return `${baseStyles} bg-blue-50 dark:bg-blue-900/20 text-blue-800 dark:text-blue-400 border border-blue-200 dark:border-blue-900/30`;
       case "SHIPPED":
-        return `${baseStyles} bg-purple-50 text-purple-800 border border-purple-200`;
+        return `${baseStyles} bg-purple-50 dark:bg-purple-900/20 text-purple-800 dark:text-purple-400 border border-purple-200 dark:border-purple-900/30`;
       case "DELIVERED":
-        return `${baseStyles} bg-green-50 text-green-800 border border-green-200`;
+        return `${baseStyles} bg-green-50 dark:bg-green-900/20 text-green-800 dark:text-green-400 border border-green-200 dark:border-green-900/30`;
       case "CANCELLED":
-        return `${baseStyles} bg-red-50 text-red-800 border border-red-200`;
+        return `${baseStyles} bg-red-50 dark:bg-red-900/20 text-red-800 dark:text-red-400 border border-red-200 dark:border-red-900/30`;
       default:
-        return `${baseStyles} bg-gray-50 text-gray-800 border border-gray-200`;
+        return `${baseStyles} bg-gray-50 dark:bg-gray-800 text-gray-800 dark:text-gray-200 border border-gray-200 dark:border-gray-700`;
     }
   };
 
@@ -70,8 +70,8 @@ const OrderHistoryPage = () => {
   if (error)
     return (
       <div className="flex justify-center items-center min-h-screen">
-        <Card className="max-w-md w-full bg-red-50 border border-red-200">
-          <CardBody className="text-red-600 text-center p-6">
+        <Card className="max-w-md w-full bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-900/30">
+          <CardBody className="text-red-600 dark:text-red-400 text-center p-6">
             <p className="text-lg font-semibold mb-2">Error loading orders</p>
             <p>{error.message}</p>
             <Button
@@ -91,8 +91,8 @@ const OrderHistoryPage = () => {
     <div className="py-8">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Your Orders</h1>
-          <p className="text-gray-500 mt-1">
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-50">Your Orders</h1>
+          <p className="text-gray-500 dark:text-gray-400 mt-1">
             {orders.length} {orders.length === 1 ? "order" : "orders"} placed
           </p>
         </div>
@@ -107,13 +107,13 @@ const OrderHistoryPage = () => {
       </div>
 
       {orders.length === 0 ? (
-        <Card className="w-full border border-dashed border-gray-200 bg-gray-50">
+        <Card className="w-full border border-dashed border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900">
           <CardBody className="text-center py-12">
             <div className="text-gray-400 mb-4 text-5xl">📦</div>
-            <h3 className="text-xl font-semibold text-gray-700 mb-2">
+            <h3 className="text-xl font-semibold text-gray-700 dark:text-gray-300 mb-2">
               No orders yet
             </h3>
-            <p className="text-gray-500 mb-4">
+            <p className="text-gray-500 dark:text-gray-400 mb-4">
               You haven&apost placed any orders yet.
             </p>
             <Button color="primary" onPress={() => router.push("/")}>
@@ -126,12 +126,12 @@ const OrderHistoryPage = () => {
           {orders.map((order: TOrder) => (
             <Card
               key={order._id}
-              className="shadow-sm hover:shadow-md transition-shadow border border-gray-100"
+              className="shadow-sm hover:shadow-md transition-shadow border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900"
             >
               <CardHeader className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 p-6">
                 <div className="space-y-1">
                   <div className="flex items-center gap-3">
-                    <h2 className="text-lg font-semibold text-gray-900">
+                    <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-50">
                       Order #{order._id.slice(0, 8).toUpperCase()}
                     </h2>
                     <Chip
@@ -155,7 +155,7 @@ const OrderHistoryPage = () => {
                       </span>
                     </Chip>
                   </div>
-                  <p className="text-sm text-gray-500">
+                  <p className="text-sm text-gray-500 dark:text-gray-400">
                     Placed on{" "}
                     {format(
                       new Date(order.createdAt),
@@ -164,7 +164,7 @@ const OrderHistoryPage = () => {
                   </p>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-sm font-medium text-gray-700">
+                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
                     Total: ৳{order.totalPrice.toFixed(2)}
                   </span>
                 </div>
@@ -173,11 +173,11 @@ const OrderHistoryPage = () => {
               <Divider />
 
               <CardBody className="p-0">
-                <div className="divide-y divide-gray-100">
+                <div className="divide-y divide-gray-100 dark:divide-gray-800">
                   {order.items.map((item) => (
                     <div
                       key={item.productId}
-                      className="flex p-6 hover:bg-gray-50 transition-colors"
+                      className="flex p-6 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors"
                     >
                       <Badge
                         className="border-2 border-white"
@@ -197,10 +197,10 @@ const OrderHistoryPage = () => {
                         />
                       </Badge>
                       <div className="ml-6 flex-1">
-                        <h4 className="font-medium text-gray-900">
+                        <h4 className="font-medium text-gray-900 dark:text-gray-50">
                           {item.name}
                         </h4>
-                        <p className="text-sm text-gray-500 mt-1">
+                        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
                           ৳{item.price.toFixed(2)} each
                         </p>
                         <div className="mt-3 flex gap-2">
@@ -267,7 +267,7 @@ const OrderHistoryPage = () => {
                                       : "bg-red-500"
                             }`}
                           />
-                          <span className="text-sm text-gray-600">
+                          <span className="text-sm text-gray-600 dark:text-gray-400">
                             {history.status}
                           </span>
                         </div>

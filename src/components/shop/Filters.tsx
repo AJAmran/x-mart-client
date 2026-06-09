@@ -3,9 +3,9 @@
 import { useState, useCallback, useEffect, useMemo } from "react";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import { debounce } from "lodash";
-import { Card, CardBody } from "@nextui-org/card";
-import { Select, SelectItem } from "@nextui-org/select";
-import { Button } from "@nextui-org/button";
+import { Card, CardBody } from "@heroui/card";
+import { Select, SelectItem } from "@heroui/select";
+import { Button } from "@heroui/button";
 import { Slider } from "@heroui/slider";
 import { Category } from "@/src/data/CategoriesData";
 import { RefreshCw } from "lucide-react";
@@ -136,14 +136,14 @@ export default function Filters({ categories, initialFilters }: FiltersProps) {
     router.push(pathname, { scroll: false });
   }, [initialFilters, router, pathname]);
 
-  // Auto-apply filters on change
+  // Auto-apply filters on change (only when local filter state changes, not when URL changes via pagination)
   useEffect(() => {
     updateURL();
 
     return () => {
-      updateURL.cancel(); // Cancel debounced calls on unmount
+      updateURL.cancel();
     };
-  }, [memoizedFilters, sortBy, sortOrder, updateURL]);
+  }, [memoizedFilters, sortBy, sortOrder]);
 
   return (
     <Card

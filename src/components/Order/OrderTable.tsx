@@ -2,7 +2,7 @@ import { useState } from "react";
 import { format } from "date-fns";
 import { ArrowDown, ArrowUp, Calendar } from "lucide-react";
 
-import { Button } from "@nextui-org/button";
+import { Button } from "@heroui/button";
 import { Chip } from "@heroui/chip";
 import { Pagination } from "@heroui/pagination";
 import { Tooltip } from "@heroui/tooltip";

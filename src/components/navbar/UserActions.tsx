@@ -2,8 +2,8 @@
 "use client";
 
 import React from "react";
-import { NavbarItem } from "@nextui-org/navbar";
-import { Link } from "@nextui-org/link";
+import { NavbarItem } from "@heroui/navbar";
+import { Link } from "@heroui/link";
 import { MyButton } from "../UI/MyButton";
 import { UserIcon } from "lucide-react";
 import { ThemeSwitch } from "../theme-switch";

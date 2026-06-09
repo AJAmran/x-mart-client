@@ -1,8 +1,9 @@
 "use client";
 
 import { useMemo } from "react";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import { motion } from "framer-motion";
+import { Pagination } from "@heroui/pagination";
 import ProductCard from "@/src/components/UI/ProductCard";
 import { useProducts } from "@/src/hooks/useProducts";
 import { TProduct } from "@/src/types";
@@ -19,6 +20,8 @@ interface ProductGridProps {
 }
 
 export default function ProductGrid({ initialFilters }: ProductGridProps) {
+  const router = useRouter();
+  const pathname = usePathname();
   const searchParams = useSearchParams();
   const page = Number(searchParams.get("page")) || 1;
   const limit = 12;
@@ -40,6 +43,19 @@ export default function ProductGrid({ initialFilters }: ProductGridProps) {
   });
 
   const productList = useMemo(() => data?.data || [], [data]);
+  const total = data?.meta?.total ?? 0;
+  const totalPages = Math.max(1, Math.ceil(total / limit));
+
+  const handlePageChange = (newPage: number) => {
+    const params = new URLSearchParams(searchParams.toString());
+
+    if (newPage <= 1) {
+      params.delete("page");
+    } else {
+      params.set("page", newPage.toString());
+    }
+    router.push(`${pathname}?${params.toString()}`, { scroll: false });
+  };
 
   if (isLoading) {
     return (
@@ -68,17 +84,30 @@ export default function ProductGrid({ initialFilters }: ProductGridProps) {
   }
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-      {productList.map((product: TProduct, index: number) => (
-        <motion.div
-          key={product._id}
-          animate={{ opacity: 1, y: 0 }}
-          initial={{ opacity: 0, y: 20 }}
-          transition={{ duration: 0.3, delay: index * 0.1 }}
-        >
-          <ProductCard product={product} onPress={() => {}} />
-        </motion.div>
-      ))}
-    </div>
+    <>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        {productList.map((product: TProduct, index: number) => (
+          <motion.div
+            key={product._id}
+            animate={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0, y: 20 }}
+            transition={{ duration: 0.3, delay: index * 0.1 }}
+          >
+            <ProductCard product={product} onPress={() => {}} />
+          </motion.div>
+        ))}
+      </div>
+      {totalPages > 1 && (
+        <div className="flex justify-center mt-8">
+          <Pagination
+            showControls
+            aria-label="Product pagination"
+            page={page}
+            total={totalPages}
+            onChange={handlePageChange}
+          />
+        </div>
+      )}
+    </>
   );
 }

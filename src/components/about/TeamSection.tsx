@@ -1,8 +1,8 @@
 "use client";
 
-import { Card, CardBody } from "@nextui-org/card";
-import { Image } from "@nextui-org/image";
-import { Tooltip } from "@nextui-org/tooltip";
+import { Card, CardBody } from "@heroui/card";
+import { Image } from "@heroui/image";
+import { Tooltip } from "@heroui/tooltip";
 import { motion, Variants } from "framer-motion";
 import { Github, Linkedin, Twitter } from "lucide-react";
 import { useMemo } from "react";

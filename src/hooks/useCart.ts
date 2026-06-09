@@ -2,7 +2,23 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { TCart, TCartItem } from "../types";
-import { syncCartWithBackend } from "@/src/services/CartService";
+import axiosInstance from "@/src/lib/axios";
+
+const syncWithBackend = async () => {
+  if (typeof window === "undefined") return;
+
+  const localCart = JSON.parse(localStorage.getItem("cart") || "[]");
+
+  if (localCart.length > 0) {
+    await axiosInstance.post(`/cart`, { items: localCart });
+  }
+};
+
+const syncCartQuietly = () => {
+  void syncWithBackend().catch(() => {
+    // Cart is still safely stored in localStorage if backend sync is unavailable.
+  });
+};
 
 export const useCart = () => {
   const queryClient = useQueryClient();
@@ -53,7 +69,13 @@ export const useCart = () => {
 
   // Add item to cart
   const addItem = (item: TCartItem) => {
-    if (!cart) return;
+    if (!cart) return false;
+
+    if (typeof item.stock === "number" && item.stock <= 0) {
+      toast.error(`${item.name} is out of stock.`);
+
+      return false;
+    }
 
     const existingItem = cart.items.find(
       (i) => i.productId === item.productId
@@ -61,9 +83,17 @@ export const useCart = () => {
     let updatedItems: TCartItem[];
 
     if (existingItem) {
+      const nextQuantity = existingItem.quantity + item.quantity;
+
+      if (typeof item.stock === "number" && nextQuantity > item.stock) {
+        toast.error(`Only ${item.stock} unit${item.stock === 1 ? "" : "s"} of ${item.name} available.`);
+
+        return false;
+      }
+
       updatedItems = cart.items.map((i) =>
         i.productId === item.productId
-          ? { ...i, quantity: i.quantity + item.quantity }
+          ? { ...i, quantity: nextQuantity, stock: item.stock ?? i.stock }
           : i
       );
     } else {
@@ -72,10 +102,12 @@ export const useCart = () => {
 
     updateCartMutation.mutate(updatedItems, {
       onSuccess: () => {
-        try { syncCartWithBackend(); } catch { /* silently fail */ }
+        syncCartQuietly();
       }
     });
     toast.success(`${item.name} added to cart!`);
+
+    return true;
   };
 
   // Remove item from cart
@@ -88,7 +120,7 @@ export const useCart = () => {
 
     updateCartMutation.mutate(updatedItems, {
       onSuccess: () => {
-        try { syncCartWithBackend(); } catch { /* silently fail */ }
+        syncCartQuietly();
       }
     });
     toast.success("Item removed from cart!");
@@ -104,13 +136,29 @@ export const useCart = () => {
       return;
     }
 
+    const cartItem = cart.items.find((item) => item.productId === productId);
+
+    if (!cartItem) return;
+
+    if (typeof cartItem.stock === "number" && cartItem.stock <= 0) {
+      toast.error(`${cartItem.name} is out of stock.`);
+
+      return;
+    }
+
+    if (typeof cartItem.stock === "number" && quantity > cartItem.stock) {
+      toast.error(`Only ${cartItem.stock} unit${cartItem.stock === 1 ? "" : "s"} of ${cartItem.name} available.`);
+
+      return;
+    }
+
     const updatedItems = cart.items.map((item) =>
       item.productId === productId ? { ...item, quantity } : item
     );
 
     updateCartMutation.mutate(updatedItems, {
       onSuccess: () => {
-        try { syncCartWithBackend(); } catch { /* silently fail */ }
+        syncCartQuietly();
       }
     });
   };
@@ -119,7 +167,7 @@ export const useCart = () => {
   const clearCart = () => {
     updateCartMutation.mutate([], {
       onSuccess: () => {
-        try { syncCartWithBackend(); } catch { /* silently fail */ }
+        syncCartQuietly();
       }
     });
     toast.success("Cart cleared!");

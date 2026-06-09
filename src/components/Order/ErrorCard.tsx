@@ -1,5 +1,5 @@
-import { Card, CardBody } from "@nextui-org/card";
-import { Button } from "@nextui-org/button";
+import { Card, CardBody } from "@heroui/card";
+import { Button } from "@heroui/button";
 
 interface ErrorCardProps {
   error: any;

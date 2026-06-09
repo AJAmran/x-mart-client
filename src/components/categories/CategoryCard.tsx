@@ -1,8 +1,8 @@
 "use client";
 
 import { PRODUCT_CATEGORY } from "@/src/constants";
-import { Card, CardBody } from "@nextui-org/card";
-import { Image } from "@nextui-org/image";
+import { Card, CardBody } from "@heroui/card";
+import { Image } from "@heroui/image";
 import Link from "next/link";
 import NextImage from "next/image";
 

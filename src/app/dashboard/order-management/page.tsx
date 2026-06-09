@@ -1,8 +1,8 @@
 "use client";
 import { useState } from "react";
 import { useOrders, useUpdateOrderStatus } from "@/src/hooks/useOrder";
-import { Button } from "@nextui-org/button";
-import { Spinner } from "@nextui-org/spinner";
+import { Button } from "@heroui/button";
+import { Spinner } from "@heroui/spinner";
 import { RefreshCw } from "lucide-react";
 import ErrorCard from "@/src/components/Order/ErrorCard";
 import FilterBar from "@/src/components/Order/FilterBar";

@@ -1,422 +1,114 @@
-"use client";
+import { Suspense } from "react";
+import { Metadata } from "next";
+import { headers } from "next/headers";
+import { notFound } from "next/navigation";
 
-import { useParams } from "next/navigation";
-import { useEffect, useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
-import Link from "next/link";
-import Head from "next/head";
-
-import { Badge } from "@nextui-org/badge";
-import { Button } from "@nextui-org/button";
-import { Image } from "@nextui-org/image";
-import { Input } from "@nextui-org/input";
-import { ChevronRight, Share2, ShoppingCart, X, AlertTriangle } from "lucide-react";
-import { toast } from "sonner";
-
-import CardSkeletons from "@/src/components/CardSkeleton";
-import ProductCard from "@/src/components/UI/ProductCard";
-import { useCart } from "@/src/hooks/useCart";
-import { useProductById, useProducts } from "@/src/hooks/useProducts";
+import envConfig from "@/src/config/envConfig";
+import { siteConfig } from "@/src/config/site";
 import { TProduct } from "@/src/types";
-import { Skeleton } from "@heroui/skeleton";
-import useEmblaCarousel from "embla-carousel-react";
-import Autoplay from "embla-carousel-autoplay";
+import ProductDetailsClient from "./ProductDetailsClient";
 
-const ProductDetailsPage = () => {
-  const { id } = useParams();
-  const [isAddingToCart, setIsAddingToCart] = useState(false);
-  const [isImageViewerOpen, setIsImageViewerOpen] = useState(false);
-  const [shareUrl, setShareUrl] = useState("");
-  const [quantity, setQuantity] = useState(1);
-  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
-  const { addItem } = useCart();
+interface ProductResponse {
+  data?: TProduct;
+}
 
-  // Fetch product details
-  const { data: response, isError, isLoading } = useProductById(id as string);
-  const product = response?.data;
+const fetchProduct = async (id: string): Promise<TProduct | null> => {
+  try {
+    const cookieHeader = (await headers()).get("cookie") ?? "";
+    const res = await fetch(`${envConfig.baseApi}/products/${id}`, {
+      headers: { cookie: cookieHeader },
+      next: { revalidate: 60, tags: [`product:${id}`] },
+    });
 
-  // Fetch relevant products
-  const { data: relevantProductsResponse } = useProducts(
-    { category: product?.category },
-    { limit: 12, page: 1, sortBy: "createdAt", sortOrder: "desc" }
-  );
+    if (!res.ok) return null;
+    const json = (await res.json()) as ProductResponse;
 
-  // Filter out current product
-  const relevantProducts = (relevantProductsResponse?.data || []).filter(
-    (p: TProduct) => p._id !== product?._id
-  );
+    return json.data ?? null;
+  } catch {
+    return null;
+  }
+};
 
-  // Set share URL
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      setShareUrl(window.location.href);
-    }
-  }, []);
+export const revalidate = 60;
+export const dynamicParams = true;
 
-  const totalStock = (product?.inventories || []).reduce((sum: number, inv: { stock: number }) => sum + inv.stock, 0);
+// High-priority fix: per-product dynamic metadata (replaces the old
+// `next/head` import which is a Pages-Router API that has no effect in the
+// App Router).
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}): Promise<Metadata> {
+  const { id } = await params;
+  const product = await fetchProduct(id);
 
-  const handleQuantityChange = (value: number) => {
-    if (value >= 1 && value <= totalStock) {
-      setQuantity(value);
-    }
+  if (!product) {
+    return { title: "Product unavailable" };
+  }
+
+  return {
+    title: product.name,
+    description: product.description,
+    alternates: { canonical: `${siteConfig.url}/product/${id}` },
+    openGraph: {
+      title: product.name,
+      description: product.description,
+      url: `${siteConfig.url}/product/${id}`,
+      images: product.images?.length ? [{ url: product.images[0] }] : undefined,
+      type: "website",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: product.name,
+      description: product.description,
+      images: product.images?.slice(0, 1),
+    },
   };
+}
 
-  const handleAddToCart = () => {
-    if (quantity > totalStock) {
-      toast.error("Insufficient stock");
+const ProductPage = async ({ params }: { params: Promise<{ id: string }> }) => {
+  const { id } = await params;
+  const product = await fetchProduct(id);
 
-      return;
-    }
-    setIsAddingToCart(true);
-    const cartItem = {
-      productId: product._id,
-      quantity,
+  if (!product) notFound();
+
+  // JSON-LD product schema for rich snippets
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    name: product.name,
+    image: product.images,
+    description: product.description,
+    sku: product.sku ?? product._id,
+    offers: {
+      "@type": "Offer",
+      priceCurrency: "BDT",
       price: product.price,
-      name: product.name,
-      image: product.images?.[0] || "/placeholder.jpg",
-    };
-
-    addItem(cartItem);
-    toast.success(`${product?.name} added to cart!`);
-    setTimeout(() => {
-      setIsAddingToCart(false);
-    }, 1000);
+      availability:
+        (product.stock ?? 0) > 0
+          ? "https://schema.org/InStock"
+          : "https://schema.org/OutOfStock",
+    },
   };
-
-  const handleShare = async () => {
-    try {
-      await navigator.share({
-        title: product?.name,
-        text: product?.description,
-        url: shareUrl,
-      });
-      toast.success("Shared successfully!");
-    } catch {
-      navigator.clipboard.writeText(shareUrl);
-      toast.success("Link copied to clipboard!");
-    }
-  };
-
-  const handleImageClick = () => setIsImageViewerOpen(true);
-
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter" || e.key === " ") {
-      setIsImageViewerOpen(true);
-    }
-  };
-
-  // Image Carousel for Viewer
-  const [emblaRef, emblaApi] = useEmblaCarousel(
-    { loop: true, startIndex: selectedImageIndex },
-    [Autoplay({ delay: 5000, stopOnInteraction: true })]
-  );
-
-  // Skeleton loader
-  if (isLoading) {
-    return (
-      <div className="container mx-auto px-4 py-8">
-        <div className="mb-6 flex items-center text-sm text-gray-500 dark:text-gray-400">
-          <Skeleton className="h-4 w-20 rounded bg-gray-200 dark:bg-gray-700" />
-          <ChevronRight className="mx-2" size={14} />
-          <Skeleton className="h-4 w-20 rounded bg-gray-200 dark:bg-gray-700" />
-          <ChevronRight className="mx-2" size={14} />
-          <Skeleton className="h-4 w-40 rounded bg-gray-200 dark:bg-gray-700" />
-        </div>
-        <div className="mb-12 grid grid-cols-1 gap-6 lg:grid-cols-2">
-          <div className="space-y-4">
-            <Skeleton className="h-[400px] w-full rounded-xl bg-gray-200 dark:bg-gray-700 sm:h-[500px]" />
-            <div className="flex gap-2">
-              <Skeleton className="h-20 w-20 rounded bg-gray-200 dark:bg-gray-700" />
-              <Skeleton className="h-20 w-20 rounded bg-gray-200 dark:bg-gray-700" />
-              <Skeleton className="h-20 w-20 rounded bg-gray-200 dark:bg-gray-700" />
-            </div>
-          </div>
-          <div className="space-y-6">
-            <Skeleton className="h-10 w-3/4 rounded-md bg-gray-200 dark:bg-gray-700" />
-            <Skeleton className="h-20 w-full rounded-md bg-gray-200 dark:bg-gray-700" />
-            <div className="flex items-center gap-4">
-              <Skeleton className="h-8 w-20 rounded-md bg-gray-200 dark:bg-gray-700" />
-              <Skeleton className="h-6 w-16 rounded-md bg-gray-200 dark:bg-gray-700" />
-            </div>
-            <Skeleton className="h-6 w-24 rounded-md bg-gray-200 dark:bg-gray-700" />
-            <div className="flex gap-4">
-              <Skeleton className="h-12 w-1/2 rounded-md bg-gray-200 dark:bg-gray-700" />
-              <Skeleton className="h-12 w-1/4 rounded-md bg-gray-200 dark:bg-gray-700" />
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  if (isError || !product) {
-    return (
-      <div className="flex h-screen items-center justify-center text-gray-600 dark:text-gray-300">
-        Failed to load product details.
-      </div>
-    );
-  }
-
-  const images = product.images || ["/placeholder.jpg"];
-  const finalPrice = product.discount?.value
-    ? product.price * (1 - product.discount.value / 100)
-    : product.price;
 
   return (
     <>
-      <Head>
-        <title>{`${product.name} | X-mart`}</title>
-        <meta content={product.description} name="description" />
-        <meta content={`${product.name}, ${product.category}, buy online, groceries`} name="keywords" />
-        <meta content={product.name} property="og:title" />
-        <meta content={product.description} property="og:description" />
-        <meta content={images[0]} property="og:image" />
-        <meta content={shareUrl} property="og:url" />
-        <meta content="summary_large_image" name="twitter:card" />
-        <script
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              "@context": "https://schema.org",
-              "@type": "Product",
-              name: product.name,
-              image: images,
-              description: product.description,
-              sku: product._id,
-              offers: {
-                "@type": "Offer",
-                url: shareUrl,
-                priceCurrency: "USD",
-                price: finalPrice.toFixed(2),
-                itemCondition: "https://schema.org/NewCondition",
-                availability: totalStock > 0 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
-              },
-            }),
-          }}
-          type="application/ld+json"
-        />
-      </Head>
-      <div className="container mx-auto px-4 py-8">
-        {/* Breadcrumb */}
-        <motion.div
-          animate={{ opacity: 1, y: 0 }}
-          className="mb-6 flex items-center text-sm text-gray-500 dark:text-gray-400"
-          initial={{ opacity: 0, y: -10 }}
-          transition={{ duration: 0.3 }}
-        >
-          <Link className="transition-colors hover:text-gray-900 dark:hover:text-gray-100" href="/">
-            Home
-          </Link>
-          <ChevronRight className="mx-2" size={14} />
-          <Link className="transition-colors hover:text-gray-900 dark:hover:text-gray-100" href="/shop">
-            Products
-          </Link>
-          <ChevronRight className="mx-2" size={14} />
-          <Link
-            className="transition-colors hover:text-gray-900 dark:hover:text-gray-100"
-            href={`/shop?category=${product.category}`}
-          >
-            {product.category}
-          </Link>
-          <ChevronRight className="mx-2" size={14} />
-          <span className="text-gray-900 dark:text-gray-100">{product.name}</span>
-        </motion.div>
-
-        {/* Product Details Section */}
-        <motion.div
-          animate={{ opacity: 1 }}
-          className="mb-12 grid grid-cols-1 gap-8 lg:grid-cols-2"
-          initial={{ opacity: 0 }}
-          transition={{ duration: 0.5 }}
-        >
-          {/* Image Gallery */}
-          <div className="space-y-4">
-            <div
-              aria-label="Open image viewer"
-              className="relative flex cursor-pointer items-center justify-center rounded-xl bg-white p-4 shadow-md sm:p-6 dark:bg-gray-800"
-              role="button"
-              tabIndex={0}
-              onClick={handleImageClick}
-              onKeyDown={handleKeyDown}
-            >
-              <Badge
-                className="absolute top-4 right-4 text-sm"
-                color={totalStock > 0 ? "success" : "warning"}
-                content={totalStock > 0 ? "In Stock" : "Out of Stock"}
-                variant="flat"
-              >
-                <Image
-                  isZoomed
-                  alt={product.name}
-                  className="max-h-[400px] w-full object-contain transition-transform duration-300 hover:scale-105 sm:max-h-[500px]"
-                  height={600}
-                  src={images[selectedImageIndex]}
-                  width={600}
-                />
-              </Badge>
-            </div>
-            {images.length > 1 && (
-              <div className="flex gap-2 overflow-x-auto pb-2">
-                {images.map((img: string | undefined, idx: number) => (
-                  <Image
-                    key={idx}
-                    alt={`${product.name} thumbnail ${idx + 1}`}
-                    className={`cursor-pointer rounded-md object-cover ${idx === selectedImageIndex ? "border-2 border-primary" : "opacity-70"}`}
-                    height={80}
-                    src={img}
-                    width={80}
-                    onClick={() => setSelectedImageIndex(idx)}
-                  />
-                ))}
-              </div>
-            )}
+      <script
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        type="application/ld+json"
+      />
+      <Suspense
+        fallback={
+          <div className="container mx-auto px-4 py-8">
+            <p className="text-gray-500">Loading product…</p>
           </div>
-
-          {/* Product Info */}
-          <div className="space-y-6">
-            <h1 className="text-3xl font-bold leading-tight text-gray-900 dark:text-gray-100 sm:text-4xl">
-              {product.name}
-            </h1>
-            <p className="leading-relaxed text-base text-gray-600 dark:text-gray-300 sm:text-lg">
-              {product.description}
-            </p>
-
-            {/* Price Section */}
-            <div className="flex items-center gap-4">
-              <span className="text-2xl font-bold text-green-600 dark:text-green-500 sm:text-3xl">
-                ৳{finalPrice.toFixed(2)}
-              </span>
-              {product.discount?.value && (
-                <>
-                  <span className="text-lg line-through text-gray-500 dark:text-gray-400">
-                    ৳{product.price.toFixed(2)}
-                  </span>
-                  <span className="text-sm font-medium text-red-500 dark:text-red-400">
-                    -{product.discount.value}%
-                  </span>
-                </>
-              )}
-            </div>
-
-            {/* Stock Info */}
-            {totalStock > 0 && totalStock <= 10 && (
-              <div className="flex items-center gap-2 text-sm text-orange-500">
-                <AlertTriangle size={16} />
-                <span>Only {totalStock} left in stock - order soon!</span>
-              </div>
-            )}
-
-            {/* Quantity Selector */}
-            <div className="flex items-center gap-4">
-              <Input
-                className="w-32"
-                isDisabled={product.stock <= 0}
-                label="Quantity"
-                max={product.stock}
-                min={1}
-                type="number"
-                value={quantity.toString()}
-                onChange={(e) => handleQuantityChange(parseInt(e.target.value) || 1)}
-              />
-            </div>
-
-            {/* Action Buttons */}
-            <div className="flex flex-col gap-4 sm:flex-row">
-              <Button
-                className="h-12 w-full rounded-xl text-base font-medium sm:flex-1 sm:text-lg"
-                color="primary"
-                isDisabled={totalStock <= 0}
-                isLoading={isAddingToCart}
-                startContent={<ShoppingCart size={20} />}
-                variant="solid"
-                onPress={handleAddToCart}
-              >
-                {totalStock > 0 ? "Add to Cart" : "Out of Stock"}
-              </Button>
-              <Button
-                className="h-12 w-full rounded-xl text-base font-medium sm:w-auto sm:text-lg"
-                color="secondary"
-                startContent={<Share2 size={20} />}
-                variant="bordered"
-                onPress={handleShare}
-              >
-                Share
-              </Button>
-            </div>
-          </div>
-        </motion.div>
-
-        {/* Relevant Products Section */}
-        <motion.div
-          animate={{ opacity: 1, y: 0 }}
-          className="mt-12"
-          initial={{ opacity: 0, y: 20 }}
-          transition={{ delay: 0.2, duration: 0.5 }}
-        >
-          <h2 className="mb-6 text-2xl font-bold text-gray-900 dark:text-gray-100 sm:text-3xl">
-            You Might Also Like
-          </h2>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6 md:grid-cols-3 lg:grid-cols-4">
-            {relevantProductsResponse?.isLoading
-              ? Array.from({ length: 4 }).map((_, i) => (
-                <CardSkeletons key={i} />
-              ))
-              : relevantProducts.map((product: TProduct) => (
-                <ProductCard
-                  key={product._id}
-                  product={product}
-                  onPress={() =>
-                    (window.location.href = `/product/${product._id}`)
-                  }
-                />
-              ))}
-          </div>
-        </motion.div>
-      </div>
-
-      {/* Full-Screen Image Viewer */}
-      <AnimatePresence>
-        {isImageViewerOpen && (
-          <motion.div
-            animate={{ opacity: 1 }}
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4"
-            exit={{ opacity: 0 }}
-            initial={{ opacity: 0 }}
-            onClick={() => setIsImageViewerOpen(false)}
-          >
-            <motion.div
-              animate={{ scale: 1 }}
-              className="relative flex h-full w-full max-w-4xl items-center justify-center"
-              exit={{ scale: 0.8 }}
-              initial={{ scale: 0.8 }}
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div ref={emblaRef} className="overflow-hidden">
-                <div className="flex">
-                  {images.map((img: string | undefined, idx: number) => ( // Changed type of idx to number
-                    <div key={idx} className="min-w-full">
-                      <Image
-                        alt={`${product.name} ${idx + 1}`}
-                        className="max-h-[90vh] w-full object-contain"
-                        src={img}
-                      />
-                    </div>
-                  ))}
-                </div>
-              </div>
-              <Button
-                isIconOnly
-                className="absolute right-2 top-2 rounded-full"
-                color="danger"
-                onPress={() => setIsImageViewerOpen(false)}
-              >
-                <X size={24} />
-              </Button>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+        }
+      >
+        <ProductDetailsClient product={product} />
+      </Suspense>
     </>
   );
 };
 
-export default ProductDetailsPage;
+export default ProductPage;

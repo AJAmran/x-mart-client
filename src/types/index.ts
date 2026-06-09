@@ -41,6 +41,7 @@ export type TProduct = {
   category: keyof typeof PRODUCT_CATEGORY;
   subCategory?: string;
   status: keyof typeof PRODUCT_STATUS;
+  stock?: number;
   inventories: TInventory[];
   images: string[];
   discount?: TDiscount;

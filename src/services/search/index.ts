@@ -1,6 +1,6 @@
 "use server";
 
-import axiosInstance from "@/src/lib/axios";
+import axiosInstance from "@/src/lib/serverAxios";
 
 export const searchItems = async (searchTerm: string) => {
   try {

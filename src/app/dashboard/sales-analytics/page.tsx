@@ -1,10 +1,10 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { Card, CardBody, CardHeader } from "@nextui-org/card";
+import { Card, CardBody, CardHeader } from "@heroui/card";
 import { Chip } from "@heroui/chip";
 import { Skeleton } from "@heroui/skeleton";
-import { Button } from "@nextui-org/button";
+import { Button } from "@heroui/button";
 import {
   TrendingUp,
   TrendingDown,
@@ -12,7 +12,6 @@ import {
   ShoppingCart,
   BarChart3,
   RefreshCw,
-  Download,
   Calendar,
 } from "lucide-react";
 import {
@@ -28,7 +27,6 @@ import {
   PieChart,
   Pie,
   Cell,
-  Legend,
 } from "recharts";
 import { useOrders } from "@/src/hooks/useOrder";
 
@@ -50,16 +48,21 @@ export default function SalesAnalyticsPage() {
     if (!ordersRes?.data) return [];
     let items = [...ordersRes.data];
     const now = new Date();
+
     if (dateRange === "7d") {
       const cutoff = new Date(now.getTime() - 7 * 86400000);
+
       items = items.filter((o: any) => new Date(o.createdAt) >= cutoff);
     } else if (dateRange === "30d") {
       const cutoff = new Date(now.getTime() - 30 * 86400000);
+
       items = items.filter((o: any) => new Date(o.createdAt) >= cutoff);
     } else if (dateRange === "90d") {
       const cutoff = new Date(now.getTime() - 90 * 86400000);
+
       items = items.filter((o: any) => new Date(o.createdAt) >= cutoff);
     }
+
     return items;
   }, [ordersRes, dateRange]);
 
@@ -74,28 +77,37 @@ export default function SalesAnalyticsPage() {
 
   const revenueByStatus = useMemo(() => {
     const map: Record<string, number> = {};
+
     orders.forEach((o: any) => {
       const status = o.status || "UNKNOWN";
+
       map[status] = (map[status] || 0) + (o.totalAmount || o.totalPrice || 0);
     });
+
     return Object.entries(map).map(([name, value]) => ({ name, value }));
   }, [orders]);
 
   const ordersByStatus = useMemo(() => {
     const map: Record<string, number> = {};
+
     orders.forEach((o: any) => {
       const status = o.status || "UNKNOWN";
+
       map[status] = (map[status] || 0) + 1;
     });
+
     return Object.entries(map).map(([name, value]) => ({ name, value }));
   }, [orders]);
 
   const dailyRevenue = useMemo(() => {
     const map: Record<string, number> = {};
+
     orders.forEach((o: any) => {
       const date = new Date(o.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric" });
+
       map[date] = (map[date] || 0) + (o.totalAmount || o.totalPrice || 0);
     });
+
     return Object.entries(map)
       .map(([date, revenue]) => ({ date, revenue }))
       .slice(-14);
@@ -103,10 +115,13 @@ export default function SalesAnalyticsPage() {
 
   const dailyOrders = useMemo(() => {
     const map: Record<string, number> = {};
+
     orders.forEach((o: any) => {
       const date = new Date(o.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric" });
+
       map[date] = (map[date] || 0) + 1;
     });
+
     return Object.entries(map)
       .map(([date, count]) => ({ date, count }))
       .slice(-14);
@@ -123,9 +138,9 @@ export default function SalesAnalyticsPage() {
           {(["7d", "30d", "90d", "all"] as const).map((range) => (
             <Button
               key={range}
+              color={dateRange === range ? "primary" : "default"}
               size="sm"
               variant={dateRange === range ? "solid" : "flat"}
-              color={dateRange === range ? "primary" : "default"}
               onPress={() => setDateRange(range)}
             >
               <Calendar className="w-3.5 h-3.5 mr-1" />
@@ -199,9 +214,9 @@ export default function SalesAnalyticsPage() {
         <Card className="shadow-sm">
           <CardHeader><h3 className="text-lg font-bold">Daily Revenue</h3></CardHeader>
           <CardBody>
-            <ResponsiveContainer width="100%" height={300}>
+            <ResponsiveContainer height={300} width="100%">
               <BarChart data={dailyRevenue}>
-                <CartesianGrid strokeDasharray="3 3" opacity={0.3} />
+                <CartesianGrid opacity={0.3} strokeDasharray="3 3" />
                 <XAxis dataKey="date" tick={{ fontSize: 12 }} />
                 <YAxis tick={{ fontSize: 12 }} />
                 <Tooltip formatter={(value) => [`৳${Number(value).toLocaleString()}`, "Revenue"]} />
@@ -214,13 +229,13 @@ export default function SalesAnalyticsPage() {
         <Card className="shadow-sm">
           <CardHeader><h3 className="text-lg font-bold">Daily Orders</h3></CardHeader>
           <CardBody>
-            <ResponsiveContainer width="100%" height={300}>
+            <ResponsiveContainer height={300} width="100%">
               <LineChart data={dailyOrders}>
-                <CartesianGrid strokeDasharray="3 3" opacity={0.3} />
+                <CartesianGrid opacity={0.3} strokeDasharray="3 3" />
                 <XAxis dataKey="date" tick={{ fontSize: 12 }} />
                 <YAxis tick={{ fontSize: 12 }} />
                 <Tooltip />
-                <Line type="monotone" dataKey="count" stroke="#10b981" strokeWidth={2} dot={{ fill: "#10b981" }} />
+                <Line dataKey="count" dot={{ fill: "#10b981" }} stroke="#10b981" strokeWidth={2} type="monotone" />
               </LineChart>
             </ResponsiveContainer>
           </CardBody>
@@ -229,17 +244,17 @@ export default function SalesAnalyticsPage() {
         <Card className="shadow-sm">
           <CardHeader><h3 className="text-lg font-bold">Revenue by Status</h3></CardHeader>
           <CardBody>
-            <ResponsiveContainer width="100%" height={300}>
+            <ResponsiveContainer height={300} width="100%">
               <PieChart>
                 <Pie
-                  data={revenueByStatus}
                   cx="50%"
                   cy="50%"
+                  data={revenueByStatus}
+                  dataKey="value"
                   innerRadius={60}
+                  label={({ name, percent }) => `${name} ${((percent ?? 0) * 100).toFixed(0)}%`}
                   outerRadius={100}
                   paddingAngle={4}
-                  dataKey="value"
-                  label={({ name, percent }) => `${name} ${((percent ?? 0) * 100).toFixed(0)}%`}
                 >
                   {revenueByStatus.map((_, index) => (
                     <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />

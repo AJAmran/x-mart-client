@@ -1,7 +1,7 @@
 "use client";
 
 import { FC, useMemo } from "react";
-import { Card, CardHeader, CardBody } from "@nextui-org/card";
+import { Card, CardHeader, CardBody } from "@heroui/card";
 import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from "@heroui/table";
 import { Skeleton } from "@heroui/skeleton";
 import { ChartIcon, FunnelIcon, ProfileIcon } from "@/src/components/icons";
@@ -46,12 +46,15 @@ const DashboardHome: FC = () => {
 
   const chartData = useMemo(() => {
     const map: Record<string, { revenue: number; orders: number }> = {};
+
     orders.forEach((o: any) => {
       const date = new Date(o.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric" });
+
       if (!map[date]) map[date] = { revenue: 0, orders: 0 };
       map[date].revenue += o.totalAmount || o.total || 0;
       map[date].orders += 1;
     });
+
     return Object.entries(map)
       .map(([date, val]) => ({ date, ...val }))
       .slice(-7);
@@ -142,9 +145,9 @@ const DashboardHome: FC = () => {
             ) : chartData.length === 0 ? (
               <p className="text-default-400 text-sm text-center py-16">No data available</p>
             ) : (
-              <ResponsiveContainer width="100%" height={250}>
+              <ResponsiveContainer height={250} width="100%">
                 <BarChart data={chartData}>
-                  <CartesianGrid strokeDasharray="3 3" opacity={0.3} />
+                  <CartesianGrid opacity={0.3} strokeDasharray="3 3" />
                   <XAxis dataKey="date" tick={{ fontSize: 11 }} />
                   <YAxis tick={{ fontSize: 11 }} />
                   <Tooltip formatter={(value) => [`৳${Number(value).toLocaleString()}`, "Revenue"]} />
@@ -164,13 +167,13 @@ const DashboardHome: FC = () => {
             ) : chartData.length === 0 ? (
               <p className="text-default-400 text-sm text-center py-16">No data available</p>
             ) : (
-              <ResponsiveContainer width="100%" height={250}>
+              <ResponsiveContainer height={250} width="100%">
                 <LineChart data={chartData}>
-                  <CartesianGrid strokeDasharray="3 3" opacity={0.3} />
+                  <CartesianGrid opacity={0.3} strokeDasharray="3 3" />
                   <XAxis dataKey="date" tick={{ fontSize: 11 }} />
                   <YAxis tick={{ fontSize: 11 }} />
                   <Tooltip />
-                  <Line type="monotone" dataKey="orders" stroke="#10b981" strokeWidth={2} dot={{ fill: "#10b981" }} />
+                  <Line dataKey="orders" dot={{ fill: "#10b981" }} stroke="#10b981" strokeWidth={2} type="monotone" />
                 </LineChart>
               </ResponsiveContainer>
             )}
@@ -200,7 +203,7 @@ const DashboardHome: FC = () => {
                   </TableRow>
                 ) : recentOrders.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={4} className="text-center text-default-400">No orders yet</TableCell>
+                    <TableCell className="text-center text-default-400" colSpan={4}>No orders yet</TableCell>
                   </TableRow>
                 ) : (
                   recentOrders.map((order: any) => (

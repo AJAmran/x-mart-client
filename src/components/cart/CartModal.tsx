@@ -10,8 +10,8 @@ import {
   useDisclosure,
 } from "@heroui/modal";
 import { ShoppingCart, Trash2 } from "lucide-react";
-import { Button } from "@nextui-org/button";
-import { Badge } from "@nextui-org/badge";
+import { Button } from "@heroui/button";
+import { Badge } from "@heroui/badge";
 import { CartItem } from "./CartItem";
 import { useCart } from "@/src/hooks/useCart";
 import Link from "next/link";

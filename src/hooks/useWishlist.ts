@@ -83,12 +83,19 @@ export const useWishlist = () => {
     const item = wishlist.items.find(item => item.productId === productId);
     
     if (item) {
+      if (typeof item.stock === "number" && item.stock <= 0) {
+        toast.error(`${item.name} is out of stock.`);
+
+        return;
+      }
+
       const cartItem = {
         productId: item.productId,
         quantity: 1,
         price: item.price,
         name: item.name,
         image: item.image,
+        stock: item.stock,
       };
       
       useCart.addItem(cartItem);

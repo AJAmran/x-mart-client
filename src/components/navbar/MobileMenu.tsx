@@ -1,8 +1,8 @@
 "use client";
 
 import React from "react";
-import { NavbarMenu } from "@nextui-org/navbar";
-import { Link } from "@nextui-org/link";
+import { NavbarMenu } from "@heroui/navbar";
+import { Link } from "@heroui/link";
 import NextLink from "next/link";
 import { useRouter } from "next/navigation";
 import {
@@ -35,6 +35,7 @@ export default function MobileMenu({
   onSearch,
 }: MobileMenuProps) {
   const router = useRouter();
+
   return (
     <NavbarMenu className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl pt-6 pb-12">
       <div className="p-4">

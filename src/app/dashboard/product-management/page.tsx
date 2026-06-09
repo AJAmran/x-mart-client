@@ -1,9 +1,9 @@
 "use client";
 
 import { useMemo } from "react";
-import { Card, CardBody } from "@nextui-org/card";
+import { Card, CardBody } from "@heroui/card";
 import { Skeleton } from "@heroui/skeleton";
-import { Button } from "@nextui-org/button";
+import { Button } from "@heroui/button";
 import Link from "next/link";
 import {
   Package,
@@ -25,6 +25,7 @@ export default function ProductManagementOverview() {
     const lowStock = products.filter((p: any) => (p.inventories?.[0]?.stock ?? 0) > 0 && (p.inventories?.[0]?.stock ?? 0) < 10).length;
     const outOfStock = products.filter((p: any) => (p.inventories?.[0]?.stock ?? 0) === 0).length;
     const avgPrice = total > 0 ? products.reduce((s: number, p: any) => s + (p.price || 0), 0) / total : 0;
+
     return { total, active, lowStock, outOfStock, avgPrice };
   }, [data]);
 
@@ -39,7 +40,7 @@ export default function ProductManagementOverview() {
           <Button as={Link} color="primary" href="/dashboard/product-management/add-product" startContent={<PlusCircle className="w-4 h-4" />}>
             Add Product
           </Button>
-          <Button as={Link} variant="flat" href="/dashboard/product-management/product-list" startContent={<List className="w-4 h-4" />}>
+          <Button as={Link} href="/dashboard/product-management/product-list" startContent={<List className="w-4 h-4" />} variant="flat">
             Product List
           </Button>
         </div>
