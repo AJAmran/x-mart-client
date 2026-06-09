@@ -1,4 +1,3 @@
-// app/loading.tsx
 export default function Loading() {
   return (
     <div className="min-h-screen bg-white dark:bg-gray-900">
@@ -109,7 +108,6 @@ export default function Loading() {
   );
 }
 
-// Product Card Skeleton Component
 function ProductCardSkeleton() {
   return (
     <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border dark:border-gray-700 overflow-hidden animate-pulse">

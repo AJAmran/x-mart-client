@@ -259,20 +259,31 @@ export const useFeaturedCategories = () => {
 };
 
 
-// Get Offers Product
-export const useDiscountedProducts = (limit?: number) => {
+export const useDiscountedProducts = (
+  filters: {
+    category?: string;
+    minPrice?: number;
+    maxPrice?: number;
+    searchTerm?: string;
+  } = {},
+  options: {
+    page?: number;
+    limit?: number;
+    sortBy?: string;
+    sortOrder?: "asc" | "desc";
+  } = {}
+) => {
+  const stableFilters = useMemo(() => filters, [JSON.stringify(filters)]);
+  const stableOptions = useMemo(() => options, [JSON.stringify(options)]);
+
   return useQuery({
-    queryKey: ["products", "discounted"],
-    queryFn: () => 
-      productService.advancedProductSearch({
-        hasDiscount: true,
-        status: "ACTIVE"
-      }, {
-        limit: limit || 12,
-        sortBy: "price",
-        sortOrder: "desc"
-      }),
-    select: (data) => data.data,
+    queryKey: ["products", "discounted", stableFilters, stableOptions],
+    queryFn: () =>
+      productService.getAllProducts(
+        { ...stableFilters, hasDiscount: true, status: "ACTIVE" },
+        { limit: 12, ...stableOptions }
+      ),
+    placeholderData: (prev) => prev,
   });
 };
 
