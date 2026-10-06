@@ -1,4 +1,4 @@
-import { Card, CardBody } from "@heroui/card";
+import { TriangleAlert } from "lucide-react";
 import { Button } from "@heroui/button";
 
 interface ErrorCardProps {
@@ -8,21 +8,21 @@ interface ErrorCardProps {
 
 const ErrorCard = ({ error, onRetry }: ErrorCardProps) => {
   return (
-    <div className="flex justify-center items-center min-h-screen">
-      <Card className="max-w-md w-full bg-red-50 border border-red-200 shadow-sm">
-        <CardBody className="text-red-600 text-center p-6">
-          <p className="text-lg font-semibold mb-2">Error loading orders</p>
-          <p className="text-sm">{error.message}</p>
-          <Button
-            className="mt-4 hover:bg-red-100"
-            color="danger"
-            variant="light"
-            onClick={onRetry}
-          >
-            Retry
-          </Button>
-        </CardBody>
-      </Card>
+    <div className="flex min-h-[50vh] items-center justify-center px-4">
+      <div className="flex w-full max-w-md flex-col items-center gap-3 rounded-lg border border-danger/25 bg-surface-raised p-8 text-center shadow-xs">
+        <span className="grid size-12 place-items-center rounded-full bg-danger/15 text-danger">
+          <TriangleAlert aria-hidden size={22} />
+        </span>
+        <p className="text-title-md font-semibold text-content">
+          Couldn&apos;t load orders
+        </p>
+        <p className="text-body-sm text-content-muted">
+          {error?.message || "Something went wrong while fetching data."}
+        </p>
+        <Button color="primary" variant="flat" onClick={onRetry}>
+          Try again
+        </Button>
+      </div>
     </div>
   );
 };

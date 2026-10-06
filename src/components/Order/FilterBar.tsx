@@ -1,9 +1,9 @@
-import { useState } from "react";
-
 import { Input } from "@heroui/input";
-import { Button } from "@heroui/button";
-import { SearchIcon, FilterIcon } from "lucide-react";
+import { Select, SelectItem } from "@heroui/select";
+import { Search } from "lucide-react";
 
+import { Panel, Toolbar, ToolbarGroup } from "@/src/components/dashboard/Panel";
+import { IconButton } from "@/src/components/dashboard/Controls";
 import { ORDER_STATUS } from "@/src/types";
 
 interface FilterBarProps {
@@ -17,131 +17,62 @@ const FilterBar = ({
   onFilterChange,
   onClearFilters,
 }: FilterBarProps) => {
-  const [isStatusDropdownOpen, setIsStatusDropdownOpen] = useState(false);
-
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter" || e.key === " ") {
-      setIsStatusDropdownOpen(!isStatusDropdownOpen);
-    }
-  };
+  const hasActiveFilters = Boolean(
+    filters.status || filters.userId || filters.search
+  );
 
   return (
-    <div className="mb-6 bg-white border border-gray-200 rounded-lg shadow-sm p-6">
-      <div className="flex items-center gap-2 mb-4">
-        <FilterIcon className="text-gray-500" size={18} />
-        <h2 className="text-lg font-semibold text-gray-900">Filters</h2>
-      </div>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Input
-          className="focus:ring-2 focus:ring-blue-500"
-          label="Search"
-          placeholder="Order ID, User ID, etc..."
-          startContent={<SearchIcon className="text-gray-400" size={18} />}
-          value={filters.search}
-          onChange={(e) => onFilterChange("search", e.target.value)}
-        />
-        <Input
-          className="focus:ring-2 focus:ring-blue-500"
-          label="User ID"
-          placeholder="Filter by user"
-          value={filters.userId}
-          onChange={(e) => onFilterChange("userId", e.target.value)}
-        />
-        <div className="relative">
-          <label
-            className="block text-sm font-medium text-gray-700 mb-1"
-            htmlFor="status-select"
-          >
-            Status
-          </label>
-          <div
-            aria-expanded={isStatusDropdownOpen}
-            aria-haspopup="listbox"
-            aria-label="Select order status"
-            className="relative w-full"
-            id="status-select"
-            role="button"
-            tabIndex={0}
-            onClick={() => setIsStatusDropdownOpen(!isStatusDropdownOpen)}
-            onKeyDown={handleKeyDown}
-          >
-            <div className="h-12 w-full flex items-center justify-between border border-gray-300 rounded-md px-3 py-2 bg-white hover:border-blue-500 transition-colors">
-              <span
-                className={filters.status ? "text-gray-900" : "text-gray-400"}
-              >
-                {filters.status || "All Statuses"}
-              </span>
-              <svg
-                className="w-5 h-5 text-gray-400"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  d="M19 9l-7 7-7-7"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                />
-              </svg>
-            </div>
+    <Panel
+      action={
+        <IconButton
+          active={hasActiveFilters}
+          label="Clear filters"
+          onClick={onClearFilters}
+        >
+          <span className="text-label-sm font-semibold">Clear</span>
+        </IconButton>
+      }
+      className="mb-5"
+      description="Narrow the order list by status, customer, or search."
+      title="Filters"
+    >
+      <Toolbar>
+        <ToolbarGroup className="w-full gap-3 md:gap-4">
+          <Input
+            className="w-full"
+            label="Search"
+            placeholder="Order ID, user, or city…"
+            startContent={
+              <Search aria-hidden className="size-4 text-content-subtle" />
+            }
+            value={filters.search}
+            onChange={(e) => onFilterChange("search", e.target.value)}
+          />
+          <Input
+            className="w-full"
+            label="User ID"
+            placeholder="Filter by user"
+            value={filters.userId}
+            onChange={(e) => onFilterChange("userId", e.target.value)}
+          />
+          <div className="w-full md:w-52">
+            <Select
+              aria-label="Order status"
+              label="Status"
+              placeholder="All statuses"
+              selectedKeys={filters.status ? [filters.status] : []}
+              size="sm"
+              variant="bordered"
+              onChange={(e) => onFilterChange("status", e.target.value)}
+            >
+              {Object.values(ORDER_STATUS).map((status) => (
+                <SelectItem key={status}>{status}</SelectItem>
+              ))}
+            </Select>
           </div>
-          {isStatusDropdownOpen && (
-            <div className="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg max-h-60 overflow-auto">
-              <ul className="py-1" role="listbox">
-                <li
-                  aria-selected={filters.status === ""}
-                  className="px-4 py-2 hover:bg-blue-50 cursor-pointer text-gray-900"
-                  role="option"
-                  tabIndex={0}
-                  onClick={() => {
-                    onFilterChange("status", "");
-                    setIsStatusDropdownOpen(false);
-                  }}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" || e.key === " ") {
-                      onFilterChange("status", "");
-                      setIsStatusDropdownOpen(false);
-                    }
-                  }}
-                >
-                  All Statuses
-                </li>
-                {Object.values(ORDER_STATUS).map((status) => (
-                  <li
-                    key={status}
-                    aria-selected={filters.status === status}
-                    className="px-4 py-2 hover:bg-blue-50 cursor-pointer text-gray-900"
-                    role="option"
-                    tabIndex={0}
-                    onClick={() => {
-                      onFilterChange("status", status);
-                      setIsStatusDropdownOpen(false);
-                    }}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter" || e.key === " ") {
-                        onFilterChange("status", status);
-                        setIsStatusDropdownOpen(false);
-                      }
-                    }}
-                  >
-                    {status}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-        </div>
-      </div>
-      <Button
-        className="mt-4 bg-gray-100 hover:bg-gray-200"
-        color="default"
-        variant="flat"
-        onPress={onClearFilters}
-      >
-        Clear Filters
-      </Button>
-    </div>
+        </ToolbarGroup>
+      </Toolbar>
+    </Panel>
   );
 };
 

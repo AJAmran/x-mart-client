@@ -2,10 +2,24 @@
 
 import { useState } from "react";
 import { toast } from "sonner";
-import { DownloadIcon, SearchIcon } from "lucide-react";
+import { Boxes, FileSpreadsheet, FileText, SearchIcon } from "lucide-react";
 
 import ApplyDiscountModal from "@/src/components/product/ApplyDiscountModal";
 import EditProductModal from "@/src/components/product/EditProductModal";
+import { DeleteIcon } from "@/src/components/icons";
+import { PageHeader } from "@/src/components/UI/Section";
+import { Container } from "@/src/components/UI/Container";
+import {
+  StatusBadge,
+  productStatusTone,
+  stockTone,
+} from "@/src/components/dashboard/StatusBadge";
+import { IconButton } from "@/src/components/dashboard/Controls";
+import {
+  Panel,
+  Toolbar,
+  ToolbarGroup,
+} from "@/src/components/dashboard/Panel";
 import {
   useDeleteProduct,
   useProducts,
@@ -14,13 +28,9 @@ import {
 import { TProduct } from "@/src/types";
 import { exportToCSV, exportToPDF } from "@/src/utils/exportUtils";
 import { Pagination } from "@heroui/pagination";
-import { Skeleton } from "@heroui/skeleton";
 import { Tooltip } from "@heroui/tooltip";
 import { Button } from "@heroui/button";
-import { Card, CardBody } from "@heroui/card";
-import { Input } from "@heroui/input";
-import { PRODUCT_CATEGORY } from "@/src/constants";
-import { DeleteIcon } from "@/src/components/icons";
+import { Select, SelectItem } from "@heroui/select";
 import {
   Table,
   TableHeader,
@@ -29,16 +39,12 @@ import {
   TableRow,
   TableCell,
 } from "@heroui/table";
-import { Chip } from "@heroui/chip";
+import { PRODUCT_CATEGORY, PRODUCT_STATUS } from "@/src/constants";
+import { formatCurrency } from "@/src/lib/productUtils";
 
-// Define types for filters and options
 type ProductFilters = {
   searchTerm: string;
   category: string;
-  minPrice: number;
-  maxPrice: number;
-  minStock: number;
-  maxStock: number;
   status: string;
 };
 
@@ -49,7 +55,6 @@ type ProductOptions = {
   sortOrder: "asc" | "desc";
 };
 
-// Utility to normalize category to uppercase
 const normalizeCategory = (category: string): string =>
   category ? category.toUpperCase() : "";
 
@@ -57,10 +62,6 @@ export default function ProductListPage() {
   const [filters, setFilters] = useState<ProductFilters>({
     searchTerm: "",
     category: "",
-    minPrice: 0,
-    maxPrice: 1000000,
-    minStock: 0,
-    maxStock: 10000,
     status: "",
   });
 
@@ -71,14 +72,12 @@ export default function ProductListPage() {
     sortOrder: "desc",
   });
 
-  // Query for displayed products (paginated)
-  const {
-    data: productsResponse,
-    isLoading,
-    isError,
-    error,
-  } = useProducts(
-    { ...filters, category: normalizeCategory(filters.category) },
+  const { data: productsResponse, isLoading, isError, error } = useProducts(
+    {
+      ...filters,
+      category: normalizeCategory(filters.category),
+      status: filters.status || undefined,
+    },
     options
   );
 
@@ -103,15 +102,14 @@ export default function ProductListPage() {
   const allProducts = allProductsResponse?.data || [];
   const totalItems = productsResponse?.meta?.total || 0;
   const limit = productsResponse?.meta?.limit || options.limit;
-  const totalPages = Math.ceil(totalItems / limit);
+  const totalPages = Math.max(1, Math.ceil(totalItems / limit));
 
   const handleDeleteProduct = async (id: string) => {
     try {
       await deleteProductMutation.mutateAsync(id);
       toast.success("Product deleted successfully");
     } catch (err: any) {
-      console.error("Failed to delete product:", err);
-      toast.error(err.message || "Failed to delete product");
+      toast.error(err?.message || "Failed to delete product");
     }
   };
 
@@ -120,8 +118,7 @@ export default function ProductListPage() {
       await removeDiscountMutation.mutateAsync(id);
       toast.success("Discount removed successfully");
     } catch (err: any) {
-      console.error("Failed to remove discount:", err);
-      toast.error(err.message || "Failed to remove discount");
+      toast.error(err?.message || "Failed to remove discount");
     }
   };
 
@@ -138,26 +135,27 @@ export default function ProductListPage() {
         return;
       }
 
-      const worksheetData = allProducts.map(
-        (product: TProduct, index: number) => ({
-          "Sl.": index + 1,
-          Name: product.name,
-          Price: product.price,
-          Stock: product.inventories?.[0]?.stock ?? 0,
-          Status: product.status ?? "N/A",
-          Category: product.category ?? "N/A",
-          Description: product.description ?? "N/A",
-          "Discount Type": product.discount?.type || "N/A",
-          "Discount Value": product.discount?.value || "N/A",
-          "Created At": product.createdAt
-            ? new Date(product.createdAt).toLocaleDateString()
-            : "N/A",
-        })
-      );
+      const worksheetData = allProducts.map((product: TProduct, index: number) => ({
+        "Sl.": index + 1,
+        Name: product.name,
+        Price: product.price,
+        Stock: product.inventories?.[0]?.stock ?? 0,
+        Status: product.status ?? "N/A",
+        Category: product.category ?? "N/A",
+        Description: product.description ?? "N/A",
+        "Discount Type": product.discount?.type || "N/A",
+        "Discount Value": product.discount?.value || "N/A",
+        "Created At": product.createdAt
+          ? new Date(product.createdAt).toLocaleDateString()
+          : "N/A",
+      }));
 
-      exportToCSV(worksheetData, `products_report_${new Date().toISOString().split("T")[0]}`);
+      exportToCSV(
+        worksheetData,
+        `products_report_${new Date().toISOString().split("T")[0]}`
+      );
       toast.success("Report downloaded successfully");
-    } catch (err: any) {
+    } catch {
       toast.error("Failed to download report");
     }
   };
@@ -176,142 +174,219 @@ export default function ProductListPage() {
       }
       exportToPDF([], "products");
       toast.success("PDF dialog opened — use the print menu to save as PDF");
-    } catch (err: any) {
+    } catch {
       toast.error("Failed to open PDF export");
     }
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-        <h1 className="text-2xl font-bold">Product Management</h1>
-        <div className="flex gap-2">
-          <Button
-            color="primary"
-            size="sm"
-            startContent={<DownloadIcon className="w-4 h-4" />}
-            variant="flat"
-            onClick={downloadExcel}
-          >
-            Excel
-          </Button>
-          <Button
-            color="primary"
-            size="sm"
-            startContent={<DownloadIcon className="w-4 h-4" />}
-            variant="flat"
-            onClick={downloadPDF}
-          >
-            PDF
-          </Button>
-        </div>
-      </div>
-
-      <Card className="shadow-sm border-none bg-white/70 dark:bg-gray-800/70 backdrop-blur-md">
-        <CardBody className="p-4">
-          <div className="flex flex-col md:flex-row gap-4 mb-6">
-            <Input
-              className="max-w-xs"
-              placeholder="Search products..."
-              startContent={<SearchIcon className="w-4 h-4 text-default-400" />}
-              value={filters.searchTerm}
-              onChange={(e) => setFilters({ ...filters, searchTerm: e.target.value })}
-            />
-            <select
-              className="max-w-xs p-2 bg-gray-100 dark:bg-gray-900 border-none rounded-xl text-sm focus:ring-2 focus:ring-blue-500 transition-all outline-none"
-              value={filters.category}
-              onChange={(e) => setFilters({ ...filters, category: e.target.value })}
-            >
-              <option value="">All Categories</option>
-              {Object.values(PRODUCT_CATEGORY).map((cat) => (
-                <option key={cat} value={cat}>{cat}</option>
-              ))}
-            </select>
+    <>
+      <PageHeader
+        description="Every product in the catalogue, with stock and pricing."
+        eyebrow="Catalog"
+        title="Product list"
+      />
+      <Container className="py-6 sm:py-8">
+        <Panel
+          action={
+            <>
+              <IconButton label="Export to Excel" onClick={downloadExcel}>
+                <FileSpreadsheet className="size-4" />
+              </IconButton>
+              <IconButton label="Export to PDF" onClick={downloadPDF}>
+                <FileText className="size-4" />
+              </IconButton>
+            </>
+          }
+          bodyClassName="p-0"
+          description="Browse, search, and manage every item in the catalogue."
+          title="Products"
+        >
+          {/* Toolbar */}
+          <div className="border-b border-line-hairline px-5 py-4">
+            <Toolbar>
+              <div className="relative w-full max-w-xs">
+                <label className="sr-only" htmlFor="product-search">
+                  Search products
+                </label>
+                <SearchIcon
+                  aria-hidden
+                  className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-content-subtle"
+                />
+                <input
+                  className="h-9 w-full rounded-md border border-line-hairline bg-surface-sunken pl-9 pr-3 text-body-sm text-content transition-colors duration-fast ease-standard placeholder:text-content-subtle hover:border-line-strong focus:border-brand focus:outline-none"
+                  id="product-search"
+                  placeholder="Search products…"
+                  type="search"
+                  value={filters.searchTerm}
+                  onChange={(e) => {
+                    setOptions((prev) => ({ ...prev, page: 1 }));
+                    setFilters((prev) => ({
+                      ...prev,
+                      searchTerm: e.target.value,
+                    }));
+                  }}
+                />
+              </div>
+              <ToolbarGroup>
+                <Select
+                  aria-label="Category"
+                  className="w-44"
+                  placeholder="All categories"
+                  selectedKeys={filters.category ? [filters.category] : []}
+                  size="sm"
+                  variant="bordered"
+                  onChange={(e) => {
+                    setOptions((prev) => ({ ...prev, page: 1 }));
+                    setFilters((prev) => ({
+                      ...prev,
+                      category: e.target.value,
+                    }));
+                  }}
+                >
+                  {Object.values(PRODUCT_CATEGORY).map((cat) => (
+                    <SelectItem key={cat}>{cat}</SelectItem>
+                  ))}
+                </Select>
+                <Select
+                  aria-label="Status"
+                  className="w-44"
+                  placeholder="All statuses"
+                  selectedKeys={filters.status ? [filters.status] : []}
+                  size="sm"
+                  variant="bordered"
+                  onChange={(e) => {
+                    setOptions((prev) => ({ ...prev, page: 1 }));
+                    setFilters((prev) => ({
+                      ...prev,
+                      status: e.target.value,
+                    }));
+                  }}
+                >
+                  {Object.values(PRODUCT_STATUS).map((status) => (
+                    <SelectItem key={status}>{status}</SelectItem>
+                  ))}
+                </Select>
+              </ToolbarGroup>
+            </Toolbar>
           </div>
 
-          <Table
-            aria-label="Product list table"
-            classNames={{
-              wrapper: "bg-transparent p-0",
-              th: "bg-gray-100/50 dark:bg-gray-900/50 text-default-600",
-            }}
-            shadow="none"
-          >
-            <TableHeader>
-              <TableColumn>PRODUCT</TableColumn>
-              <TableColumn>PRICE</TableColumn>
-              <TableColumn>STOCK</TableColumn>
-              <TableColumn>STATUS</TableColumn>
-              <TableColumn align="center">ACTIONS</TableColumn>
-            </TableHeader>
-            <TableBody
-              emptyContent={"No products found."}
-              isLoading={isLoading}
-              loadingContent={<Skeleton className="w-full h-40 rounded-xl" />}
+          {/* Table */}
+          <div className="overflow-x-auto">
+            <Table
+              aria-label="Product list table"
+              classNames={{
+                th: "text-overline font-semibold uppercase tracking-[0.12em] text-content-subtle",
+              }}
+              shadow="none"
             >
-              {products.map((product: TProduct) => (
-                <TableRow key={product._id} className="border-b border-gray-100 dark:border-gray-800 last:border-none">
-                  <TableCell>
-                    <div className="flex flex-col">
-                      <span className="font-semibold text-sm">{product.name}</span>
-                      <span className="text-tiny text-default-400 uppercase">{product.category}</span>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <span className="font-bold text-blue-600 dark:text-blue-400">৳{product.price}</span>
-                  </TableCell>
-                  <TableCell>
-                    <Chip
-                      color={(product.inventories?.[0]?.stock ?? 0) < 10 ? "danger" : "success"}
-                      size="sm"
-                      variant="flat"
+              <TableHeader>
+                <TableColumn>Product</TableColumn>
+                <TableColumn>Price</TableColumn>
+                <TableColumn>Stock</TableColumn>
+                <TableColumn>Status</TableColumn>
+                <TableColumn align="end">Actions</TableColumn>
+              </TableHeader>
+
+              <TableBody
+                emptyContent={
+                  <div className="flex flex-col items-center gap-3 py-16 text-center">
+                    <span className="grid size-12 place-items-center rounded-full border border-dashed border-line-strong bg-surface-sunken text-content-subtle">
+                      <Boxes aria-hidden size={20} />
+                    </span>
+                    <p className="text-body-sm font-medium text-content">
+                      No products found
+                    </p>
+                    <p className="max-w-sm text-label-sm text-content-subtle">
+                      Try adjusting your filters, or add a new product to the
+                      catalogue.
+                    </p>
+                  </div>
+                }
+                isLoading={isLoading}
+              >
+                {products.map((product: TProduct) => {
+                  const stock = product.inventories?.[0]?.stock ?? 0;
+
+                  return (
+                    <TableRow
+                      key={product._id}
+                      className="transition-colors duration-fast hover:bg-surface-sunken/60"
                     >
-                      {product.inventories?.[0]?.stock ?? 0} in stock
-                    </Chip>
-                  </TableCell>
-                  <TableCell>
-                    <Chip
-                      color={product.status === "ACTIVE" ? "success" : "warning"}
-                      size="sm"
-                      variant="dot"
-                    >
-                      {product.status || "N/A"}
-                    </Chip>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center justify-center gap-2">
-                      <EditProductModal product={product} />
-                      <Tooltip content="Delete Product">
-                        <Button
-                          isIconOnly
-                          color="danger"
-                          isDisabled={deleteProductMutation.isPending}
-                          size="sm"
-                          variant="light"
-                          onClick={() => handleDeleteProduct(product._id)}
+                      <TableCell>
+                        <div className="flex flex-col">
+                          <span className="text-body-sm font-semibold text-content">
+                            {product.name}
+                          </span>
+                          <span className="text-label-sm capitalize text-content-subtle">
+                            {product.category}
+                          </span>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <span className="tabular text-body-sm font-semibold text-content">
+                          {formatCurrency(product.price)}
+                        </span>
+                      </TableCell>
+                      <TableCell>
+                        <StatusBadge dot tone={stockTone(stock)}>
+                          {stock} in stock
+                        </StatusBadge>
+                      </TableCell>
+                      <TableCell>
+                        <StatusBadge
+                          dot
+                          tone={productStatusTone(product.status)}
                         >
-                          <DeleteIcon className="w-4 h-4" />
-                        </Button>
-                      </Tooltip>
-                      <ApplyDiscountModal
-                        product={product}
-                        onRemoveDiscount={() => handleRemoveDiscount(product._id)}
-                      />
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+                          {product.status || "—"}
+                        </StatusBadge>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center justify-end gap-1.5">
+                          <EditProductModal product={product} />
+                          <Tooltip content="Delete Product">
+                            <Button
+                              color="danger"
+                              isDisabled={deleteProductMutation.isPending}
+                              size="sm"
+                              variant="light"
+                              onClick={() =>
+                                handleDeleteProduct(product._id)
+                              }
+                            >
+                              <DeleteIcon className="size-4" />
+                            </Button>
+                          </Tooltip>
+                          <ApplyDiscountModal
+                            product={product}
+                            onRemoveDiscount={() =>
+                              handleRemoveDiscount(product._id)
+                            }
+                          />
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
+              </TableBody>
+            </Table>
+          </div>
 
           {isError && (
-            <div className="text-red-500 text-center py-4">
-              Error: {error?.message || "Failed to load products"}
-            </div>
+            <p className="border-t border-line-hairline px-5 py-3 text-label-sm text-danger">
+              {error?.message || "Failed to load products"}
+            </p>
           )}
 
-          <div className="flex justify-center mt-6">
-            {totalPages > 1 && (
+          {/* Pagination footer */}
+          <div className="flex flex-col gap-3 border-t border-line-hairline px-5 py-3.5 sm:flex-row sm:items-center sm:justify-between">
+            <p className="tabular text-label-sm text-content-subtle">
+              {totalItems} {totalItems === 1 ? "product" : "products"}
+            </p>
+            <div className="flex items-center justify-between gap-4 sm:justify-end">
+              <p className="tabular text-label-sm text-content-subtle">
+                Page {options.page} of {totalPages}
+              </p>
               <Pagination
                 showControls
                 color="primary"
@@ -320,10 +395,10 @@ export default function ProductListPage() {
                 variant="flat"
                 onChange={(page) => setOptions({ ...options, page })}
               />
-            )}
+            </div>
           </div>
-        </CardBody>
-      </Card>
-    </div>
+        </Panel>
+      </Container>
+    </>
   );
 }

@@ -62,29 +62,37 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({
                     </p>
                   </div>
                   <div className="flex items-center justify-between gap-3">
-                    <div className="grid h-9 w-28 grid-cols-3 overflow-hidden rounded-md border border-gray-200 dark:border-gray-800">
+                    <div className="grid h-9 w-28 grid-cols-3 overflow-hidden rounded-md border border-line-hairline">
                       <Button
                         isIconOnly
-                        className="h-full min-w-0 rounded-none"
+                        aria-label={`Decrease quantity of ${item.name}`}
+                        className="h-full min-w-0 rounded-none text-content"
                         isDisabled={item.quantity <= 1}
+                        radius="none"
                         size="sm"
                         variant="light"
                         onPress={() => updateQuantity(item.productId, item.quantity - 1)}
                       >
-                        <Minus size={14} />
+                        <Minus aria-hidden size={14} />
                       </Button>
-                      <span className="flex items-center justify-center border-x border-gray-200 text-sm font-semibold dark:border-gray-800">
+                      <span
+                        aria-label={`Quantity of ${item.name}`}
+                        className="tabular flex items-center justify-center border-x border-line-hairline text-body-sm font-semibold text-content"
+                        role="status"
+                      >
                         {item.quantity}
                       </span>
                       <Button
                         isIconOnly
-                        className="h-full min-w-0 rounded-none"
+                        aria-label={`Increase quantity of ${item.name}`}
+                        className="h-full min-w-0 rounded-none text-content"
                         isDisabled={!!item.stock && item.quantity >= item.stock}
+                        radius="none"
                         size="sm"
                         variant="light"
                         onPress={() => updateQuantity(item.productId, item.quantity + 1)}
                       >
-                        <Plus size={14} />
+                        <Plus aria-hidden size={14} />
                       </Button>
                     </div>
                     <Button

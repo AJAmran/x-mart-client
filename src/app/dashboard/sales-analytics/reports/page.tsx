@@ -1,31 +1,66 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { Card, CardBody, CardHeader } from "@heroui/card";
-import { Button } from "@heroui/button";
-import { Skeleton } from "@heroui/skeleton";
 import { toast } from "sonner";
 import {
+  CheckCircle2,
   FileSpreadsheet,
   FileText,
   RefreshCw,
-  Calendar,
+  ShoppingBag,
+  XCircle,
+  Banknote,
 } from "lucide-react";
-import { exportToCSV, exportToPDF } from "@/src/utils/exportUtils";
+
 import {
-  BarChart,
   Bar,
+  BarChart,
+  CartesianGrid,
+  ResponsiveContainer,
+  Tooltip,
   XAxis,
   YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
 } from "recharts";
+
+import { PageHeader } from "@/src/components/UI/Section";
+import { Container } from "@/src/components/UI/Container";
+import { Panel } from "@/src/components/dashboard/Panel";
+import {
+  MetricCard,
+  metricGrid,
+} from "@/src/components/dashboard/MetricCard";
+import {
+  IconButton,
+  SegmentTabs,
+} from "@/src/components/dashboard/Controls";
+import { chartPalette } from "@/src/config/theme";
 import { useOrders } from "@/src/hooks/useOrder";
+import { exportToCSV, exportToPDF } from "@/src/utils/exportUtils";
+import { formatCurrency, formatNumber } from "@/src/lib/productUtils";
+
+type Period = "weekly" | "monthly" | "yearly";
+
+const periodOptions: { value: Period; label: string }[] = [
+  { value: "weekly", label: "Weekly" },
+  { value: "monthly", label: "Monthly" },
+  { value: "yearly", label: "Yearly" },
+];
+
+const periodLabel: Record<Period, string> = {
+  weekly: "Last 7 days",
+  monthly: "Last 30 days",
+  yearly: "Last 12 months",
+};
+
+const axisTick = { fontSize: 11 } as const;
 
 export default function ReportsPage() {
-  const [period, setPeriod] = useState<"weekly" | "monthly" | "yearly">("monthly");
-  const { data: ordersRes, isLoading, refetch } = useOrders({}, { limit: 5000, sortBy: "createdAt", sortOrder: "desc" });
+  const [period, setPeriod] = useState<Period>("monthly");
+  const {
+    data: ordersRes,
+    isLoading,
+    refetch,
+  } = useOrders({}, { limit: 5000, sortBy: "createdAt", sortOrder: "desc" });
 
   const { reportData, summary } = useMemo(() => {
     const orders = ordersRes?.data || [];
@@ -46,23 +81,34 @@ export default function ReportsPage() {
       filtered = orders.filter((o: any) => new Date(o.createdAt) >= yearAgo);
     }
 
-    const totalRev = filtered.reduce((s: number, o: any) => s + (o.totalAmount || o.totalPrice || 0), 0);
+    const totalRev = filtered.reduce(
+      (s: number, o: any) => s + (o.totalPrice ?? 0),
+      0
+    );
     const totalOrd = filtered.length;
-    const delivered = filtered.filter((o: any) => o.status === "DELIVERED").length;
-    const cancelled = filtered.filter((o: any) => o.status === "CANCELLED").length;
+    const delivered = filtered.filter((o: any) => o.status === "DELIVERED")
+      .length;
+    const cancelled = filtered.filter((o: any) => o.status === "CANCELLED")
+      .length;
 
     const dailyMap: Record<string, { revenue: number; orders: number }> = {};
 
     filtered.forEach((o: any) => {
-      const d = new Date(o.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric" });
+      const d = new Date(o.createdAt).toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric",
+      });
 
       if (!dailyMap[d]) dailyMap[d] = { revenue: 0, orders: 0 };
-      dailyMap[d].revenue += o.totalAmount || o.totalPrice || 0;
+      dailyMap[d].revenue += o.totalPrice ?? 0;
       dailyMap[d].orders += 1;
     });
 
     return {
-      reportData: Object.entries(dailyMap).map(([date, val]) => ({ date, ...val })),
+      reportData: Object.entries(dailyMap).map(([date, val]) => ({
+        date,
+        ...val,
+      })),
       summary: { totalRev, totalOrd, delivered, cancelled },
     };
   }, [ordersRes, period]);
@@ -78,11 +124,14 @@ export default function ReportsPage() {
       "Order ID": o._id?.slice(-8).toUpperCase(),
       Customer: o.user?.name || o.customerName || "N/A",
       Status: o.status,
-      Amount: o.totalAmount || o.totalPrice || 0,
+      Amount: o.totalPrice ?? 0,
       Date: new Date(o.createdAt).toLocaleDateString(),
     }));
 
-    exportToCSV(data, `sales_report_${new Date().toISOString().split("T")[0]}`);
+    exportToCSV(
+      data,
+      `sales_report_${new Date().toISOString().split("T")[0]}`
+    );
     toast.success("Report downloaded");
   };
 
@@ -97,84 +146,127 @@ export default function ReportsPage() {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-        <div>
-          <h1 className="text-2xl font-bold">Sales Reports</h1>
-          <p className="text-sm text-default-500">Generate and download sales reports</p>
-        </div>
-        <div className="flex gap-2">
-          {(["weekly", "monthly", "yearly"] as const).map((p) => (
-            <Button key={p} color={period === p ? "primary" : "default"} size="sm" variant={period === p ? "solid" : "flat"} onPress={() => setPeriod(p)}>
-              <Calendar className="w-3.5 h-3.5 mr-1" />
-              {p.charAt(0).toUpperCase() + p.slice(1)}
-            </Button>
-          ))}
-          <Button isIconOnly size="sm" variant="flat" onPress={downloadExcel}>
-            <FileSpreadsheet className="w-4 h-4" />
-          </Button>
-          <Button isIconOnly size="sm" variant="flat" onPress={downloadPDF}>
-            <FileText className="w-4 h-4" />
-          </Button>
-          <Button isIconOnly size="sm" variant="flat" onPress={() => refetch()}>
-            <RefreshCw className="w-4 h-4" />
-          </Button>
-        </div>
-      </div>
+    <>
+      <PageHeader
+        action={
+          <div className="flex items-center gap-2">
+            <SegmentTabs
+              className="hidden sm:inline-flex"
+              label="Report period"
+              options={periodOptions}
+              value={period}
+              onChange={setPeriod}
+            />
+            <IconButton label="Export to CSV" onClick={downloadExcel}>
+              <FileSpreadsheet className="size-4" />
+            </IconButton>
+            <IconButton label="Export to PDF" onClick={downloadPDF}>
+              <FileText className="size-4" />
+            </IconButton>
+            <IconButton label="Refresh data" onClick={() => refetch()}>
+              <RefreshCw className="size-4" />
+            </IconButton>
+          </div>
+        }
+        description="Generate, review, and export sales reports."
+        eyebrow="Sales & analytics"
+        title="Sales reports"
+      />
 
-      {isLoading ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {Array.from({ length: 4 }).map((_, i) => (
-            <Card key={i}><CardBody><Skeleton className="h-24 rounded-lg" /></CardBody></Card>
-          ))}
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <Card className="shadow-sm bg-gradient-to-br from-blue-500/10">
-            <CardBody>
-              <p className="text-tiny uppercase font-bold text-blue-500">Total Revenue</p>
-              <h3 className="text-2xl font-extrabold mt-1">৳{summary.totalRev.toLocaleString()}</h3>
-            </CardBody>
-          </Card>
-          <Card className="shadow-sm bg-gradient-to-br from-green-500/10">
-            <CardBody>
-              <p className="text-tiny uppercase font-bold text-green-500">Total Orders</p>
-              <h3 className="text-2xl font-extrabold mt-1">{summary.totalOrd}</h3>
-            </CardBody>
-          </Card>
-          <Card className="shadow-sm bg-gradient-to-br from-emerald-500/10">
-            <CardBody>
-              <p className="text-tiny uppercase font-bold text-emerald-500">Delivered</p>
-              <h3 className="text-2xl font-extrabold mt-1">{summary.delivered}</h3>
-            </CardBody>
-          </Card>
-          <Card className="shadow-sm bg-gradient-to-br from-red-500/10">
-            <CardBody>
-              <p className="text-tiny uppercase font-bold text-red-500">Cancelled</p>
-              <h3 className="text-2xl font-extrabold mt-1">{summary.cancelled}</h3>
-            </CardBody>
-          </Card>
-        </div>
-      )}
+      <Container className="py-6 sm:py-8">
+        <SegmentTabs
+          className="mb-5 sm:hidden"
+          label="Report period"
+          options={periodOptions}
+          value={period}
+          onChange={setPeriod}
+        />
 
-      <Card className="shadow-sm">
-        <CardHeader><h3 className="text-lg font-bold">Daily Revenue - {period.charAt(0).toUpperCase() + period.slice(1)}</h3></CardHeader>
-        <CardBody>
-          {isLoading ? (
-            <Skeleton className="h-72 rounded-lg" />
-          ) : (
-            <ResponsiveContainer height={350} width="100%">
-              <BarChart data={reportData}>
-                <CartesianGrid opacity={0.3} strokeDasharray="3 3" />
-                <XAxis dataKey="date" tick={{ fontSize: 11 }} />
-                <YAxis tick={{ fontSize: 11 }} />
-                <Tooltip formatter={(value) => [`৳${Number(value).toLocaleString()}`, "Revenue"]} />
-                <Bar dataKey="revenue" fill="#3b82f6" radius={[4, 4, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
-          )}
-        </CardBody>
-      </Card>
-    </div>
+        {/* Summary KPIs */}
+        <div className={metricGrid}>
+          <MetricCard
+            hint={periodLabel[period]}
+            icon={Banknote}
+            label="Total revenue"
+            loading={isLoading}
+            tone="brand"
+            value={formatCurrency(summary.totalRev)}
+          />
+          <MetricCard
+            hint="Orders placed in period"
+            icon={ShoppingBag}
+            label="Total orders"
+            loading={isLoading}
+            tone="neutral"
+            value={formatNumber(summary.totalOrd)}
+          />
+          <MetricCard
+            hint="Successfully delivered"
+            icon={CheckCircle2}
+            label="Delivered"
+            loading={isLoading}
+            tone="success"
+            value={formatNumber(summary.delivered)}
+          />
+          <MetricCard
+            hint="Cancelled in period"
+            icon={XCircle}
+            label="Cancelled"
+            loading={isLoading}
+            tone="danger"
+            value={formatNumber(summary.cancelled)}
+          />
+        </div>
+
+        {/* Revenue chart */}
+        <Panel
+          className="mt-5"
+          description={`Revenue per day · ${periodLabel[period]}`}
+          empty={reportData.length === 0}
+          loading={isLoading}
+          title="Daily revenue"
+        >
+          <ResponsiveContainer height={320} width="100%">
+            <BarChart data={reportData} margin={{ top: 4, right: 4, bottom: 0, left: -12 }}>
+              <CartesianGrid
+                stroke="rgb(var(--line))"
+                strokeDasharray="3 3"
+                vertical={false}
+              />
+              <XAxis dataKey="date" tick={axisTick} tickLine={false} />
+              <YAxis
+                axisLine={false}
+                tick={axisTick}
+                tickFormatter={(v: number) =>
+                  v >= 1000 ? `${Math.round(v / 1000)}k` : `${v}`
+                }
+                tickLine={false}
+              />
+              <Tooltip
+                content={({ active, payload, label }: any) =>
+                  active && payload?.length ? (
+                    <div className="rounded-md border border-line-hairline bg-surface-raised px-3 py-2 shadow-lg">
+                      <p className="text-label-sm text-content-subtle">
+                        {label}
+                      </p>
+                      <p className="tabular mt-0.5 text-body-sm font-semibold text-content">
+                        {formatCurrency(Number(payload[0].value ?? 0))}
+                      </p>
+                    </div>
+                  ) : null
+                }
+                cursor={{ fill: "rgb(var(--surface-sunken))" }}
+              />
+              <Bar
+                dataKey="revenue"
+                fill={chartPalette[0]}
+                maxBarSize={32}
+                radius={[5, 5, 0, 0]}
+              />
+            </BarChart>
+          </ResponsiveContainer>
+        </Panel>
+      </Container>
+    </>
   );
 }

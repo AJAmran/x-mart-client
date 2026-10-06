@@ -1,13 +1,16 @@
 "use client";
+
 import { useState } from "react";
-import { useOrders, useUpdateOrderStatus } from "@/src/hooks/useOrder";
-import { Button } from "@heroui/button";
-import { Spinner } from "@heroui/spinner";
 import { RefreshCw } from "lucide-react";
+
+import { useOrders, useUpdateOrderStatus } from "@/src/hooks/useOrder";
 import ErrorCard from "@/src/components/Order/ErrorCard";
 import FilterBar from "@/src/components/Order/FilterBar";
 import OrderTable from "@/src/components/Order/OrderTable";
-import StatusUpdateModal from "@/src/components/Order/StatusUpdateModal";
+import { IconButton } from "@/src/components/dashboard/Controls";
+import { Panel } from "@/src/components/dashboard/Panel";
+import { Container } from "@/src/components/UI/Container";
+import { PageHeader } from "@/src/components/UI/Section";
 
 const OrderManagementPage = () => {
   const [filters, setFilters] = useState({
@@ -50,60 +53,70 @@ const OrderManagementPage = () => {
     setOptions((prev) => ({ ...prev, page: 1 }));
   };
 
-  if (isLoading) {
+  if (error) {
     return (
-      <div className="flex justify-center items-center min-h-screen">
-        <Spinner color="primary" label="Loading orders..." size="lg" />
-      </div>
+      <Container className="py-8">
+        <ErrorCard error={error} onRetry={refetch} />
+      </Container>
     );
   }
 
-  if (error) {
-    return <ErrorCard error={error} onRetry={refetch} />;
+  if (isLoading) {
+    return (
+      <>
+        <PageHeader
+          description="Loading the order pipeline…"
+          eyebrow="Operations"
+          title="Order management"
+        />
+        <Container className="py-6 sm:py-8">
+          <Panel
+            loading
+            className="mb-5"
+            description="Narrow the order list by status, customer, or search."
+            title="Filters"
+          />
+          <Panel
+            loading
+            description="Every order across the pipeline, newest first."
+            title="Orders"
+          />
+        </Container>
+      </>
+    );
   }
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-7xl">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">Order Management</h1>
-          <p className="text-gray-500 mt-1">
-            {meta.total} {meta.total === 1 ? "order" : "orders"} found
-          </p>
-        </div>
-        <Button
-          className="bg-blue-50 hover:bg-blue-100"
-          color="primary"
-          startContent={<RefreshCw size={18} />}
-          variant="flat"
-          onPress={() => refetch()}
-        >
-          Refresh
-        </Button>
-      </div>
-
-      <FilterBar
-        filters={filters}
-        onClearFilters={handleClearFilters}
-        onFilterChange={handleFilterChange}
+    <>
+      <PageHeader
+        action={
+          <IconButton label="Refresh orders" onClick={() => refetch()}>
+            <RefreshCw className="size-4" />
+          </IconButton>
+        }
+        description={`${meta.total} ${meta.total === 1 ? "order" : "orders"} in the pipeline.`}
+        eyebrow="Operations"
+        title="Order management"
       />
 
-      <OrderTable
-        isPending={isPending}
-        meta={meta}
-        options={options}
-        orders={orders}
-        updateStatus={updateStatus}
-        onPageChange={(page) => setOptions((prev) => ({ ...prev, page }))}
-        onSort={handleSort}
-      />
+      <Container className="py-6 sm:py-8">
+        <FilterBar
+          filters={filters}
+          onClearFilters={handleClearFilters}
+          onFilterChange={handleFilterChange}
+        />
 
-      <StatusUpdateModal
-        isPending={isPending}
-        refetch={refetch}
-        updateStatus={updateStatus}
-      />
-    </div>
+        <OrderTable
+          isPending={isPending}
+          meta={meta}
+          options={options}
+          orders={orders}
+          updateStatus={updateStatus}
+          onPageChange={(page) => setOptions((prev) => ({ ...prev, page }))}
+          onSort={handleSort}
+        />
+      </Container>
+    </>
   );
 };
 

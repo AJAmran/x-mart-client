@@ -1,97 +1,157 @@
 "use client";
 
 import { useMemo } from "react";
-import { Card, CardBody } from "@heroui/card";
-import { Skeleton } from "@heroui/skeleton";
-import { Button } from "@heroui/button";
 import Link from "next/link";
 import {
+  ArrowUpRight,
+  Boxes,
+  CircleDollarSign,
   Package,
-  PlusCircle,
-  List,
+  Plus,
   TrendingUp,
-  AlertTriangle,
-  DollarSign,
+  TriangleAlert,
 } from "lucide-react";
+
+import { PageHeader } from "@/src/components/UI/Section";
+import { Container } from "@/src/components/UI/Container";
+import {
+  MetricCard,
+  metricGrid,
+  type MetricTone,
+} from "@/src/components/dashboard/MetricCard";
 import { useProducts } from "@/src/hooks/useProducts";
+import { formatCurrency, formatNumber } from "@/src/lib/productUtils";
+
+const quickLinks = [
+  {
+    title: "Product list",
+    description: "Browse, search, and manage every item in the catalogue.",
+    href: "/dashboard/product-management/product-list",
+    icon: Boxes,
+  },
+  {
+    title: "Add product",
+    description: "Create a new product entry with stock and pricing.",
+    href: "/dashboard/product-management/add-product",
+    icon: Plus,
+  },
+];
 
 export default function ProductManagementOverview() {
-  const { data, isLoading } = useProducts({}, { limit: 1000, sortBy: "createdAt", sortOrder: "desc" });
+  const { data, isLoading } = useProducts(
+    {},
+    { limit: 1000, sortBy: "createdAt", sortOrder: "desc" }
+  );
 
   const stats = useMemo(() => {
     const products = data?.data || [];
     const total = products.length;
     const active = products.filter((p: any) => p.status === "ACTIVE").length;
-    const lowStock = products.filter((p: any) => (p.inventories?.[0]?.stock ?? 0) > 0 && (p.inventories?.[0]?.stock ?? 0) < 10).length;
-    const outOfStock = products.filter((p: any) => (p.inventories?.[0]?.stock ?? 0) === 0).length;
-    const avgPrice = total > 0 ? products.reduce((s: number, p: any) => s + (p.price || 0), 0) / total : 0;
+    const lowStock = products.filter(
+      (p: any) =>
+        (p.inventories?.[0]?.stock ?? 0) > 0 &&
+        (p.inventories?.[0]?.stock ?? 0) < 10
+    ).length;
+    const outOfStock = products.filter(
+      (p: any) => (p.inventories?.[0]?.stock ?? 0) === 0
+    ).length;
+    const totalValue = products.reduce(
+      (s: number, p: any) => s + (p.price || 0),
+      0
+    );
+    const avgPrice = total > 0 ? totalValue / total : 0;
 
     return { total, active, lowStock, outOfStock, avgPrice };
   }, [data]);
 
-  return (
-    <div className="space-y-6">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-        <div>
-          <h1 className="text-2xl font-bold">Product Management</h1>
-          <p className="text-sm text-default-500">Manage your product catalog</p>
-        </div>
-        <div className="flex gap-2">
-          <Button as={Link} color="primary" href="/dashboard/product-management/add-product" startContent={<PlusCircle className="w-4 h-4" />}>
-            Add Product
-          </Button>
-          <Button as={Link} href="/dashboard/product-management/product-list" startContent={<List className="w-4 h-4" />} variant="flat">
-            Product List
-          </Button>
-        </div>
-      </div>
+  const cards: {
+    label: string;
+    value: string;
+    icon: any;
+    tone: MetricTone;
+    hint: string;
+  }[] = [
+    {
+      label: "Total products",
+      value: formatNumber(stats.total),
+      icon: Package,
+      tone: "brand",
+      hint: "Across the whole catalogue",
+    },
+    {
+      label: "Active listings",
+      value: formatNumber(stats.active),
+      icon: TrendingUp,
+      tone: "success",
+      hint: "Currently visible to shoppers",
+    },
+    {
+      label: "Low stock",
+      value: formatNumber(stats.lowStock),
+      icon: TriangleAlert,
+      tone: "warning",
+      hint: "Below the reorder threshold",
+    },
+    {
+      label: "Average price",
+      value: formatCurrency(stats.avgPrice),
+      icon: CircleDollarSign,
+      tone: "neutral",
+      hint: "Mean list price per product",
+    },
+  ];
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card className="shadow-sm bg-gradient-to-br from-blue-500/10">
-          <CardBody>
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-tiny uppercase font-bold text-blue-500">Total Products</p>
-                {isLoading ? <Skeleton className="h-8 w-16 mt-1 rounded" /> : <h3 className="text-2xl font-extrabold mt-1">{stats.total}</h3>}
+  return (
+    <>
+      <PageHeader
+        description="Manage your product catalogue — listings, stock, and pricing."
+        eyebrow="Product management"
+        title="Catalogue"
+      />
+
+      <Container className="py-8">
+        {/* KPI row */}
+        <div className={metricGrid}>
+          {cards.map((card) => (
+            <MetricCard
+              key={card.label}
+              hint={card.hint}
+              icon={card.icon}
+              label={card.label}
+              loading={isLoading}
+              tone={card.tone}
+              value={card.value}
+            />
+          ))}
+        </div>
+
+        {/* Quick links */}
+        <div className="mt-5 grid grid-cols-1 gap-5 md:grid-cols-2">
+          {quickLinks.map((link) => (
+            <Link
+              key={link.href}
+              className="group relative flex items-start gap-4 overflow-hidden rounded-lg border border-line-hairline bg-surface-raised p-5 shadow-xs transition-all duration-base ease-standard hover:-translate-y-0.5 hover:shadow-md"
+              href={link.href}
+            >
+              <span className="grid size-11 shrink-0 place-items-center rounded-md bg-brand-subtle text-brand transition-transform duration-base ease-standard group-hover:scale-105">
+                <link.icon aria-hidden size={20} />
+              </span>
+              <div className="min-w-0 flex-1">
+                <p className="flex items-center gap-1.5 text-title-md font-semibold text-content">
+                  {link.title}
+                  <ArrowUpRight
+                    aria-hidden
+                    className="size-4 text-content-subtle opacity-0 transition-all duration-fast group-hover:translate-x-0.5 group-hover:opacity-100"
+                  />
+                </p>
+                <p className="mt-1 text-label-sm text-content-subtle">
+                  {link.description}
+                </p>
               </div>
-              <div className="p-3 bg-blue-500 rounded-lg text-white"><Package className="w-5 h-5" /></div>
-            </div>
-          </CardBody>
-        </Card>
-        <Card className="shadow-sm bg-gradient-to-br from-green-500/10">
-          <CardBody>
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-tiny uppercase font-bold text-green-500">Active</p>
-                {isLoading ? <Skeleton className="h-8 w-16 mt-1 rounded" /> : <h3 className="text-2xl font-extrabold mt-1">{stats.active}</h3>}
-              </div>
-              <div className="p-3 bg-green-500 rounded-lg text-white"><TrendingUp className="w-5 h-5" /></div>
-            </div>
-          </CardBody>
-        </Card>
-        <Card className="shadow-sm bg-gradient-to-br from-yellow-500/10">
-          <CardBody>
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-tiny uppercase font-bold text-yellow-500">Low Stock</p>
-                {isLoading ? <Skeleton className="h-8 w-16 mt-1 rounded" /> : <h3 className="text-2xl font-extrabold mt-1">{stats.lowStock}</h3>}
-              </div>
-              <div className="p-3 bg-yellow-500 rounded-lg text-white"><AlertTriangle className="w-5 h-5" /></div>
-            </div>
-          </CardBody>
-        </Card>
-        <Card className="shadow-sm bg-gradient-to-br from-purple-500/10">
-          <CardBody>
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-tiny uppercase font-bold text-purple-500">Avg Price</p>
-                {isLoading ? <Skeleton className="h-8 w-24 mt-1 rounded" /> : <h3 className="text-2xl font-extrabold mt-1">৳{stats.avgPrice.toFixed(2)}</h3>}
-              </div>
-              <div className="p-3 bg-purple-500 rounded-lg text-white"><DollarSign className="w-5 h-5" /></div>
-            </div>
-          </CardBody>
-        </Card>
-      </div>
-    </div>
+            </Link>
+          ))}
+        </div>
+      </Container>
+    </>
   );
 }

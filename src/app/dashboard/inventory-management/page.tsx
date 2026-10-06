@@ -1,12 +1,35 @@
 "use client";
 
-import { useState, useMemo } from "react";
-import { Card, CardBody } from "@heroui/card";
-import { Chip } from "@heroui/chip";
-import { Skeleton } from "@heroui/skeleton";
-import { Tooltip } from "@heroui/tooltip";
-import { Button } from "@heroui/button";
-import { Input } from "@heroui/input";
+import { useMemo, useState } from "react";
+import { toast } from "sonner";
+import {
+  Boxes,
+  Download,
+  Package,
+  RefreshCw,
+  SearchIcon,
+  TrendingDown,
+  TriangleAlert,
+} from "lucide-react";
+
+import { PageHeader } from "@/src/components/UI/Section";
+import { Container } from "@/src/components/UI/Container";
+import { Panel, Toolbar, ToolbarGroup } from "@/src/components/dashboard/Panel";
+import {
+  MetricCard,
+  metricGrid,
+} from "@/src/components/dashboard/MetricCard";
+import {
+  StatusBadge,
+  stockTone,
+} from "@/src/components/dashboard/StatusBadge";
+import {
+  IconButton,
+  SegmentTabs,
+} from "@/src/components/dashboard/Controls";
+import { useProducts } from "@/src/hooks/useProducts";
+import { TProduct } from "@/src/types";
+import { exportToCSV } from "@/src/utils/exportUtils";
 import { Pagination } from "@heroui/pagination";
 import {
   Table,
@@ -16,24 +39,20 @@ import {
   TableRow,
   TableCell,
 } from "@heroui/table";
-import {
-  Package,
-  AlertTriangle,
-  SearchIcon,
-  RefreshCw,
-  Download,
-  TrendingUp,
-  TrendingDown,
-} from "lucide-react";
-import { useProducts } from "@/src/hooks/useProducts";
-import { TProduct } from "@/src/types";
-import { exportToCSV } from "@/src/utils/exportUtils";
-import { toast } from "sonner";
+import { formatNumber } from "@/src/lib/productUtils";
+
+type StockFilter = "all" | "low" | "out";
+
+const stockOptions: { value: StockFilter; label: string }[] = [
+  { value: "all", label: "All" },
+  { value: "low", label: "Low stock" },
+  { value: "out", label: "Out of stock" },
+];
 
 export default function InventoryManagementPage() {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
-  const [stockFilter, setStockFilter] = useState<"all" | "low" | "out">("all");
+  const [stockFilter, setStockFilter] = useState<StockFilter>("all");
 
   const { data, isLoading, refetch } = useProducts(
     { searchTerm: search },
@@ -58,18 +77,32 @@ export default function InventoryManagementPage() {
   }, [data, stockFilter]);
 
   const totalItems = data?.meta?.total || 0;
-  const totalPages = Math.ceil(totalItems / 10);
+  const totalPages = Math.max(1, Math.ceil(totalItems / 10));
 
   const lowStockCount = useMemo(
-    () => (data?.data as TProduct[])?.filter((p) => (p.inventories?.[0]?.stock ?? 0) > 0 && (p.inventories?.[0]?.stock ?? 0) < 10).length || 0,
+    () =>
+      (data?.data as TProduct[])
+        ?.filter(
+          (p) =>
+            (p.inventories?.[0]?.stock ?? 0) > 0 &&
+            (p.inventories?.[0]?.stock ?? 0) < 10
+        )
+        .length || 0,
     [data]
   );
   const outOfStockCount = useMemo(
-    () => (data?.data as TProduct[])?.filter((p) => (p.inventories?.[0]?.stock ?? 0) === 0).length || 0,
+    () =>
+      (data?.data as TProduct[])
+        ?.filter((p) => (p.inventories?.[0]?.stock ?? 0) === 0)
+        .length || 0,
     [data]
   );
   const totalStock = useMemo(
-    () => (data?.data as TProduct[])?.reduce((sum, p) => sum + (p.inventories?.[0]?.stock ?? 0), 0) || 0,
+    () =>
+      (data?.data as TProduct[])?.reduce(
+        (sum, p) => sum + (p.inventories?.[0]?.stock ?? 0),
+        0
+      ) || 0,
     [data]
   );
 
@@ -89,189 +122,222 @@ export default function InventoryManagementPage() {
       Price: p.price,
     }));
 
-    exportToCSV(wsData, `inventory_${new Date().toISOString().split("T")[0]}`);
+    exportToCSV(
+      wsData,
+      `inventory_${new Date().toISOString().split("T")[0]}`
+    );
     toast.success("Inventory report downloaded");
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-        <div>
-          <h1 className="text-2xl font-bold">Inventory Management</h1>
-          <p className="text-sm text-default-500">Track and manage product stock levels</p>
-        </div>
-        <div className="flex gap-2">
-          <Tooltip content="Download Report">
-            <Button isIconOnly size="sm" variant="flat" onPress={downloadReport}>
-              <Download className="w-4 h-4" />
-            </Button>
-          </Tooltip>
-          <Tooltip content="Refresh">
-            <Button isIconOnly size="sm" variant="flat" onPress={() => refetch()}>
-              <RefreshCw className="w-4 h-4" />
-            </Button>
-          </Tooltip>
-        </div>
-      </div>
+    <>
+      <PageHeader
+        action={
+          <div className="flex items-center gap-2">
+            <IconButton label="Download report" onClick={downloadReport}>
+              <Download className="size-4" />
+            </IconButton>
+            <IconButton label="Refresh inventory" onClick={() => refetch()}>
+              <RefreshCw className="size-4" />
+            </IconButton>
+          </div>
+        }
+        description="Track stock levels and spot products that need restocking."
+        eyebrow="Inventory"
+        title="Inventory management"
+      />
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card className="shadow-sm bg-gradient-to-br from-blue-500/10 to-transparent">
-          <CardBody>
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-tiny uppercase font-bold text-blue-500">Total Products</p>
-                {isLoading ? (
-                  <Skeleton className="h-8 w-16 mt-1 rounded" />
-                ) : (
-                  <h3 className="text-2xl font-extrabold mt-1">{totalItems}</h3>
-                )}
-              </div>
-              <div className="p-3 bg-blue-500 rounded-lg text-white"><Package className="w-5 h-5" /></div>
-            </div>
-          </CardBody>
-        </Card>
-        <Card className="shadow-sm bg-gradient-to-br from-green-500/10 to-transparent">
-          <CardBody>
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-tiny uppercase font-bold text-green-500">Total Stock</p>
-                {isLoading ? (
-                  <Skeleton className="h-8 w-16 mt-1 rounded" />
-                ) : (
-                  <h3 className="text-2xl font-extrabold mt-1">{totalStock.toLocaleString()}</h3>
-                )}
-              </div>
-              <div className="p-3 bg-green-500 rounded-lg text-white"><TrendingUp className="w-5 h-5" /></div>
-            </div>
-          </CardBody>
-        </Card>
-        <Card className="shadow-sm bg-gradient-to-br from-yellow-500/10 to-transparent">
-          <CardBody>
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-tiny uppercase font-bold text-yellow-500">Low Stock</p>
-                {isLoading ? (
-                  <Skeleton className="h-8 w-16 mt-1 rounded" />
-                ) : (
-                  <h3 className="text-2xl font-extrabold mt-1">{lowStockCount}</h3>
-                )}
-              </div>
-              <div className="p-3 bg-yellow-500 rounded-lg text-white"><AlertTriangle className="w-5 h-5" /></div>
-            </div>
-          </CardBody>
-        </Card>
-        <Card className="shadow-sm bg-gradient-to-br from-red-500/10 to-transparent">
-          <CardBody>
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-tiny uppercase font-bold text-red-500">Out of Stock</p>
-                {isLoading ? (
-                  <Skeleton className="h-8 w-16 mt-1 rounded" />
-                ) : (
-                  <h3 className="text-2xl font-extrabold mt-1">{outOfStockCount}</h3>
-                )}
-              </div>
-              <div className="p-3 bg-red-500 rounded-lg text-white"><TrendingDown className="w-5 h-5" /></div>
-            </div>
-          </CardBody>
-        </Card>
-      </div>
+      <Container className="py-6 sm:py-8">
+        {/* KPI row */}
+        <div className={metricGrid}>
+          <MetricCard
+            hint="In the catalogue"
+            icon={Package}
+            label="Total products"
+            loading={isLoading}
+            tone="brand"
+            value={formatNumber(totalItems)}
+          />
+          <MetricCard
+            hint="Units across all products"
+            icon={Boxes}
+            label="Total stock"
+            loading={isLoading}
+            tone="neutral"
+            value={formatNumber(totalStock)}
+          />
+          <MetricCard
+            hint="Below the reorder threshold"
+            icon={TriangleAlert}
+            label="Low stock"
+            loading={isLoading}
+            tone="warning"
+            value={formatNumber(lowStockCount)}
+          />
+          <MetricCard
+            hint="Need restocking now"
+            icon={TrendingDown}
+            label="Out of stock"
+            loading={isLoading}
+            tone="danger"
+            value={formatNumber(outOfStockCount)}
+          />
+        </div>
 
-      <Card className="shadow-sm">
-        <CardBody>
-          <div className="flex flex-col md:flex-row gap-4 mb-6">
-            <Input
-              className="max-w-xs"
-              placeholder="Search products..."
-              startContent={<SearchIcon className="w-4 h-4 text-default-400" />}
-              value={search}
-              onChange={(e) => { setSearch(e.target.value); setPage(1); }}
-            />
-            <div className="flex gap-2">
-              {(["all", "low", "out"] as const).map((filter) => (
-                <Button
-                  key={filter}
-                  color={stockFilter === filter ? "primary" : "default"}
-                  size="sm"
-                  variant={stockFilter === filter ? "solid" : "flat"}
-                  onPress={() => { setStockFilter(filter); setPage(1); }}
-                >
-                  {filter === "all" ? "All" : filter === "low" ? "Low Stock" : "Out of Stock"}
-                </Button>
-              ))}
-            </div>
+        {/* Table */}
+        <Panel
+          bodyClassName="p-0"
+          className="mt-5"
+          description="Current stock position per product."
+          title="Stock levels"
+        >
+          <div className="border-b border-line-hairline px-5 py-4">
+            <Toolbar>
+              <div className="relative w-full max-w-xs">
+                <label className="sr-only" htmlFor="inventory-search">
+                  Search products
+                </label>
+                <SearchIcon
+                  aria-hidden
+                  className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-content-subtle"
+                />
+                <input
+                  className="h-9 w-full rounded-md border border-line-hairline bg-surface-sunken pl-9 pr-3 text-body-sm text-content transition-colors duration-fast ease-standard placeholder:text-content-subtle hover:border-line-strong focus:border-brand focus:outline-none"
+                  id="inventory-search"
+                  placeholder="Search products…"
+                  type="search"
+                  value={search}
+                  onChange={(e) => {
+                    setPage(1);
+                    setSearch(e.target.value);
+                  }}
+                />
+              </div>
+              <ToolbarGroup className="md:ml-auto">
+                <SegmentTabs
+                  label="Stock filter"
+                  options={stockOptions}
+                  value={stockFilter}
+                  onChange={(value) => {
+                    setPage(1);
+                    setStockFilter(value);
+                  }}
+                />
+              </ToolbarGroup>
+            </Toolbar>
           </div>
 
-          <div className="overflow-x-auto -mx-1">
-          <Table
-            aria-label="Inventory table"
-            className="min-w-[500px]"
-            classNames={{
-              wrapper: "bg-transparent p-0 shadow-none",
-              th: "bg-gray-100/50 dark:bg-gray-900/50 text-default-600",
-            }}
-            shadow="none"
-          >
-            <TableHeader>
-              <TableColumn>PRODUCT</TableColumn>
-              <TableColumn>CATEGORY</TableColumn>
-              <TableColumn>STOCK</TableColumn>
-              <TableColumn>THRESHOLD</TableColumn>
-              <TableColumn>STATUS</TableColumn>
-            </TableHeader>
-            <TableBody
-              emptyContent="No products found"
-              isLoading={isLoading}
-              loadingContent={<Skeleton className="w-full h-40 rounded-xl" />}
+          <div className="overflow-x-auto">
+            <Table
+              aria-label="Inventory table"
+              classNames={{
+                th: "text-overline font-semibold uppercase tracking-[0.12em] text-content-subtle",
+              }}
+              shadow="none"
             >
-              {products.map((product: TProduct) => {
-                const stock = product.inventories?.[0]?.stock ?? 0;
-                const threshold = product.inventories?.[0]?.lowStockThreshold ?? 5;
-                const isLow = stock > 0 && stock < 10;
-                const isOut = stock === 0;
+              <TableHeader>
+                <TableColumn>Product</TableColumn>
+                <TableColumn className="hidden sm:table-cell">
+                  Category
+                </TableColumn>
+                <TableColumn>Stock</TableColumn>
+                <TableColumn className="hidden md:table-cell">
+                  Threshold
+                </TableColumn>
+                <TableColumn>Status</TableColumn>
+              </TableHeader>
 
-                return (
-                  <TableRow key={product._id} className="border-b border-gray-100 dark:border-gray-800 last:border-none">
-                    <TableCell>
-                      <span className="font-semibold text-sm">{product.name}</span>
-                    </TableCell>
-                    <TableCell>
-                      <Chip className="capitalize" size="sm" variant="flat">{product.category}</Chip>
-                    </TableCell>
-                    <TableCell>
-                      <span className={`font-bold ${isOut ? "text-red-500" : isLow ? "text-yellow-500" : "text-green-500"}`}>
-                        {stock}
-                      </span>
-                    </TableCell>
-                    <TableCell>
-                      <span className="text-sm text-default-500">{threshold}</span>
-                    </TableCell>
-                    <TableCell>
-                      <Chip
-                        color={isOut ? "danger" : isLow ? "warning" : "success"}
-                        size="sm"
-                        startContent={
-                          isOut || isLow ? <AlertTriangle className="w-3 h-3" /> : undefined
-                        }
-                        variant="flat"
-                      >
-                        {isOut ? "Out of Stock" : isLow ? "Low Stock" : "In Stock"}
-                      </Chip>
-                    </TableCell>
-                  </TableRow>
-                );
-              })}
-            </TableBody>
-          </Table>
+              <TableBody
+                emptyContent={
+                  <div className="flex flex-col items-center gap-3 py-16 text-center">
+                    <span className="grid size-12 place-items-center rounded-full border border-dashed border-line-strong bg-surface-sunken text-content-subtle">
+                      <Package aria-hidden size={20} />
+                    </span>
+                    <p className="text-body-sm font-medium text-content">
+                      No products found
+                    </p>
+                    <p className="max-w-sm text-label-sm text-content-subtle">
+                      Adjust the search or stock filter to see inventory.
+                    </p>
+                  </div>
+                }
+                isLoading={isLoading}
+              >
+                {products.map((product: TProduct) => {
+                  const stock = product.inventories?.[0]?.stock ?? 0;
+                  const threshold =
+                    product.inventories?.[0]?.lowStockThreshold ?? 5;
+                  const isLow = stock > 0 && stock < 10;
+                  const isOut = stock === 0;
+
+                  return (
+                    <TableRow
+                      key={product._id}
+                      className="transition-colors duration-fast hover:bg-surface-sunken/60"
+                    >
+                      <TableCell>
+                        <span className="text-body-sm font-semibold text-content">
+                          {product.name}
+                        </span>
+                      </TableCell>
+                      <TableCell className="hidden sm:table-cell">
+                        <StatusBadge tone="neutral">
+                          {product.category}
+                        </StatusBadge>
+                      </TableCell>
+                      <TableCell>
+                        <span
+                          className={
+                            "tabular text-body-sm font-bold " +
+                            (isOut
+                              ? "text-danger"
+                              : isLow
+                                ? "text-warning"
+                                : "text-success")
+                          }
+                        >
+                          {stock}
+                        </span>
+                      </TableCell>
+                      <TableCell className="hidden md:table-cell">
+                        <span className="tabular text-body-sm text-content-muted">
+                          {threshold}
+                        </span>
+                      </TableCell>
+                      <TableCell>
+                        <StatusBadge dot tone={stockTone(stock)}>
+                          {isOut
+                            ? "Out of stock"
+                            : isLow
+                              ? "Low stock"
+                              : "In stock"}
+                        </StatusBadge>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
+              </TableBody>
+            </Table>
           </div>
 
+          {/* Pagination */}
           {totalPages > 1 && (
-            <div className="flex justify-center mt-6">
-              <Pagination showControls color="primary" page={page} total={totalPages} variant="flat" onChange={setPage} />
+            <div className="flex flex-col gap-3 border-t border-line-hairline px-5 py-3.5 sm:flex-row sm:items-center sm:justify-between">
+              <p className="tabular text-label-sm text-content-subtle">
+                Page {page} of {totalPages}
+              </p>
+              <Pagination
+                showControls
+                color="primary"
+                page={page}
+                total={totalPages}
+                variant="flat"
+                onChange={setPage}
+              />
             </div>
           )}
-        </CardBody>
-      </Card>
-    </div>
+        </Panel>
+      </Container>
+    </>
   );
 }

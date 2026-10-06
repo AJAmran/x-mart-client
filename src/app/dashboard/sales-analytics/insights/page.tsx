@@ -1,55 +1,81 @@
 "use client";
 
 import { useMemo } from "react";
-import { Card, CardBody, CardHeader } from "@heroui/card";
-import { Skeleton } from "@heroui/skeleton";
 import {
-  TrendingUp,
-  TrendingDown,
-  DollarSign,
-  ShoppingCart,
-  Users,
+  Banknote,
   Package,
+  Percent,
+  ShoppingBag,
   Target,
-  Award,
+  TrendingUp,
+  Users,
+  Wallet,
 } from "lucide-react";
+
 import {
-  ResponsiveContainer,
-  PieChart,
-  Pie,
-  Cell,
-  Tooltip,
-  Legend,
-  BarChart,
   Bar,
+  BarChart,
+  CartesianGrid,
+  Cell,
+  Pie,
+  PieChart,
+  ResponsiveContainer,
+  Tooltip,
   XAxis,
   YAxis,
-  CartesianGrid,
 } from "recharts";
+
+import { PageHeader } from "@/src/components/UI/Section";
+import { Container } from "@/src/components/UI/Container";
+import { Panel } from "@/src/components/dashboard/Panel";
+import {
+  MetricCard,
+  StatTile,
+  metricGrid,
+} from "@/src/components/dashboard/MetricCard";
+import {
+  chartPalette,
+  statusPalette,
+  statusPaletteFallback,
+} from "@/src/config/theme";
 import { useOrders } from "@/src/hooks/useOrder";
 import { useUsers } from "@/src/hooks/useUser";
 import { useProducts } from "@/src/hooks/useProducts";
+import { formatCurrency, formatNumber } from "@/src/lib/productUtils";
 
-const COLORS = ["#3b82f6", "#10b981", "#f59e0b", "#ef4444", "#8b5cf6", "#ec4899"];
+const axisTick = { fontSize: 11 } as const;
 
 export default function InsightsPage() {
-  const { data: ordersRes, isLoading: ordersLoading } = useOrders({}, { limit: 5000, sortBy: "createdAt", sortOrder: "desc" });
+  const {
+    data: ordersRes,
+    isLoading: ordersLoading,
+  } = useOrders({}, { limit: 5000, sortBy: "createdAt", sortOrder: "desc" });
   const { data: usersRes, isLoading: usersLoading } = useUsers({ limit: 1 });
-  const { data: productsRes, isLoading: productsLoading } = useProducts({}, { limit: 1 });
+  const {
+    data: productsRes,
+    isLoading: productsLoading,
+  } = useProducts({}, { limit: 1 });
 
   const insights = useMemo(() => {
     const orders = ordersRes?.data || [];
     const totalUsers = usersRes?.meta?.total || usersRes?.data?.length || 0;
-    const totalProducts = productsRes?.meta?.total || productsRes?.data?.length || 0;
-    const totalRevenue = orders.reduce((s: number, o: any) => s + (o.totalAmount || o.totalPrice || 0), 0);
+    const totalProducts =
+      productsRes?.meta?.total || productsRes?.data?.length || 0;
+    const totalRevenue = orders.reduce(
+      (s: number, o: any) => s + (o.totalPrice ?? 0),
+      0
+    );
     const totalOrders = orders.length;
     const avgOrderValue = totalOrders > 0 ? totalRevenue / totalOrders : 0;
     const revenuePerUser = totalUsers > 0 ? totalRevenue / totalUsers : 0;
 
-    const delivered = orders.filter((o: any) => o.status === "DELIVERED").length;
-    const cancelled = orders.filter((o: any) => o.status === "CANCELLED").length;
+    const delivered = orders.filter((o: any) => o.status === "DELIVERED")
+      .length;
+    const cancelled = orders.filter((o: any) => o.status === "CANCELLED")
+      .length;
     const deliveryRate = totalOrders > 0 ? (delivered / totalOrders) * 100 : 0;
-    const cancellationRate = totalOrders > 0 ? (cancelled / totalOrders) * 100 : 0;
+    const cancellationRate =
+      totalOrders > 0 ? (cancelled / totalOrders) * 100 : 0;
 
     const statusCounts: Record<string, number> = {};
 
@@ -58,7 +84,9 @@ export default function InsightsPage() {
 
       statusCounts[s] = (statusCounts[s] || 0) + 1;
     });
-    const statusData = Object.entries(statusCounts).map(([name, value]) => ({ name, value }));
+    const statusData = Object.entries(statusCounts).map(
+      ([name, value]) => ({ name, value })
+    );
 
     const topProducts: Record<string, { qty: number; revenue: number }> = {};
 
@@ -66,9 +94,11 @@ export default function InsightsPage() {
       (o.items || []).forEach((item: any) => {
         const name = item.name || item.productId || "Unknown";
 
-        if (!topProducts[name]) topProducts[name] = { qty: 0, revenue: 0 };
+        if (!topProducts[name])
+          topProducts[name] = { qty: 0, revenue: 0 };
         topProducts[name].qty += item.quantity || 1;
-        topProducts[name].revenue += (item.price || 0) * (item.quantity || 1);
+        topProducts[name].revenue +=
+          (item.price || 0) * (item.quantity || 1);
       });
     });
     const topSelling = Object.entries(topProducts)
@@ -77,140 +107,232 @@ export default function InsightsPage() {
       .slice(0, 5);
 
     return {
-      totalUsers, totalProducts, totalRevenue, totalOrders, avgOrderValue, revenuePerUser,
-      delivered, cancelled, deliveryRate, cancellationRate, statusData, topSelling,
+      totalUsers,
+      totalProducts,
+      totalRevenue,
+      totalOrders,
+      avgOrderValue,
+      revenuePerUser,
+      delivered,
+      cancelled,
+      deliveryRate,
+      cancellationRate,
+      statusData,
+      topSelling,
     };
   }, [ordersRes, usersRes, productsRes]);
 
   const isLoading = ordersLoading || usersLoading || productsLoading;
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold">Business Insights</h1>
-        <p className="text-sm text-default-500">Key metrics and performance indicators</p>
-      </div>
+    <>
+      <PageHeader
+        description="Key metrics and performance indicators across the store."
+        eyebrow="Sales & analytics"
+        title="Business insights"
+      />
 
-      {isLoading ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {Array.from({ length: 8 }).map((_, i) => (
-            <Card key={i}><CardBody><Skeleton className="h-20 rounded-lg" /></CardBody></Card>
-          ))}
+      <Container className="py-6 sm:py-8">
+        {/* Primary KPIs */}
+        <div className={metricGrid}>
+          <MetricCard
+            icon={Banknote}
+            label="Total revenue"
+            loading={isLoading}
+            tone="brand"
+            value={formatCurrency(insights.totalRevenue)}
+          />
+          <MetricCard
+            icon={ShoppingBag}
+            label="Total orders"
+            loading={isLoading}
+            tone="neutral"
+            value={formatNumber(insights.totalOrders)}
+          />
+          <MetricCard
+            icon={Wallet}
+            label="Avg. order value"
+            loading={isLoading}
+            tone="neutral"
+            value={formatCurrency(insights.avgOrderValue)}
+          />
+          <MetricCard
+            hint={`${formatNumber(insights.delivered)} delivered`}
+            icon={Target}
+            label="Delivery rate"
+            loading={isLoading}
+            tone="success"
+            value={`${insights.deliveryRate.toFixed(1)}%`}
+          />
         </div>
-      ) : (
-        <>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <Card className="shadow-sm bg-gradient-to-br from-blue-500/10">
-              <CardBody className="flex flex-row items-center gap-4">
-                <div className="p-3 bg-blue-500 rounded-lg text-white"><DollarSign className="w-5 h-5" /></div>
-                <div>
-                  <p className="text-xs uppercase font-bold text-blue-500">Revenue</p>
-                  <h3 className="text-xl font-extrabold">৳{insights.totalRevenue.toLocaleString()}</h3>
-                </div>
-              </CardBody>
-            </Card>
-            <Card className="shadow-sm bg-gradient-to-br from-green-500/10">
-              <CardBody className="flex flex-row items-center gap-4">
-                <div className="p-3 bg-green-500 rounded-lg text-white"><ShoppingCart className="w-5 h-5" /></div>
-                <div>
-                  <p className="text-xs uppercase font-bold text-green-500">Orders</p>
-                  <h3 className="text-xl font-extrabold">{insights.totalOrders}</h3>
-                </div>
-              </CardBody>
-            </Card>
-            <Card className="shadow-sm bg-gradient-to-br from-purple-500/10">
-              <CardBody className="flex flex-row items-center gap-4">
-                <div className="p-3 bg-purple-500 rounded-lg text-white"><Users className="w-5 h-5" /></div>
-                <div>
-                  <p className="text-xs uppercase font-bold text-purple-500">Users</p>
-                  <h3 className="text-xl font-extrabold">{insights.totalUsers}</h3>
-                </div>
-              </CardBody>
-            </Card>
-            <Card className="shadow-sm bg-gradient-to-br from-orange-500/10">
-              <CardBody className="flex flex-row items-center gap-4">
-                <div className="p-3 bg-orange-500 rounded-lg text-white"><Package className="w-5 h-5" /></div>
-                <div>
-                  <p className="text-xs uppercase font-bold text-orange-500">Products</p>
-                  <h3 className="text-xl font-extrabold">{insights.totalProducts}</h3>
-                </div>
-              </CardBody>
-            </Card>
-            <Card className="shadow-sm bg-gradient-to-br from-emerald-500/10">
-              <CardBody className="flex flex-row items-center gap-4">
-                <div className="p-3 bg-emerald-500 rounded-lg text-white"><Target className="w-5 h-5" /></div>
-                <div>
-                  <p className="text-xs uppercase font-bold text-emerald-500">Avg Order Value</p>
-                  <h3 className="text-xl font-extrabold">৳{insights.avgOrderValue.toFixed(2)}</h3>
-                </div>
-              </CardBody>
-            </Card>
-            <Card className="shadow-sm bg-gradient-to-br from-cyan-500/10">
-              <CardBody className="flex flex-row items-center gap-4">
-                <div className="p-3 bg-cyan-500 rounded-lg text-white"><TrendingUp className="w-5 h-5" /></div>
-                <div>
-                  <p className="text-xs uppercase font-bold text-cyan-500">Delivery Rate</p>
-                  <h3 className="text-xl font-extrabold">{insights.deliveryRate.toFixed(1)}%</h3>
-                </div>
-              </CardBody>
-            </Card>
-            <Card className="shadow-sm bg-gradient-to-br from-red-500/10">
-              <CardBody className="flex flex-row items-center gap-4">
-                <div className="p-3 bg-red-500 rounded-lg text-white"><TrendingDown className="w-5 h-5" /></div>
-                <div>
-                  <p className="text-xs uppercase font-bold text-red-500">Cancellation Rate</p>
-                  <h3 className="text-xl font-extrabold">{insights.cancellationRate.toFixed(1)}%</h3>
-                </div>
-              </CardBody>
-            </Card>
-            <Card className="shadow-sm bg-gradient-to-br from-pink-500/10">
-              <CardBody className="flex flex-row items-center gap-4">
-                <div className="p-3 bg-pink-500 rounded-lg text-white"><Award className="w-5 h-5" /></div>
-                <div>
-                  <p className="text-xs uppercase font-bold text-pink-500">Revenue/User</p>
-                  <h3 className="text-xl font-extrabold">৳{insights.revenuePerUser.toFixed(2)}</h3>
-                </div>
-              </CardBody>
-            </Card>
-          </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <Card className="shadow-sm">
-              <CardHeader><h3 className="text-lg font-bold">Order Status Distribution</h3></CardHeader>
-              <CardBody>
-                <ResponsiveContainer height={300} width="100%">
-                  <PieChart>
-                    <Pie cx="50%" cy="50%" data={insights.statusData} dataKey="value" label={({ name, percent }) => `${name} ${((percent ?? 0) * 100).toFixed(0)}%`} outerRadius={100} paddingAngle={3}>
-                      {insights.statusData.map((_, i) => (<Cell key={i} fill={COLORS[i % COLORS.length]} />))}
-                    </Pie>
-                    <Tooltip />
-                    <Legend />
-                  </PieChart>
-                </ResponsiveContainer>
-              </CardBody>
-            </Card>
-
-            <Card className="shadow-sm">
-              <CardHeader><h3 className="text-lg font-bold">Top Selling Products</h3></CardHeader>
-              <CardBody>
-                {insights.topSelling.length === 0 ? (
-                  <p className="text-default-400 text-center py-10">No data available</p>
-                ) : (
-                  <ResponsiveContainer height={300} width="100%">
-                    <BarChart data={insights.topSelling} layout="vertical">
-                      <CartesianGrid opacity={0.3} strokeDasharray="3 3" />
-                      <XAxis type="number" />
-                      <YAxis dataKey="name" tick={{ fontSize: 11 }} type="category" width={120} />
-                      <Tooltip />
-                      <Bar dataKey="qty" fill="#3b82f6" radius={[0, 4, 4, 0]} />
-                    </BarChart>
-                  </ResponsiveContainer>
-                )}
-              </CardBody>
-            </Card>
+        {/* Secondary indicators */}
+        <Panel
+          className="mt-5"
+          description="Supporting metrics at a glance"
+          loading={isLoading}
+          title="Quick indicators"
+        >
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
+            <StatTile
+              icon={Users}
+              label="Users"
+              loading={isLoading}
+              tone="brand"
+              value={formatNumber(insights.totalUsers)}
+            />
+            <StatTile
+              icon={Package}
+              label="Products"
+              loading={isLoading}
+              tone="neutral"
+              value={formatNumber(insights.totalProducts)}
+            />
+            <StatTile
+              icon={Percent}
+              label="Cancellation rate"
+              loading={isLoading}
+              tone={insights.cancellationRate > 10 ? "danger" : "warning"}
+              value={`${insights.cancellationRate.toFixed(1)}%`}
+            />
+            <StatTile
+              icon={TrendingUp}
+              label="Revenue / user"
+              loading={isLoading}
+              tone="success"
+              value={formatCurrency(insights.revenuePerUser)}
+            />
           </div>
-        </>
-      )}
-    </div>
+        </Panel>
+
+        {/* Charts */}
+        <div className="mt-5 grid grid-cols-1 gap-5 lg:grid-cols-2">
+          <Panel
+            description="Share of orders by pipeline stage"
+            empty={insights.statusData.length === 0}
+            loading={isLoading}
+            title="Order status distribution"
+          >
+            <div className="relative h-64">
+              <ResponsiveContainer height="100%" width="100%">
+                <PieChart>
+                  <Pie
+                    cx="50%"
+                    cy="50%"
+                    data={insights.statusData}
+                    dataKey="value"
+                    innerRadius={64}
+                    outerRadius={96}
+                    paddingAngle={3}
+                    stroke="none"
+                  >
+                    {insights.statusData.map((entry) => (
+                      <Cell
+                        key={entry.name}
+                        fill={
+                          statusPalette[entry.name] ?? statusPaletteFallback
+                        }
+                      />
+                    ))}
+                  </Pie>
+                </PieChart>
+              </ResponsiveContainer>
+              <div className="pointer-events-none absolute inset-0 grid place-items-center">
+                <div className="text-center">
+                  <p className="tabular text-display-sm font-bold text-content">
+                    {formatNumber(insights.totalOrders)}
+                  </p>
+                  <p className="text-overline font-semibold uppercase tracking-[0.14em] text-content-subtle">
+                    Orders
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <ul className="mt-4 flex flex-wrap gap-x-5 gap-y-2">
+              {insights.statusData.map((entry) => (
+                <li
+                  key={entry.name}
+                  className="flex items-center gap-2 text-label-sm text-content-muted"
+                >
+                  <span
+                    className="size-2.5 rounded-full"
+                    style={{
+                      backgroundColor:
+                        statusPalette[entry.name] ?? statusPaletteFallback,
+                    }}
+                  />
+                  {entry.name}
+                  <span className="tabular font-semibold text-content">
+                    {entry.value}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </Panel>
+
+          <Panel
+            description="Best sellers by quantity"
+            empty={insights.topSelling.length === 0}
+            emptyDescription="Top sellers appear once orders contain product items."
+            loading={isLoading}
+            title="Top selling products"
+          >
+            {insights.topSelling.length === 0 ? (
+              <div className="grid h-64 place-items-center" />
+            ) : (
+              <ResponsiveContainer height={280} width="100%">
+                <BarChart
+                  data={insights.topSelling}
+                  height={280}
+                  layout="vertical"
+                  margin={{ top: 4, right: 16, bottom: 0, left: 8 }}
+                >
+                  <CartesianGrid
+                    horizontal={false}
+                    stroke="rgb(var(--line))"
+                    strokeDasharray="3 3"
+                  />
+                  <XAxis
+                    allowDecimals={false}
+                    tick={axisTick}
+                    tickLine={false}
+                    type="number"
+                  />
+                  <YAxis
+                    dataKey="name"
+                    tick={axisTick}
+                    tickLine={false}
+                    type="category"
+                    width={140}
+                  />
+                  <Tooltip
+                    content={({ active, payload, label }: any) =>
+                      active && payload?.length ? (
+                        <div className="rounded-md border border-line-hairline bg-surface-raised px-3 py-2 shadow-lg">
+                          <p className="text-label-sm text-content-subtle">
+                            {label}
+                          </p>
+                          <p className="tabular mt-0.5 text-body-sm font-semibold text-content">
+                            {formatNumber(Number(payload[0].value ?? 0))}{" "}
+                            units
+                          </p>
+                        </div>
+                      ) : null
+                    }
+                  />
+                  <Bar
+                    dataKey="qty"
+                    fill={chartPalette[0]}
+                    maxBarSize={18}
+                    radius={[0, 5, 5, 0]}
+                  />
+                </BarChart>
+              </ResponsiveContainer>
+            )}
+          </Panel>
+        </div>
+      </Container>
+    </>
   );
 }

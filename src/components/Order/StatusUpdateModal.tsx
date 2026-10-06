@@ -1,7 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-
+import { useEffect, useState } from "react";
 import {
   Modal,
   ModalBody,
@@ -9,10 +8,11 @@ import {
   ModalFooter,
   ModalHeader,
 } from "@heroui/modal";
-import { Chip } from "@heroui/chip";
 import { Button } from "@heroui/button";
 import { Input } from "@heroui/input";
+import { Select, SelectItem } from "@heroui/select";
 
+import { StatusBadge, orderStatusTone } from "@/src/components/dashboard/StatusBadge";
 import { ORDER_STATUS, TOrder } from "@/src/types";
 
 interface StatusUpdateModalProps {
@@ -35,29 +35,14 @@ const StatusUpdateModal = ({
   isPending,
   refetch,
 }: StatusUpdateModalProps) => {
-  const [newStatus, setNewStatus] = useState(selectedOrder?.status || "");
+  const [newStatus, setNewStatus] = useState<string | null>(null);
   const [note, setNote] = useState("");
-  const [isStatusDropdownOpen, setIsStatusDropdownOpen] = useState(false);
 
-  const dropdownRef = useRef<HTMLDivElement>(null);
-  const triggerRef = useRef<HTMLDivElement>(null);
-
-  const getStatusColor = (status: keyof typeof ORDER_STATUS) => {
-    switch (status) {
-      case "PENDING":
-        return "warning";
-      case "PROCESSING":
-        return "primary";
-      case "SHIPPED":
-        return "secondary";
-      case "DELIVERED":
-        return "success";
-      case "CANCELLED":
-        return "danger";
-      default:
-        return "default";
-    }
-  };
+  // Keep the form in sync whenever a different order is opened.
+  useEffect(() => {
+    setNewStatus(selectedOrder?.status || null);
+    setNote("");
+  }, [selectedOrder]);
 
   const handleStatusUpdate = () => {
     if (selectedOrder && newStatus) {
@@ -65,7 +50,6 @@ const StatusUpdateModal = ({
         { id: selectedOrder._id, status: newStatus, note },
         {
           onSuccess: () => {
-            setNewStatus("");
             setNote("");
             onOpenChange?.(false);
             refetch?.();
@@ -75,165 +59,74 @@ const StatusUpdateModal = ({
     }
   };
 
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(event.target as Node) &&
-        triggerRef.current &&
-        !triggerRef.current.contains(event.target as Node)
-      ) {
-        setIsStatusDropdownOpen(false);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
-
-  const handleKeyDown = (e: React.KeyboardEvent, status: string) => {
-    if (e.key === "Enter" || e.key === " ") {
-      setNewStatus(status);
-      setIsStatusDropdownOpen(false);
-    }
-  };
-
   return (
     <Modal
       backdrop="blur"
-      className="max-w-[90vw] sm:max-w-2xl mx-auto my-4 sm:my-8"
+      className="mx-auto my-4 max-w-[90vw] sm:max-w-xl"
       isOpen={isOpen}
       size="lg"
       onOpenChange={onOpenChange}
     >
-      <ModalContent className="bg-white rounded-lg shadow-xl">
+      <ModalContent className="overflow-hidden rounded-lg border border-line-hairline bg-surface-raised shadow-xl">
         {(onClose) => (
           <>
-            <ModalHeader className="border-b border-gray-200 px-4 sm:px-6 py-4">
+            <ModalHeader className="border-b border-line-hairline bg-surface-sunken/40 px-5 py-4">
               <div className="flex flex-col gap-1">
-                <h2 className="text-lg sm:text-xl font-semibold text-gray-900">
-                  Update Order Status
+                <h2 className="text-title-md font-semibold text-content">
+                  Update order status
                 </h2>
                 {selectedOrder && (
-                  <p className="text-xs sm:text-sm text-gray-500">
-                    Order #{selectedOrder._id.slice(0, 8)}...
+                  <p className="tabular text-label-sm text-content-subtle">
+                    Order #{selectedOrder._id.slice(0, 8).toUpperCase()}…
                   </p>
                 )}
               </div>
             </ModalHeader>
 
-            <ModalBody className="px-4 sm:px-6 py-6 space-y-4 sm:space-y-6 max-h-[70vh] overflow-y-auto">
+            <ModalBody className="flex flex-col gap-5 px-5 py-5">
               <div>
-                <label
-                  className="block text-sm font-medium text-gray-700 mb-1"
-                  htmlFor="current-status"
-                >
-                  Current Status
-                </label>
+                <p className="mb-1.5 text-label-sm font-semibold text-content-muted">
+                  Current status
+                </p>
                 {selectedOrder && (
-                  <Chip
-                    className="px-3 sm:px-4 py-1 sm:py-2 text-sm"
-                    color={getStatusColor(selectedOrder.status)}
-                    id="current-status"
-                    variant="dot"
+                  <StatusBadge
+                    dot
+                    tone={orderStatusTone(selectedOrder.status)}
                   >
                     {selectedOrder.status}
-                  </Chip>
+                  </StatusBadge>
                 )}
               </div>
 
-              <div className="relative">
-                <label
-                  className="block text-sm font-medium text-gray-700 mb-1"
-                  htmlFor="new-status"
+              <div>
+                <p className="mb-1.5 text-label-sm font-semibold text-content-muted">
+                  New status
+                </p>
+                <Select
+                  aria-label="New status"
+                  placeholder="Select a status"
+                  selectedKeys={newStatus ? [newStatus] : []}
+                  size="md"
+                  variant="bordered"
+                  onChange={(e) => setNewStatus(e.target.value)}
                 >
-                  New Status
-                </label>
-
-                <div
-                  ref={triggerRef}
-                  aria-controls="status-dropdown"
-                  aria-expanded={isStatusDropdownOpen}
-                  className="h-10 sm:h-12 w-full flex items-center justify-between border border-gray-300 rounded-md px-3 py-2 cursor-pointer bg-white hover:border-blue-500 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  id="new-status"
-                  role="combobox"
-                  tabIndex={0}
-                  onClick={() => setIsStatusDropdownOpen(!isStatusDropdownOpen)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" || e.key === " ") {
-                      setIsStatusDropdownOpen(!isStatusDropdownOpen);
-                    }
-                  }}
-                >
-                  <span
-                    className={
-                      newStatus
-                        ? "text-gray-900 text-sm"
-                        : "text-gray-400 text-sm"
-                    }
-                  >
-                    {newStatus || "Select new status"}
-                  </span>
-                  <svg
-                    className="w-4 sm:w-5 h-4 sm:h-5 text-gray-400"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      d="M19 9l-7 7-7-7"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                    />
-                  </svg>
-                </div>
-
-                {isStatusDropdownOpen && (
-                  <div
-                    ref={dropdownRef}
-                    className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg max-h-60 overflow-y-auto sm:max-h-80"
-                    id="status-dropdown"
-                    role="listbox"
-                  >
-                    <ul className="py-1">
-                      {Object.values(ORDER_STATUS).map((status) => (
-                        <li
-                          key={status}
-                          aria-selected={newStatus === status}
-                          className="px-3 sm:px-4 py-2 hover:bg-blue-50 cursor-pointer text-gray-900 text-sm sm:text-base transition-colors"
-                          role="option"
-                          tabIndex={0}
-                          onClick={() => {
-                            setNewStatus(status);
-                            setIsStatusDropdownOpen(false);
-                          }}
-                          onKeyDown={(e) => handleKeyDown(e, status)}
-                        >
-                          {status}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
+                  {Object.values(ORDER_STATUS).map((status) => (
+                    <SelectItem key={status}>{status}</SelectItem>
+                  ))}
+                </Select>
               </div>
 
               <Input
-                className="focus:ring-2 focus:ring-blue-500 text-sm sm:text-base"
-                id="status-note"
-                label="Note (Optional)"
-                placeholder="Add any notes about this status change"
+                aria-label="Note"
+                label="Note (optional)"
+                placeholder="Add context for this status change"
                 value={note}
                 onChange={(e) => setNote(e.target.value)}
               />
             </ModalBody>
 
-            <ModalFooter className="border-t border-gray-200 px-4 sm:px-6 py-4 flex flex-col sm:flex-row gap-2 sm:gap-4">
+            <ModalFooter className="flex flex-col-reverse gap-2 border-t border-line-hairline bg-surface-sunken/40 px-5 py-4 sm:flex-row sm:justify-end sm:gap-3">
               <Button
-                className="w-full sm:w-auto hover:bg-gray-100 text-sm sm:text-base"
                 color="default"
                 variant="light"
                 onPress={onClose}
@@ -241,13 +134,12 @@ const StatusUpdateModal = ({
                 Cancel
               </Button>
               <Button
-                className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-sm sm:text-base"
                 color="primary"
                 isDisabled={!newStatus || isPending}
                 isLoading={isPending}
                 onPress={handleStatusUpdate}
               >
-                Update Status
+                Update status
               </Button>
             </ModalFooter>
           </>
