@@ -32,12 +32,12 @@ export function NewsletterForm() {
       </label>
       <div className="flex gap-2">
         <input
+          required
           autoComplete="email"
           className="h-10 min-w-0 flex-1 rounded-sm border border-line-hairline bg-surface-sunken px-3 text-body-sm text-content placeholder:text-content-subtle transition-colors duration-fast focus:border-brand focus:outline-none"
           id="newsletter-email"
           name="email"
           placeholder="you@example.com"
-          required
           type="email"
         />
         <button

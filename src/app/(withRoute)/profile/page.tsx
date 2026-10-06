@@ -134,7 +134,9 @@ const ProfilePage = () => {
       await logout();
       router.push("/auth/login");
     } catch (error) {
+      /* eslint-disable no-console */
       console.error(error);
+      /* eslint-enable no-console */
       toast.error("Failed to sign out. Please try again.");
       setIsSigningOut(false);
     }
@@ -307,8 +309,8 @@ const ProfilePage = () => {
                     <Button
                       className="flex-1"
                       color="primary"
-                      size="sm"
                       isLoading={isUpdating}
+                      size="sm"
                       onPress={handleSave}
                     >
                       Save changes
@@ -338,15 +340,15 @@ const ProfilePage = () => {
                   </span>
                   <ChevronRight
                     aria-hidden
-                    size={15}
                     className="text-content-subtle transition-transform duration-fast group-hover:translate-x-0.5"
+                    size={15}
                   />
                 </Link>
                 <button
                   className="group flex w-full items-center gap-3 rounded-md px-2.5 py-2.5 text-left transition-colors hover:bg-danger/10 disabled:cursor-not-allowed"
                   disabled={isSigningOut}
-                  onClick={handleLogout}
                   type="button"
+                  onClick={handleLogout}
                 >
                   <span className="grid size-9 shrink-0 place-items-center rounded-md bg-surface-sunken text-content-subtle transition-colors group-hover:bg-danger/15 group-hover:text-danger">
                     {isSigningOut ? (

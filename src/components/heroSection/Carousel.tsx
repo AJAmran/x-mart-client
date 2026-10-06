@@ -87,6 +87,7 @@ export function Carousel() {
     if (!emblaApi) return;
 
     const onSelect = () => setIndex(emblaApi.selectedScrollSnap());
+
     onSelect();
     emblaApi.on("select", onSelect);
 
@@ -97,6 +98,7 @@ export function Carousel() {
 
   useEffect(() => {
     const bar = progressRef.current;
+
     if (!bar) return;
 
     bar.style.transition = "none";
@@ -114,16 +116,16 @@ export function Carousel() {
 
   return (
     <div
-      aria-roledescription="carousel"
       aria-label="Featured offers"
+      aria-roledescription="carousel"
       className="group relative w-full overflow-hidden rounded-xl bg-surface-inset"
-      onMouseEnter={() => setPaused(true)}
-      onMouseLeave={() => setPaused(false)}
-      onFocusCapture={() => setPaused(true)}
       onBlurCapture={(event) => {
         if (!event.currentTarget.contains(event.relatedTarget))
           setPaused(false);
       }}
+      onFocusCapture={() => setPaused(true)}
+      onMouseEnter={() => setPaused(true)}
+      onMouseLeave={() => setPaused(false)}
     >
       <div ref={emblaRef} className="overflow-hidden">
         <ul className="flex">
@@ -139,9 +141,9 @@ export function Carousel() {
               >
                 <div className="relative h-[22rem] w-full sm:h-[26rem] lg:h-[30rem] xl:h-[32rem]">
                   <Image
+                    fill
                     alt=""
                     className="object-cover transition-transform duration-[12s] ease-linear group-hover:scale-[1.04]"
-                    fill
                     priority={slideIndex === 0}
                     sizes="(max-width: 1024px) 100vw, 60vw"
                     src={slide.image}

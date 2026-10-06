@@ -46,8 +46,10 @@ export default async function OutletsPage() {
     // nothing and the page silently renders empty. `OutletsBrowser` does the
     // active check case-insensitively instead.
     const response = await getAllBranches({}, { limit: 50 });
+
     outlets = response.data || [];
   } catch (error) {
+    /* eslint-disable no-console */
     console.error("Error fetching outlets:", error);
   }
 

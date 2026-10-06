@@ -22,7 +22,6 @@ export function ThemeSwitch({ className, showLabel = false }: ThemeSwitchProps) 
 
   return (
     <button
-      type="button"
       aria-label={
         mounted
           ? `Switch to ${isDark ? "light" : "dark"} mode`
@@ -35,6 +34,7 @@ export function ThemeSwitch({ className, showLabel = false }: ThemeSwitchProps) 
         showLabel && "h-9 px-3",
         className
       )}
+      type="button"
       onClick={() => setTheme(isDark ? "light" : "dark")}
     >
       <Sun

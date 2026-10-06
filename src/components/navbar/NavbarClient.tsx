@@ -70,9 +70,9 @@ export function NavbarClient({ user }: { user: IUser | null }) {
             href="/"
           >
             <Logo
+              priority
               className="transition-opacity duration-fast group-hover:opacity-80"
               height={38}
-              priority
             />
           </NextLink>
 
@@ -96,9 +96,9 @@ export function NavbarClient({ user }: { user: IUser | null }) {
                 className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-content-subtle transition-colors duration-fast group-focus-within:text-brand"
               />
               <input
-                id="site-search"
                 className="h-10 w-full rounded-md border border-line-hairline bg-surface-sunken pl-10 pr-4 text-body-sm text-content placeholder:text-content-subtle transition-colors duration-fast ease-standard hover:border-line-strong focus:border-brand focus:outline-none"
                 defaultValue={searchParams.get("search") ?? ""}
+                id="site-search"
                 name="q"
                 placeholder="Search for groceries, kitchenware…"
                 type="search"
@@ -120,12 +120,12 @@ export function NavbarClient({ user }: { user: IUser | null }) {
             >
               <Search aria-hidden size={19} />
             </NextLink>
-            <UserActions user={user} compact />
+            <UserActions compact user={user} />
             <button
-              type="button"
               aria-expanded={drawerOpen}
               aria-label={drawerOpen ? "Close menu" : "Open menu"}
               className="grid size-10 place-items-center rounded-sm text-content transition-colors duration-fast hover:bg-surface-sunken"
+              type="button"
               onClick={() => setDrawerOpen((open) => !open)}
             >
               {drawerOpen ? (
@@ -192,13 +192,13 @@ export function NavbarClient({ user }: { user: IUser | null }) {
                 className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-content-subtle"
               />
               <input
-                id="mobile-search"
-                className="h-11 w-full rounded-md border border-line-hairline bg-surface-sunken pl-10 pr-4 text-body-sm text-content placeholder:text-content-subtle focus:border-brand focus:outline-none"
-                onChange={(event) => setMobileQuery(event.target.value)}
-                placeholder="Search products…"
                 ref={mobileSearchRef}
+                className="h-11 w-full rounded-md border border-line-hairline bg-surface-sunken pl-10 pr-4 text-body-sm text-content placeholder:text-content-subtle focus:border-brand focus:outline-none"
+                id="mobile-search"
+                placeholder="Search products…"
                 type="search"
                 value={mobileQuery}
+                onChange={(event) => setMobileQuery(event.target.value)}
               />
             </form>
 

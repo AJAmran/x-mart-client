@@ -1,6 +1,5 @@
 import NextLink from "next/link";
 import {
-  ArrowRight,
   Clock,
   Facebook,
   Instagram,
@@ -138,7 +137,7 @@ export function Footer() {
           {/* ---- Zone 2: sitemap ---- */}
           <div className="grid gap-8 sm:grid-cols-3 lg:col-span-7">
             {groups.map((group) => (
-              <LinkColumn group={group} key={group.title} />
+              <LinkColumn key={group.title} group={group} />
             ))}
           </div>
         </div>

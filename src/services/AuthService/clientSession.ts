@@ -11,6 +11,7 @@ let inflight: Promise<IUser | null> | null = null;
 async function requestCurrentUser(): Promise<IUser | null> {
   try {
     const { data } = await axiosInstance.get("/auth/me");
+
     return data?.success && data?.data?.user ? (data.data.user as IUser) : null;
   } catch {
     return null;
@@ -27,6 +28,7 @@ export async function fetchCurrentUser(): Promise<IUser | null> {
   });
 
   const user = await inflight;
+
   cache = { user, at: Date.now() };
 
   return user;

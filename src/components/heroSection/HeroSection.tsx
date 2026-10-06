@@ -87,7 +87,7 @@ export function HeroSection() {
                 className="inline-flex h-12 items-center justify-center gap-2 rounded-full border border-line-hairline bg-surface-raised px-6 text-body-sm font-bold text-content shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-brand/40 hover:bg-brand-subtle/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2"
                 href="/deals"
               >
-                <BadgePercent aria-hidden size={16} className="text-brand" />
+                <BadgePercent aria-hidden className="text-brand" size={16} />
                 See today&apos;s deals
               </NextLink>
             </motion.div>

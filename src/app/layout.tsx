@@ -91,16 +91,16 @@ export default function RootLayout({
       <body className={clsx("min-h-dvh font-sans antialiased", fontSans.variable)}>
         <Providers themeProps={{ attribute: "class", defaultTheme: "dark" }}>
           <a
-            href="#main"
             className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-toast focus:rounded-md focus:bg-brand focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-brand-contrast"
+            href="#main"
           >
             Skip to content
           </a>
           {children}
         </Providers>
         <Toaster
-          position="bottom-right"
           closeButton
+          position="bottom-right"
           toastOptions={{
             classNames: {
               toast:

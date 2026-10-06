@@ -9,7 +9,6 @@ import { Pagination } from "@heroui/pagination";
 
 import CardSkeletons from "../CardSkeleton";
 import ProductCard from "@/src/components/UI/ProductCard";
-import { Container } from "@/src/components/UI/Container";
 import { useProducts } from "@/src/hooks/useProducts";
 import { useMotion } from "@/src/lib/motion";
 import type { TProduct } from "@/src/types";
@@ -95,6 +94,7 @@ export default function ProductGrid({ initialFilters }: ProductGridProps) {
 
   const handlePageChange = (newPage: number) => {
     const params = new URLSearchParams(searchParams.toString());
+
     if (newPage <= 1) params.delete("page");
     else params.set("page", newPage.toString());
     router.push(`${pathname}?${params.toString()}`, { scroll: false });
@@ -123,7 +123,7 @@ export default function ProductGrid({ initialFilters }: ProductGridProps) {
       >
         {productList.map((product, index) => (
           <motion.div key={product._id} variants={m.item}>
-            <ProductCard product={product} priority={index < 8} />
+            <ProductCard priority={index < 8} product={product} />
           </motion.div>
         ))}
       </motion.div>

@@ -4,7 +4,6 @@ import NextLink from "next/link";
 import { motion } from "framer-motion";
 import { ArrowRight, RefreshCw } from "lucide-react";
 
-import { Container } from "@/src/components/UI/Container";
 import ProductCard from "@/src/components/UI/ProductCard";
 import { Section, SectionHeading } from "@/src/components/UI/Section";
 import FeatureProductSkeleton from "./FeatureProductSkeleton";
@@ -79,7 +78,7 @@ export default function FeatureProduct() {
       >
         {visible.map((product, index) => (
           <motion.div key={product._id} variants={m.item}>
-            <ProductCard product={product} priority={index < 4} />
+            <ProductCard priority={index < 4} product={product} />
           </motion.div>
         ))}
       </motion.div>

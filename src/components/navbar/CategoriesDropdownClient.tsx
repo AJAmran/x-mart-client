@@ -14,8 +14,7 @@ type CategoriesDropdownProps = {
   align?: "start" | "end";
 };
 
-/** Hover-intent delay, so sweeping the cursor across the bar does not flicker. */
-const OPEN_DELAY_MS = 90;
+/** Close delay, so sweeping the cursor across the bar does not flicker shut. */
 const CLOSE_DELAY_MS = 160;
 
 export function CategoriesDropdownClient({
@@ -61,6 +60,7 @@ export function CategoriesDropdownClient({
     }
 
     document.addEventListener("pointerdown", onPointerDown);
+
     return () => document.removeEventListener("pointerdown", onPointerDown);
   }, [open, closeNow]);
 
@@ -76,6 +76,7 @@ export function CategoriesDropdownClient({
     }
 
     document.addEventListener("keydown", onKeyDown);
+
     return () => document.removeEventListener("keydown", onKeyDown);
   }, [open, closeNow]);
 
@@ -84,19 +85,21 @@ export function CategoriesDropdownClient({
 
   function shopHref(categoryId: string, subCategoryId?: string) {
     const params = new URLSearchParams({ category: categoryId });
+
     if (subCategoryId) params.set("subcategory", subCategoryId);
+
     return `/shop?${params.toString()}`;
   }
 
   return (
     <div
+      ref={rootRef}
       className="relative"
       onBlur={(event) => {
         if (!event.currentTarget.contains(event.relatedTarget)) closeSoon();
       }}
       onMouseEnter={openNow}
       onMouseLeave={closeSoon}
-      ref={rootRef}
     >
       <button
         aria-controls={panelId}

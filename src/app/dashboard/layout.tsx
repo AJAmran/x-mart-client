@@ -1,11 +1,9 @@
 "use client";
 
 import type { ReactNode } from "react";
-import Link from "next/link";
 import { SearchIcon } from "@/src/components/icons";
 
 import Sidebar from "@/src/components/UI/Sidebar";
-import { Logo } from "@/src/components/UI/Logo";
 import { ThemeSwitch } from "@/src/components/theme-switch";
 
 /**

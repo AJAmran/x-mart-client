@@ -17,6 +17,7 @@ const FILTERS: { key: Filter; label: string }[] = [
 
 function matchesQuery(branch: TBranch, query: string): boolean {
   const q = query.trim().toLowerCase();
+
   if (!q) return true;
 
   return [
@@ -53,8 +54,10 @@ export function OutletsBrowser({ outlets }: { outlets: TBranch[] }) {
       if (filter === "open-now") return isOpenNow(branch);
       if (filter === "open-late") {
         const latest = latestClosingMinutes(branch);
+
         return latest !== null && latest >= 21 * 60;
       }
+
       return true;
     });
   }, [outlets, query, filter]);

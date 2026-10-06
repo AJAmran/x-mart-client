@@ -40,6 +40,7 @@ export function MobileMenu({
       </p>
       {primaryNav.map((item) => {
         const Icon = item.icon;
+
         return (
           <NextLink
             key={item.href}
@@ -67,6 +68,7 @@ export function MobileMenu({
           </p>
           {accountNav.map((item) => {
             const Icon = item.icon;
+
             return (
               <NextLink
                 key={item.href}
@@ -74,7 +76,7 @@ export function MobileMenu({
                 href={item.href}
                 onClick={onNavigate}
               >
-                {Icon && <Icon aria-hidden size={18} className="shrink-0" />}
+                {Icon && <Icon aria-hidden className="shrink-0" size={18} />}
                 {item.label}
               </NextLink>
             );
@@ -86,21 +88,21 @@ export function MobileMenu({
               href="/dashboard"
               onClick={onNavigate}
             >
-              <LogIn aria-hidden size={18} className="shrink-0" />
+              <LogIn aria-hidden className="shrink-0" size={18} />
               Admin dashboard
             </NextLink>
           )}
 
           <button
-            type="button"
             className={`${rowBase} text-danger hover:bg-danger/10 hover:text-danger`}
+            type="button"
             onClick={() => {
               onNavigate?.();
               logout();
               router.push("/auth/login");
             }}
           >
-            <LogOut aria-hidden size={18} className="shrink-0" />
+            <LogOut aria-hidden className="shrink-0" size={18} />
             Sign out
           </button>
         </>

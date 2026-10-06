@@ -30,9 +30,9 @@ export function OutletCard({ outlet }: { outlet: TBranch }) {
       {/* ---- Media ---- */}
       <div className="relative aspect-[16/10] w-full overflow-hidden bg-surface-sunken">
         <Image
+          fill
           alt={outlet.name}
           className="object-cover transition-transform duration-slower ease-entrance hover:scale-105"
-          fill
           sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"
           src={outlet.images?.[0] || "/placeholder.jpg"}
         />

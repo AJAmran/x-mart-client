@@ -80,12 +80,14 @@ export default function ContactPage() {
 
   function validate() {
     const next: Errors = {};
+
     if (!values.name.trim()) next.name = "Please tell us your name.";
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(values.email.trim()))
       next.email = "Enter a valid email address.";
     if (values.message.trim().length < 10)
       next.message = "Please add a little more detail (10+ characters).";
     setErrors(next);
+
     return Object.keys(next).length === 0;
   }
 
@@ -95,6 +97,7 @@ export default function ContactPage() {
 
     const subject = `[${values.topic}] ${values.name}`;
     const body = `${values.message}\n\n—\n${values.name}\n${values.email}`;
+
     window.location.href = `mailto:support@xmart.com?subject=${encodeURIComponent(
       subject
     )}&body=${encodeURIComponent(body)}`;
@@ -210,7 +213,7 @@ export default function ContactPage() {
                 </button>
               </div>
             ) : (
-              <form className="mt-8 flex flex-col gap-5" noValidate onSubmit={handleSubmit}>
+              <form noValidate className="mt-8 flex flex-col gap-5" onSubmit={handleSubmit}>
                 <div className="grid gap-5 sm:grid-cols-2">
                   <div>
                     <label className="mb-1.5 block text-label-sm font-medium text-content" htmlFor="contact-name">
@@ -263,6 +266,7 @@ export default function ContactPage() {
                   <div className="flex flex-wrap gap-2">
                     {TOPICS.map((topic) => {
                       const selected = values.topic === topic;
+
                       return (
                         <button
                           key={topic}

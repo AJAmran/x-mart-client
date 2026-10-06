@@ -25,7 +25,7 @@ export function ComingSoon({
   cta,
 }: ComingSoonProps) {
   return (
-    <Container width="narrow" className="py-20 sm:py-28">
+    <Container className="py-20 sm:py-28" width="narrow">
       <div className="flex flex-col items-center text-center">
         <span className="relative mb-8 grid size-20 place-items-center rounded-xl bg-brand-subtle text-brand">
           <span
