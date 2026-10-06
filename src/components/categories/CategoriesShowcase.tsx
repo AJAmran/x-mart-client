@@ -1,5 +1,6 @@
 "use client";
 
+import { Container } from "@/src/components/UI/Container";
 import { useFeaturedCategories } from "@/src/hooks/useProducts";
 import CategoryProductsSlider from "./CategoryProductsSlider";
 
@@ -7,12 +8,12 @@ const CategoriesShowcase = () => {
   const categories = useFeaturedCategories();
 
   return (
-    <section className="py-8 sm:py-12 lg:py-16 px-4 sm:px-6 lg:px-8">
-      <div className="container mx-auto">
+    <section className="py-10 sm:py-14 lg:py-16">
+      <Container>
         {categories.map((category) => (
           <CategoryProductsSlider key={category} category={category} />
         ))}
-      </div>
+      </Container>
     </section>
   );
 };

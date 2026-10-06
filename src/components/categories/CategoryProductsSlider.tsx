@@ -43,7 +43,8 @@ const CategoryProductsSlider = ({ category }: CategoryProductsSliderProps) => {
     [Autoplay({ delay: 4000, stopOnInteraction: true })]
   );
 
-  const { data: products = [], isLoading } = useProductsByCategory(category);
+  const { data: productsRes, isLoading } = useProductsByCategory(category);
+  const products = productsRes?.data ?? [];
   const {
     prevBtnDisabled,
     nextBtnDisabled,
@@ -53,22 +54,20 @@ const CategoryProductsSlider = ({ category }: CategoryProductsSliderProps) => {
 
   if (isLoading) {
     return (
-      <section className="relative py-6 px-4 sm:px-6 lg:px-8">
+      <section className="relative py-6">
         <h2 className="text-xl font-bold mb-4 md:hidden">
           <Skeleton className="h-6 w-40" />
         </h2>
 
         <div className="relative">
           <div className="flex gap-4 sm:gap-6">
-            <Skeleton
-              className="h-[420px] w-[280px] sm:w-[300px] lg:w-[320px] xl:w-[340px] rounded-xl flex-shrink-0 hidden md:block"
-            />
+            <Skeleton className="hidden h-full w-rail shrink-0 rounded-lg md:block" />
             <div className="flex-1 overflow-hidden">
               <div className="flex gap-4 sm:gap-6">
                 {Array.from({ length: 10 }).map((_, i) => (
                   <Skeleton
                     key={i}
-                    className="h-[420px] w-[280px] sm:w-[300px] lg:w-[320px] xl:w-[340px] rounded-xl flex-shrink-0 min-w-0 basis-[280px] sm:basis-[300px] lg:basis-[320px] xl:basis-[340px]"
+                    className="h-full w-rail shrink-0 rounded-lg"
                   />
                 ))}
               </div>
@@ -84,7 +83,7 @@ const CategoryProductsSlider = ({ category }: CategoryProductsSliderProps) => {
   }
 
   return (
-    <section className="relative py-6 px-4 sm:px-6 lg:px-8">
+    <section className="relative py-6">
       {/* Mobile category title - only shown on mobile */}
       <h2 className="text-xl font-bold mb-4 md:hidden">
         {categoryNames[category]}
@@ -95,7 +94,7 @@ const CategoryProductsSlider = ({ category }: CategoryProductsSliderProps) => {
           {/* Category card - hidden on mobile */}
           <div
             aria-label={`${category} category`}
-            className="flex-shrink-0 w-[280px] sm:w-[300px] lg:w-[320px] xl:w-[340px] hidden md:block"
+            className="hidden w-rail shrink-0 md:block"
             role="region"
           >
             <CategoryCard category={category} />
@@ -106,7 +105,7 @@ const CategoryProductsSlider = ({ category }: CategoryProductsSliderProps) => {
                 <div
                   key={product._id}
                   aria-label={`Product ${product.name}`}
-                  className="flex-shrink-0 w-[280px] sm:w-[300px] lg:w-[320px] xl:w-[340px] min-w-0 basis-[280px] sm:basis-[300px] lg:basis-[320px] xl:basis-[340px]"
+                  className="w-rail shrink-0"
                   role="region"
                 >
                   <ProductCard product={product} variant="default" />
@@ -118,14 +117,14 @@ const CategoryProductsSlider = ({ category }: CategoryProductsSliderProps) => {
 
         {/* Navigation buttons - always visible if there are multiple products */}
         {products.length > 1 && (
-          <div className="absolute top-1/2 -translate-y-1/2 w-full px-4 sm:px-6 lg:px-8">
+          <div className="pointer-events-none absolute inset-y-0 left-0 right-0">
             <PrevButton
-              className="absolute -left-4 sm:-left-6 lg:-left-8 p-2 sm:p-3 rounded-full bg-white shadow-md disabled:opacity-30 disabled:cursor-not-allowed hover:bg-gray-100 transition-all z-10"
+              className="pointer-events-auto absolute left-0 top-1/2 grid size-9 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full border border-line-hairline bg-surface-raised text-content shadow-md transition-colors duration-fast hover:bg-surface-sunken disabled:pointer-events-none disabled:opacity-30"
               disabled={prevBtnDisabled}
               onClick={onPrevButtonClick}
             />
             <NextButton
-              className="absolute -right-4 sm:-right-6 lg:-right-8 p-2 sm:p-3 rounded-full bg-white shadow-md disabled:opacity-30 disabled:cursor-not-allowed hover:bg-gray-100 transition-all z-10"
+              className="pointer-events-auto absolute right-0 top-1/2 grid size-9 translate-x-1/2 -translate-y-1/2 place-items-center rounded-full border border-line-hairline bg-surface-raised text-content shadow-md transition-colors duration-fast hover:bg-surface-sunken disabled:pointer-events-none disabled:opacity-30"
               disabled={nextBtnDisabled}
               onClick={onNextButtonClick}
             />

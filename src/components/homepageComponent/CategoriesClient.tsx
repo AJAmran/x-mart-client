@@ -1,118 +1,96 @@
 "use client";
 
-import React, { useCallback } from "react";
+import { useCallback } from "react";
 import Image from "next/image";
-import Link from "next/link";
-import { Card, CardBody } from "@heroui/card";
-import { Category } from "@/src/data/CategoriesData";
+import NextLink from "next/link";
 import { motion } from "framer-motion";
 import useEmblaCarousel from "embla-carousel-react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { Button } from "@heroui/button";
+
+import { useMotion } from "@/src/lib/motion";
+import type { Category } from "@/src/data/CategoriesData";
 
 interface CategoriesClientProps {
   categories: Category[];
 }
+function CategoriesClient({ categories }: CategoriesClientProps) {
+  const [emblaRef, emblaApi] = useEmblaCarousel({
+    loop: true,
+    align: "start",
+    skipSnaps: true,
+  });
+  const m = useMotion();
 
-const CategoriesClient: React.FC<CategoriesClientProps> = ({ categories }) => {
-  const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true, align: "start" });
-
-  const scrollPrev = useCallback(() => {
-    if (emblaApi) emblaApi.scrollPrev();
-  }, [emblaApi]);
-
-  const scrollNext = useCallback(() => {
-    if (emblaApi) emblaApi.scrollNext();
-  }, [emblaApi]);
-
-  // Define a set of soft gradient backgrounds to rotate through
-  const gradients = [
-    "bg-blue-50 hover:bg-blue-100",
-    "bg-green-50 hover:bg-green-100",
-    "bg-purple-50 hover:bg-purple-100",
-    "bg-orange-50 hover:bg-orange-100",
-    "bg-pink-50 hover:bg-pink-100",
-    "bg-teal-50 hover:bg-teal-100",
-  ];
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    show: { opacity: 1, y: 0 },
-  };
+  const scrollPrev = useCallback(() => emblaApi?.scrollPrev(), [emblaApi]);
+  const scrollNext = useCallback(() => emblaApi?.scrollNext(), [emblaApi]);
 
   return (
-    <div className="relative group/carousel">
+    <div className="group/carousel relative">
       <div ref={emblaRef} className="overflow-hidden">
-        <motion.div
-          className="flex -ml-4"
-          initial="hidden"
-          transition={{ staggerChildren: 0.1 }}
-          viewport={{ once: true }}
-          whileInView="show"
+        <motion.ul
+          animate="visible"
+          className="flex -ml-3"
+          initial={m.initial}
+          variants={m.container}
         >
-          {categories.map((category, index) => (
-            <motion.div
+          {categories.map((category) => (
+            <motion.li
               key={category.id}
-              className="flex-[0_0_50%] sm:flex-[0_0_33.333%] md:flex-[0_0_25%] lg:flex-[0_0_16.666%] min-w-0 pl-4 py-4"
-              variants={itemVariants}
+              className="min-w-0 flex-[0_0_50%] pl-3 sm:flex-[0_0_33.333%] md:flex-[0_0_25%] lg:flex-[0_0_20%] xl:flex-[0_0_16.666%]"
+              variants={m.item}
             >
-              <Link className="block h-full group" href={`/shop?category=${category.id}`}>
-                <Card
-                  isPressable
-                  className={`h-full border-none shadow-sm hover:shadow-xl transition-all duration-300 bg-white dark:bg-zinc-900 overflow-visible`}
-                >
-                  <CardBody className="p-4 flex flex-col items-center justify-center gap-4 text-center">
-                    <div
-                      className={`w-20 h-20 rounded-full flex items-center justify-center transition-all duration-300 group-hover:scale-110 ${gradients[index % gradients.length]
-                        }`}
-                    >
-                      <Image
-                        alt={`${category.name} icon`}
-                        className="object-contain drop-shadow-sm"
-                        height={48}
-                        src={category.image}
-                        width={48}
-                      />
-                    </div>
-                    <div className="space-y-1">
-                      <h3 className="font-bold text-gray-800 dark:text-gray-100 group-hover:text-primary transition-colors">
-                        {category.name}
-                      </h3>
-                      <p className="text-tiny text-gray-400 font-medium uppercase tracking-wide">
-                        Browse
-                      </p>
-                    </div>
-                  </CardBody>
-                </Card>
-              </Link>
-            </motion.div>
+              <NextLink
+                className="group flex h-full flex-col items-center gap-3 rounded-lg border border-line-hairline bg-surface-raised p-5 text-center shadow-xs transition-all duration-base ease-standard hover:-translate-y-1 hover:border-brand/40 hover:shadow-lg"
+                href={`/shop?category=${encodeURIComponent(category.id)}`}
+              >
+                <span className="grid size-20 place-items-center rounded-full bg-surface-sunken transition-colors duration-base ease-standard group-hover:bg-brand-subtle">
+                  <Image
+                    alt=""
+                    className="size-12 object-contain transition-transform duration-base ease-standard group-hover:scale-110"
+                    height={48}
+                    loading="lazy"
+                    src={category.image}
+                    width={48}
+                  />
+                </span>
+                <span className="min-w-0">
+                  <span className="block truncate text-body-sm font-semibold text-content">
+                    {category.name}
+                  </span>
+                  <span className="mt-0.5 block text-overline font-semibold uppercase tracking-[0.14em] text-content-subtle transition-colors duration-fast group-hover:text-brand">
+                    Browse
+                  </span>
+                </span>
+              </NextLink>
+            </motion.li>
           ))}
-        </motion.div>
+        </motion.ul>
       </div>
 
-      {/* Navigation Buttons */}
-      <Button
-        isIconOnly
-        aria-label="Previous slide"
-        className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1/2 z-10 bg-white/80 backdrop-blur-md shadow-md hover:bg-white text-gray-700 hidden sm:flex opacity-0 group-hover/carousel:opacity-100 transition-opacity"
-        radius="full"
-        variant="flat"
+      {/* Arrows are decorative affordances; the rail is also swipeable and the
+          links are all in the tab order. */}
+      <button
+        aria-label="Scroll categories backwards"
+        className="absolute left-0 top-1/2 z-raised hidden size-10 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full border border-line-hairline bg-surface-raised text-content shadow-md transition-[opacity,background-color] duration-fast ease-standard hover:bg-surface-sunken group-hover/carousel:opacity-100 sm:grid"
+        style={{ opacity: 0 }}
+        tabIndex={-1}
+        type="button"
         onClick={scrollPrev}
       >
-        <ChevronLeft size={24} />
-      </Button>
-      <Button
-        isIconOnly
-        aria-label="Next slide"
-        className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-1/2 z-10 bg-white/80 backdrop-blur-md shadow-md hover:bg-white text-gray-700 hidden sm:flex opacity-0 group-hover/carousel:opacity-100 transition-opacity"
-        radius="full"
-        variant="flat"
+        <ChevronLeft aria-hidden size={20} />
+      </button>
+      <button
+        aria-label="Scroll categories forwards"
+        className="absolute right-0 top-1/2 z-raised hidden size-10 translate-x-1/2 -translate-y-1/2 place-items-center rounded-full border border-line-hairline bg-surface-raised text-content shadow-md transition-[opacity,background-color] duration-fast ease-standard hover:bg-surface-sunken group-hover/carousel:opacity-100 sm:grid"
+        style={{ opacity: 0 }}
+        tabIndex={-1}
+        type="button"
         onClick={scrollNext}
       >
-        <ChevronRight size={24} />
-      </Button>
+        <ChevronRight aria-hidden size={20} />
+      </button>
     </div>
   );
-};
+}
 
 export default CategoriesClient;

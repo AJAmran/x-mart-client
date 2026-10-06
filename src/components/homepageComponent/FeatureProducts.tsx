@@ -1,153 +1,88 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import NextLink from "next/link";
 import { motion } from "framer-motion";
+import { ArrowRight, RefreshCw } from "lucide-react";
+
+import { Container } from "@/src/components/UI/Container";
 import ProductCard from "@/src/components/UI/ProductCard";
+import { Section, SectionHeading } from "@/src/components/UI/Section";
+import FeatureProductSkeleton from "./FeatureProductSkeleton";
 import { useFeaturedProducts } from "@/src/hooks/useFeaturedProducts";
-import { TProduct } from "@/src/types";
-import { Button } from "@heroui/button";
-import FeatureProductSkeleton from "@/src/components/homepageComponent/FeatureProductSkeleton";
-import { MyButton } from "../UI/MyButton";
+import { useMotion } from "@/src/lib/motion";
+import type { TProduct } from "@/src/types";
+
+const VISIBLE_COUNT = 12;
 
 export default function FeatureProduct() {
-  const router = useRouter();
-  const { data: featuredProducts, isLoading, isError } = useFeaturedProducts();
+  const { data, isLoading, isError, refetch } = useFeaturedProducts();
+  const m = useMotion();
 
-  const handleProductClick = (productId: string) => {
-    // Navigate or other action
-    router.push(`/product/${productId}`);
-  };
+  if (isLoading) return <FeatureProductSkeleton />;
 
-  const handleSeeAll = () => {
-    router.push("/shop");
-  };
-
-  // Helper function to determine grid class based on product count
-  const getGridClass = (count: number) => {
-    if (count === 1) {
-      return "flex justify-center items-start";
-    }
-
-    return "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 justify-items-center";
-  };
-
-  if (isLoading) {
-    return <FeatureProductSkeleton />;
-  }
+  const products: TProduct[] = data ?? [];
 
   if (isError) {
     return (
-      <section aria-label="Featured Products Error" className="py-8">
-        <div className="text-center mb-12">
-          <h2 className="text-lg md:text-xl lg:text-3xl font-bold tracking-tight">
-            Featured Products
+      <Section spacing="md">
+        <div className="flex flex-col items-center gap-4 text-center">
+          <h2 className="text-display-sm font-bold text-content">
+            Featured products unavailable
           </h2>
-          <p className="mt-2 text-sm lg:text-base text-red-500">
-            Failed to load featured products. Please try again later.
+          <p className="max-w-prose text-body-sm text-content-muted">
+            We could not reach the catalogue. Please try again.
           </p>
-          <Button
-            aria-label="Retry loading featured products"
-            className="mt-4"
-            color="primary"
-            variant="light"
-            onClick={() => window.location.reload()}
+          <button
+            className="inline-flex h-10 items-center gap-2 rounded-sm bg-brand px-4 text-body-sm font-semibold text-brand-contrast transition-colors duration-fast ease-standard hover:bg-brand-hover"
+            type="button"
+            onClick={() => refetch()}
           >
+            <RefreshCw aria-hidden size={15} />
             Retry
-          </Button>
+          </button>
         </div>
-      </section>
+      </Section>
     );
   }
 
-  if (!featuredProducts || featuredProducts.length === 0) {
-    return (
-      <section aria-label="No Featured Products" className="py-8">
-        <div className="text-center mb-12">
-          <h2 className="text-lg md:text-xl lg:text-3xl font-bold tracking-tight">
-            Featured Products
-          </h2>
-          <p className="mt-2 text-sm lg:text-base">
-            No featured products available at the moment.
-          </p>
-          <Button
-            aria-label="View all products"
-            className="mt-4"
-            color="primary"
-            variant="light"
-            onClick={handleSeeAll}
-          >
-            Shop Now
-          </Button>
-        </div>
-      </section>
-    );
-  }
+  if (products.length === 0) return null;
 
-  const displayedProducts = featuredProducts.slice(0, 12);
+  const visible = products.slice(0, VISIBLE_COUNT);
 
   return (
-    <section aria-label="Featured Products" className="py-8">
-      <div className="text-center mb-12">
-        <h2 className="text-lg md:text-xl lg:text-3xl font-bold tracking-tight">
-          Featured Products
-        </h2>
-        <p className="mt-2 text-sm lg:text-base">
-          Explore our top picks handpicked just for you.
-        </p>
-      </div>
-
-      {/* Dynamic container that centers when only one product */}
-      <div
-        className={`
-        container mx-auto 
-        px-4 sm:px-6 lg:px-8
-        ${getGridClass(displayedProducts.length)}
-      `}
-      >
-        {displayedProducts.map((product: TProduct, index: number) => (
-          <motion.div
-            key={product._id}
-            animate={{ opacity: 1, y: 0 }}
-            className={`
-              ${displayedProducts.length === 1
-                ? "w-full max-w-[340px]"
-                : "w-full max-w-[340px]"
-              }
-            `}
-            initial={{ opacity: 0, y: 20 }}
-            transition={{ duration: 0.3, delay: index * 0.1 }}
+    /* `default` (1280px) to match the category rail above it, so the two
+       homepage sections share one left edge under the full-width hero. */
+    <Section spacing="lg" tone="raised">
+      <SectionHeading
+        action={
+          <NextLink
+            className="group inline-flex h-10 items-center gap-2 rounded-sm border border-line-hairline bg-surface px-4 text-body-sm font-semibold text-content transition-colors duration-fast ease-standard hover:border-brand/40 hover:text-brand"
+            href="/shop"
           >
-            <ProductCard
-              product={product}
-              onPress={() => handleProductClick(product._id)}
+            View all
+            <ArrowRight
+              aria-hidden
+              className="size-4 transition-transform duration-fast ease-standard group-hover:translate-x-0.5"
             />
-          </motion.div>
-        ))}
-      </div>
+          </NextLink>
+        }
+        description="Hand-picked by our merchandisers — the range people keep coming back for."
+        eyebrow="Curated for you"
+        title="Featured products"
+      />
 
       <motion.div
-        animate={{ opacity: 1, y: 0 }}
-        className="text-center mt-12"
-        initial={{ opacity: 0, y: 20 }}
-        transition={{ duration: 0.5, delay: 0.2 }}
+        animate="visible"
+        className="mt-10 grid grid-cols-2 gap-4 sm:gap-5 lg:grid-cols-3 xl:grid-cols-4"
+        initial={m.initial}
+        variants={m.container}
       >
-        <MyButton
-          aria-label="View all products in the shop"
-          className="px-8 py-3 text-lg font-semibold rounded-full shadow-md hover:shadow-lg transition-all duration-300"
-          color="primary"
-          size="lg"
-          variant="solid"
-          onClick={handleSeeAll}
-        >
-          <motion.span
-            transition={{ duration: 0.2 }}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-          >
-            See All Products
-          </motion.span>
-        </MyButton>
+        {visible.map((product, index) => (
+          <motion.div key={product._id} variants={m.item}>
+            <ProductCard product={product} priority={index < 4} />
+          </motion.div>
+        ))}
       </motion.div>
-    </section>
+    </Section>
   );
 }

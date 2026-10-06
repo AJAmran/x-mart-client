@@ -1,15 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useId, useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { Eye, Heart, ShoppingCart, Tag, CheckCircle } from "lucide-react";
+import { Check, Heart, Plus, Tag } from "lucide-react";
 
-import { Button } from "@heroui/button";
-import { Card, CardBody, CardFooter } from "@heroui/card";
-import { Chip } from "@heroui/chip";
-import { Image } from "@heroui/image";
+import { Spinner } from "@heroui/spinner";
 
 import { useCart } from "@/src/hooks/useCart";
 import { useWishlist } from "@/src/hooks/useWishlist";
@@ -26,16 +23,17 @@ type ProductCardProps = {
   product: TProduct;
   variant?: "default" | "category";
   onPress?: () => void;
+  priority?: boolean;
 };
 
-const ProductCard = ({
+export function ProductCard({
   product,
   variant = "default",
   onPress,
-}: ProductCardProps) => {
-  const [isLoading, setIsLoading] = useState(false);
-  const [isWishlistLoading, setIsWishlistLoading] = useState(false);
-  const router = useRouter();
+  priority = false,
+}: ProductCardProps) {
+  const [pending, setPending] = useState<"cart" | "wishlist" | null>(null);
+  const headingId = `product-${useId()}`;
   const { addItem, isInCart } = useCart();
   const {
     addItem: addToWishlist,
@@ -44,249 +42,253 @@ const ProductCard = ({
   } = useWishlist();
 
   const stock = getProductStock(product);
-  const stockStatus = getStockStatus(stock);
+  const { canAddToCart } = getStockStatus(stock);
   const finalPrice = getDiscountedPrice(product.price, product.discount);
   const hasDiscount = finalPrice < product.price;
-  const isProductInCart = isInCart(product._id);
-  const isProductInWishlist = isInWishlist(product._id);
-  const isOutOfStock = !stockStatus.canAddToCart;
+  const inCart = Boolean(product._id) && isInCart(product._id as string);
+  const wishlisted =
+    Boolean(product._id) && isInWishlist(product._id as string);
+  const outOfStock = !canAddToCart;
+  const lowStock = canAddToCart && stock <= 5;
 
-  const handleAddToCart = (event: React.MouseEvent) => {
-    event.preventDefault();
-    event.stopPropagation();
+  const handleAddToCart = useCallback(() => {
     if (!product._id) return;
-    if (isOutOfStock) {
+    if (outOfStock) {
       toast.error(`${product.name} is out of stock.`);
 
       return;
     }
-    setIsLoading(true);
+
+    setPending("cart");
     addItem({
-      productId: product._id,
+      productId: product._id as string,
       quantity: 1,
       price: finalPrice,
       name: product.name,
       image: product.images?.[0] || "/placeholder.jpg",
       stock,
     });
-    setTimeout(() => setIsLoading(false), 500);
-  };
+    toast.success(`${product.name} added to cart`);
+    window.setTimeout(() => setPending(null), 400);
+  }, [product._id, product.name, outOfStock, finalPrice, stock, addItem]);
 
-  const handleWishlistToggle = (event: React.MouseEvent) => {
-    event.preventDefault();
-    event.stopPropagation();
+  const handleWishlistToggle = useCallback(() => {
     if (!product._id) return;
-    setIsWishlistLoading(true);
-    if (isProductInWishlist) {
-      removeFromWishlist(product._id);
+
+    setPending("wishlist");
+    if (wishlisted) {
+      removeFromWishlist(product._id as string);
+      toast(`${product.name} removed from wishlist`);
     } else {
       addToWishlist({
-        productId: product._id,
+        productId: product._id as string,
         price: finalPrice,
         name: product.name,
         image: product.images?.[0] || "/placeholder.jpg",
         stock,
       });
+      toast.success(`${product.name} saved to wishlist`);
     }
-    setTimeout(() => setIsWishlistLoading(false), 500);
-  };
+    window.setTimeout(() => setPending(null), 400);
+  }, [
+    product._id,
+    product.name,
+    wishlisted,
+    finalPrice,
+    stock,
+    addToWishlist,
+    removeFromWishlist,
+  ]);
 
-  const handleDetailsClick = (event: React.MouseEvent) => {
-    event.preventDefault();
-    event.stopPropagation();
-    router.push(`/product/${product._id}`);
-  };
-
+  /* ── Category showcase tile ───────────────────────────────────────────── */
   if (variant === "category") {
     return (
-      <Link
-        aria-label={`Explore ${product.name} category`}
-        className="block h-[420px] w-[280px] sm:w-[300px] lg:w-[320px] xl:w-[340px]"
-        href={`/category/${product.category}`}
-      >
-        <Card
-          className="h-full overflow-hidden rounded-2xl border-0 transition-all duration-300 hover:scale-[1.02] hover:shadow-xl"
-          role="presentation"
+      <article className="group relative h-full w-full overflow-hidden rounded-xl border border-line-hairline bg-surface-raised">
+        <Link
+          aria-label={`Browse the ${product.name} category`}
+          className="after:absolute after:inset-0 after:z-[1] after:content-['']"
+          href={`/shop?category=${encodeURIComponent(product.category)}`}
           onClick={onPress}
         >
-          <div className="relative h-full">
-            <Image
-              removeWrapper
-              alt={product.name}
-              className="h-full w-full object-cover"
-              src={product.images?.[0] || "/placeholder.jpg"}
-            />
-            <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/85 via-black/40 to-transparent p-6">
-              <h3 className="truncate text-xl font-bold text-white">
-                {product.name}
-              </h3>
-              <Button
-                className="mt-3 bg-primary text-white"
-                color="primary"
-                size="sm"
-                variant="solid"
-                onClick={(event) => event.stopPropagation()}
-              >
-                Shop Now
-              </Button>
-            </div>
-          </div>
-        </Card>
-      </Link>
+          <span className="sr-only">Browse the {product.name} category</span>
+        </Link>
+
+        <div className="relative aspect-[4/5] w-full overflow-hidden bg-surface-sunken">
+          <Image
+            fill
+            alt={product.name}
+            className="object-cover transition-transform duration-slower ease-entrance group-hover:scale-105"
+            sizes="(max-width: 640px) 80vw, (max-width: 1024px) 45vw, 320px"
+            src={product.images?.[0] || "/placeholder.jpg"}
+          />
+          <div
+            aria-hidden
+            className="absolute inset-0 bg-gradient-to-t from-surface via-surface/40 to-transparent"
+          />
+          {hasDiscount && (
+            <span className="absolute left-3 top-3 rounded-full bg-danger px-2.5 py-1 text-overline font-bold uppercase tracking-wider text-white shadow-sm">
+              {getDiscountLabel(product.discount, product.price)}
+            </span>
+          )}
+        </div>
+
+        <div className="relative flex flex-col gap-1 p-4">
+          <h3 className="truncate text-title-md font-semibold text-content">
+            {product.name}
+          </h3>
+          <p className="text-body-sm text-content-muted">
+            {outOfStock ? "Currently unavailable" : "In stock — ships today"}
+          </p>
+          <span className="mt-2 inline-flex items-center gap-1.5 text-sm font-semibold text-brand">
+            Shop now
+            <span
+              aria-hidden
+              className="transition-transform duration-fast group-hover:translate-x-0.5"
+            >
+              &rarr;
+            </span>
+          </span>
+        </div>
+      </article>
     );
   }
 
+  /* ── Default product tile ─────────────────────────────────────────────── */
   return (
-    <Link
-      aria-label={`View details for ${product.name}`}
-      className="block h-[440px] w-[280px] sm:w-[300px] lg:w-[310px] xl:w-[320px]"
-      href={`/product/${product._id}`}
+    <article
+      className={[
+        "group relative flex h-full flex-col overflow-hidden rounded-lg",
+        "border border-line-hairline bg-surface-raised",
+        "shadow-xs transition-[transform,box-shadow,border-color]",
+        "duration-base ease-standard",
+        "hover:-translate-y-1 hover:border-brand/40 hover:shadow-lg",
+        outOfStock ? "opacity-70" : "",
+      ].join(" ")}
     >
-      <Card
-        className={`group relative h-full overflow-hidden rounded-2xl border-2 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl
-          bg-white dark:bg-gray-900
-          border-gray-100 dark:border-gray-800
-          ${isOutOfStock ? "opacity-80" : ""}`}
-        role="presentation"
-        shadow="none"
+      {/* ── Card-wide link target ───────────────────────────────────────────
+       * `after:z-[1]` is required, not cosmetic: the media and body wrappers
+       * are themselves positioned, so an unlayered `::after` overlay painted
+       * earlier in the DOM ends up *underneath* them and the click lands on the
+       * image instead of the link. Only the action row (`relative z-10`) stays
+       * above the overlay.
+       */}
+      <Link
+        aria-labelledby={headingId}
+        className="after:absolute after:inset-0 after:z-[1] after:content-['']"
+        href={`/product/${product._id}`}
         onClick={onPress}
-      >
-        {/* ── Badges top-left ─────────────────────────────── */}
-        <div className="absolute left-3 top-3 z-40 flex flex-col gap-1.5">
-          {hasDiscount && (
-            <Chip
-              className="h-6 px-2 text-[11px] font-bold"
-              color="danger"
-              size="sm"
-              startContent={<Tag size={10} />}
-              variant="solid"
-            >
-              {getDiscountLabel(product.discount)}
-            </Chip>
-          )}
-          {isOutOfStock ? (
-            <Chip
-              className="h-6 px-2 text-[11px] font-semibold"
-              color="default"
-              size="sm"
-              variant="flat"
-            >
-              Out of Stock
-            </Chip>
-          ) : stock <= 5 ? (
-            <Chip
-              className="h-6 px-2 text-[11px] font-semibold"
-              color="warning"
-              size="sm"
-              variant="flat"
-            >
-              Only {stock} left
-            </Chip>
-          ) : null}
-        </div>
+      />
 
-        {/* ── Wishlist button top-right ───────────────────── */}
-        <Button
-          isIconOnly
+      {/* ── Media ─────────────────────────────────────────────────────── */}
+      <div className="relative aspect-square w-full overflow-hidden bg-surface-sunken">
+        <Image
+          fill
+          alt={product.name}
+          className="object-contain p-6 transition-transform duration-slower ease-entrance group-hover:scale-105"
+          priority={priority}
+          sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, (max-width: 1280px) 25vw, 20vw"
+          src={product.images?.[0] || "/placeholder.jpg"}
+        />
+
+        <div className="pointer-events-none absolute left-3 top-3 flex flex-col items-start gap-1.5">
+          {hasDiscount && (
+            <span className="inline-flex items-center gap-1 rounded-full bg-danger px-2 py-1 text-[11px] font-bold uppercase tracking-wide text-white shadow-sm">
+              <Tag aria-hidden size={11} />
+              {getDiscountLabel(product.discount, product.price)}
+            </span>
+          )}
+          {outOfStock && (
+            <span className="rounded-full bg-surface-inverse px-2 py-1 text-[11px] font-semibold text-content-inverted">
+              Out of stock
+            </span>
+          )}
+          {!outOfStock && lowStock && (
+            <span className="rounded-full bg-warning px-2 py-1 text-[11px] font-semibold text-white">
+              Only {stock} left
+            </span>
+          )}
+        </div>
+      </div>
+
+      {/* ── Body ──────────────────────────────────────────────────────── */}
+      <div className="flex flex-1 flex-col gap-2 p-4">
+        <h3
+          className="line-clamp-2 min-h-10 text-body-sm font-medium leading-snug text-content"
+          id={headingId}
+        >
+          {product.name}
+        </h3>
+
+        <div className="mt-auto flex items-baseline gap-2 pt-1">
+          <span className="tabular text-title-md font-bold text-content">
+            {formatCurrency(finalPrice)}
+          </span>
+          {hasDiscount && (
+            <span className="tabular text-body-sm text-content-subtle line-through">
+              {formatCurrency(product.price)}
+            </span>
+          )}
+        </div>
+      </div>
+
+      {/* ── Actions ───────────────────────────────────────────────────── */}
+      {/* `relative z-10` lifts these above the stretched link overlay. */}
+      <div className="relative z-10 flex items-center gap-2 p-4 pt-0">
+        <button
           aria-label={
-            isProductInWishlist ? "Remove from wishlist" : "Add to wishlist"
+            wishlisted
+              ? `Remove ${product.name} from wishlist`
+              : `Save ${product.name} to wishlist`
           }
-          className="absolute right-3 top-3 z-40 h-8 w-8 min-w-8 bg-white/90 shadow-sm backdrop-blur-sm transition-transform duration-200 group-hover:scale-105 dark:bg-gray-900/90"
-          isLoading={isWishlistLoading}
-          radius="full"
-          size="sm"
-          variant="flat"
+          aria-pressed={wishlisted}
+          className={[
+            "inline-flex size-9 shrink-0 items-center justify-center rounded-sm border",
+            "border-line-hairline bg-surface text-content-muted",
+            "transition-colors duration-fast ease-standard",
+            "hover:border-brand/50 hover:text-brand",
+            wishlisted ? "border-brand/50 text-brand" : "",
+          ].join(" ")}
+          disabled={pending === "wishlist"}
+          type="button"
           onClick={handleWishlistToggle}
         >
-          <Heart
-            className={`transition-colors duration-200 ${
-              isProductInWishlist
-                ? "fill-red-500 text-red-500"
-                : "text-gray-400 hover:text-red-400"
-            }`}
-            size={15}
-          />
-        </Button>
+          {pending === "wishlist" ? (
+            <Spinner color="current" size="sm" />
+          ) : (
+            <Heart
+              aria-hidden
+              className={wishlisted ? "fill-brand" : ""}
+              size={16}
+            />
+          )}
+        </button>
 
-        {/* ── Product Image ───────────────────────────────── */}
-        <div className="relative flex h-52 items-center justify-center overflow-hidden bg-gray-50 dark:bg-gray-950/60">
-          <Image
-            alt={product.name}
-            className="h-48 w-full object-contain transition-transform duration-500"
-            height={192}
-            isZoomed={!isOutOfStock}
-            src={product.images?.[0] || "/placeholder.jpg"}
-            width={240}
-          />
-        </div>
-
-        {/* ── Card Body ───────────────────────────────────── */}
-        <CardBody className="flex flex-1 flex-col gap-3 px-4 py-3">
-          {/* Product name */}
-          <h3 className="line-clamp-2 min-h-[3rem] text-sm font-semibold leading-snug text-gray-900 dark:text-gray-50">
-            {product.name}
-          </h3>
-
-          {/* Price row */}
-          <div className="flex items-baseline gap-2">
-            <span className="text-xl font-bold text-primary dark:text-primary-400">
-              {formatCurrency(finalPrice)}
-            </span>
-            {hasDiscount && (
-              <span className="text-xs text-gray-400 line-through dark:text-gray-500">
-                {formatCurrency(product.price)}
-              </span>
-            )}
-          </div>
-        </CardBody>
-
-        {/* ── Footer Actions ──────────────────────────────── */}
-        <CardFooter className="gap-2 px-4 pb-4 pt-0">
-          {/* Details button */}
-          <Button
-            className="h-9 flex-1 border border-gray-200 bg-transparent text-xs font-medium text-gray-600 hover:border-primary hover:bg-primary/5 hover:text-primary dark:border-gray-700 dark:text-gray-300 dark:hover:border-primary dark:hover:text-primary"
-            radius="lg"
-            size="sm"
-            startContent={<Eye size={14} />}
-            variant="bordered"
-            onClick={handleDetailsClick}
-          >
-            Details
-          </Button>
-
-          {/* Add to Cart / In Cart / Out of Stock */}
-          <Button
-            className={`h-9 flex-1 text-xs font-semibold transition-all duration-200 ${
-              isOutOfStock
-                ? "cursor-not-allowed opacity-50"
-                : isProductInCart
-                  ? "bg-success-50 text-success-700 dark:bg-success-900/30 dark:text-success-400"
-                  : "bg-primary text-white hover:bg-primary-600 hover:shadow-md hover:shadow-primary/30"
-            }`}
-            isDisabled={isOutOfStock}
-            isLoading={isLoading}
-            radius="lg"
-            size="sm"
-            startContent={
-              isLoading ? null : isProductInCart ? (
-                <CheckCircle size={14} />
-              ) : isOutOfStock ? null : (
-                <ShoppingCart size={14} />
-              )
-            }
-            variant="flat"
-            onClick={handleAddToCart}
-          >
-            {isProductInCart
-              ? "In Cart"
-              : isOutOfStock
-                ? "Out of Stock"
-                : "Add to Cart"}
-          </Button>
-        </CardFooter>
-      </Card>
-    </Link>
+        <button
+          className={[
+            "inline-flex h-9 flex-1 items-center justify-center gap-1.5 rounded-sm",
+            "text-body-sm font-semibold transition-colors duration-fast ease-standard",
+            outOfStock
+              ? "cursor-not-allowed border border-line-hairline bg-surface-sunken text-content-subtle"
+              : inCart
+                ? "bg-brand-subtle text-brand"
+                : "bg-brand text-brand-contrast hover:bg-brand-hover",
+          ].join(" ")}
+          disabled={outOfStock || pending === "cart"}
+          type="button"
+          onClick={handleAddToCart}
+        >
+          {pending === "cart" ? (
+            <Spinner color="current" size="sm" />
+          ) : inCart ? (
+            <Check aria-hidden size={16} />
+          ) : (
+            <Plus aria-hidden size={16} />
+          )}
+          {outOfStock ? "Unavailable" : inCart ? "In cart" : "Add to cart"}
+        </button>
+      </div>
+    </article>
   );
-};
+}
 
 export default ProductCard;

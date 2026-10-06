@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import { Tag, Percent, Clock, Sparkles } from "lucide-react";
 import { Chip } from "@heroui/chip";
+import { Container } from "@/src/components/UI/Container";
 
 const STATS = [
   {
@@ -25,7 +26,7 @@ const STATS = [
 export default function DealsHero() {
   return (
     <section className="relative overflow-hidden bg-gradient-to-b from-primary-50/50 via-white to-white dark:from-primary-950/10 dark:via-transparent dark:to-transparent">
-      <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 sm:py-20 lg:px-8">
+      <Container className="py-12 sm:py-20">
         <div className="flex flex-col items-center text-center">
           <motion.div
             animate={{ opacity: 1, y: 0 }}
@@ -84,7 +85,7 @@ export default function DealsHero() {
             ))}
           </motion.div>
         </div>
-      </div>
+      </Container>
     </section>
   );
 }

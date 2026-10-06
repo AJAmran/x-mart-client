@@ -1,24 +1,33 @@
 "use client";
 
-import { Tag } from "lucide-react";
-import { MyButton } from "@/src/components/UI/MyButton";
+import { CloudOff } from "lucide-react";
 
-export default function DealsErrorState() {
+type Props = {
+  onRetry?: () => void;
+};
+
+export default function DealsErrorState({ onRetry }: Props) {
   return (
-    <div className="flex flex-col items-center justify-center py-20 text-center">
-      <Tag className="mb-4 h-16 w-16 text-red-400" />
-      <h2 className="text-xl font-semibold">Failed to Load Deals</h2>
-      <p className="mt-2 text-gray-500 dark:text-gray-400">
-        Something went wrong. Please try again later.
+    <div
+      className="flex flex-col items-center justify-center py-20 text-center"
+      role="alert"
+    >
+      <span className="mb-5 grid size-16 place-items-center rounded-xl bg-danger/10 text-danger">
+        <CloudOff aria-hidden className="size-7" strokeWidth={1.75} />
+      </span>
+      <h2 className="text-display-sm font-bold text-content">
+        We could not load the deals
+      </h2>
+      <p className="mt-2 max-w-prose text-body-sm text-content-muted">
+        Something went wrong on our end. This is usually temporary.
       </p>
-      <MyButton
-        className="mt-6"
-        color="primary"
-        variant="flat"
-        onClick={() => window.location.reload()}
+      <button
+        className="mt-6 inline-flex h-11 items-center rounded-md bg-brand px-5 text-body-sm font-semibold text-brand-contrast transition-colors duration-fast ease-standard hover:bg-brand-hover"
+        type="button"
+        onClick={onRetry ?? (() => window.location.reload())}
       >
-        Retry
-      </MyButton>
+        Try again
+      </button>
     </div>
   );
 }

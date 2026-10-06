@@ -1,30 +1,25 @@
-import { Skeleton } from "@heroui/skeleton";
-import { Card, CardBody } from "@heroui/card";
-
 export default function CategoriesSkeleton() {
   return (
-    <section
-      aria-label="Loading Categories"
-      className="container mx-auto py-8 px-4 sm:px-6 lg:px-8"
-    >
-      <div className="text-center mb-12">
-        <Skeleton className="w-40 h-8 mx-auto rounded-lg" />
-        <Skeleton className="w-60 h-4 mt-2 mx-auto rounded-lg" />
-      </div>
-      <div className="flex overflow-hidden -ml-4">
-        {Array.from({ length: 6 }).map((_, index) => (
-          <div key={index} className="flex-[0_0_50%] sm:flex-[0_0_33.333%] md:flex-[0_0_25%] lg:flex-[0_0_16.666%] min-w-0 pl-4 py-4">
-            <Card className="h-full border-none shadow-sm" radius="lg">
-              <CardBody className="p-4 flex flex-col items-center justify-center gap-4 text-center">
-                <Skeleton className="w-20 h-20 rounded-full" />
-                <div className="space-y-2 flex flex-col items-center">
-                  <Skeleton className="w-24 h-4 rounded-lg" />
-                  <Skeleton className="w-12 h-3 rounded-lg" />
-                </div>
-              </CardBody>
-            </Card>
-          </div>
-        ))}
+    <section aria-busy="true" aria-label="Loading categories" className="py-16 sm:py-20">
+      <div className="mx-auto w-full max-w-container px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-xl text-center">
+          <div className="xm-skeleton mx-auto h-3 w-24 rounded-xs bg-surface-sunken" />
+          <div className="xm-skeleton mx-auto mt-3 h-8 w-64 rounded-sm bg-surface-sunken" />
+          <div className="xm-skeleton mx-auto mt-3 h-4 w-full rounded-xs bg-surface-sunken" />
+        </div>
+
+        <div className="mt-12 flex gap-3 overflow-hidden">
+          {Array.from({ length: 6 }).map((_, index) => (
+            <div
+              key={index}
+              className="flex min-w-0 flex-1 flex-col items-center gap-3 rounded-lg border border-line-hairline bg-surface-raised p-5"
+            >
+              <div className="xm-skeleton size-20 shrink-0 rounded-full bg-surface-sunken" />
+              <div className="xm-skeleton h-4 w-16 rounded-xs bg-surface-sunken" />
+              <div className="xm-skeleton h-2.5 w-12 rounded-xs bg-surface-sunken" />
+            </div>
+          ))}
+        </div>
       </div>
     </section>
   );

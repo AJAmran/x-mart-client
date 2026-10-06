@@ -148,34 +148,35 @@ export default function Filters({ categories, initialFilters }: FiltersProps) {
   return (
     <Card
       aria-label="Product Filters"
-      className="p-4 shadow-sm bg-white dark:bg-gray-800"
+      className="border border-line-hairline bg-surface-raised shadow-xs"
     >
-      <CardBody className="space-y-6">
+      <CardBody className="gap-6 p-5">
         {/* Sorting */}
         <div>
-          <h3 className="text-lg font-semibold mb-2 text-gray-900 dark:text-gray-100">
-            Sort By
+          <h3 className="mb-2 text-title-md font-semibold text-content">
+            Sort by
           </h3>
           <Select
             aria-label="Sort products"
             classNames={{
               trigger:
-                "bg-white dark:bg-gray-900 border-gray-300 dark:border-gray-600",
-              listbox: "bg-white dark:bg-gray-900",
-              popoverContent: "bg-white dark:bg-gray-900",
+                "border-line-hairline bg-surface-sunken text-content",
+              listbox: "bg-surface-raised text-content",
+              popoverContent: "bg-surface-raised border border-line-hairline",
             }}
             label="Sort By"
             placeholder="Select sorting option"
+            radius="md"
             selectedKeys={[`${sortBy}:${sortOrder}`]}
             onChange={(e) => handleSortChange(e.target.value)}
           >
-            <SelectItem key="price:desc" value="price:desc">
+            <SelectItem key="price:desc">
               Price: High to Low
             </SelectItem>
-            <SelectItem key="price:asc" value="price:asc">
+            <SelectItem key="price:asc">
               Price: Low to High
             </SelectItem>
-            <SelectItem key="createdAt:desc" value="createdAt:desc">
+            <SelectItem key="createdAt:desc">
               Newest First
             </SelectItem>
           </Select>
@@ -183,18 +184,21 @@ export default function Filters({ categories, initialFilters }: FiltersProps) {
 
         {/* Price Range Filter */}
         <div>
-          <h3 className="text-lg font-semibold mb-2 text-gray-900 dark:text-gray-100">
-            Price Range
+          <h3 className="mb-2 text-title-md font-semibold text-content">
+            Price range
           </h3>
           <Slider
             aria-label="Select price range"
             classNames={{
-              track: "bg-gray-200 dark:bg-gray-700",
-              filler: "bg-primary",
-              thumb:
-                "bg-white dark:bg-gray-900 border-gray-300 dark:border-gray-600",
+              track: "bg-line",
+              filler: "bg-brand",
+              thumb: "border-2 border-brand bg-surface-raised",
             }}
-            formatOptions={{ style: "currency", currency: "BDT" }}
+            formatOptions={{
+              style: "currency",
+              currency: "BDT",
+              maximumFractionDigits: 0,
+            }}
             label="Price Range"
             maxValue={10000}
             minValue={0}
@@ -207,19 +211,19 @@ export default function Filters({ categories, initialFilters }: FiltersProps) {
               }
             }}
           />
-          <div className="flex justify-between text-sm mt-2 text-gray-600 dark:text-gray-400">
-            <span>৳{filters.minPrice}</span>
-            <span>৳{filters.maxPrice}</span>
+          <div className="tabular mt-2 flex justify-between text-body-sm text-content-muted">
+            <span>Tk {filters.minPrice.toLocaleString("en-BD")}</span>
+            <span>Tk {filters.maxPrice.toLocaleString("en-BD")}</span>
           </div>
         </div>
 
         {/* Category Filter */}
         <div>
-          <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-gray-100 flex items-center justify-between">
+          <h3 className="mb-3 flex items-center justify-between text-title-md font-semibold text-content">
             Category
             {filters.category && (
               <button
-                className="text-xs text-blue-500 hover:underline bg-transparent border-none p-0 cursor-pointer"
+                className="text-label-sm font-medium text-brand transition-colors duration-fast hover:text-brand-hover hover:underline"
                 type="button"
                 onClick={() => handleFilterChange("category", "")}
               >
@@ -228,42 +232,43 @@ export default function Filters({ categories, initialFilters }: FiltersProps) {
             )}
           </h3>
           <div className="flex flex-wrap gap-2">
-            {categories.map((category) => (
-              <Button
-                key={category.id}
-                aria-label={`Filter by ${category.name}`}
-                className={`
-                  rounded-full transition-all duration-300
-                  ${filters.category === category.id
-                    ? "shadow-md shadow-blue-500/30"
-                    : "bg-gray-100 dark:bg-gray-700/50 hover:bg-gray-200 dark:hover:bg-gray-700"
+            {categories.map((category) => {
+              const isSelected = filters.category === category.id;
+
+              return (
+                <button
+                  key={category.id}
+                  aria-label={`Filter by ${category.name}`}
+                  aria-pressed={isSelected}
+                  className={[
+                    "rounded-full border px-3 py-1.5 text-label-sm font-medium",
+                    "transition-colors duration-fast ease-standard",
+                    isSelected
+                      ? "border-brand bg-brand text-brand-contrast"
+                      : "border-line-hairline bg-surface-sunken text-content-muted hover:border-brand/40 hover:text-content",
+                  ].join(" ")}
+                  type="button"
+                  onClick={() =>
+                    handleFilterChange("category", isSelected ? "" : category.id)
                   }
-                `}
-                color={filters.category === category.id ? "primary" : "default"}
-                size="sm"
-                variant={filters.category === category.id ? "solid" : "flat"}
-                onClick={() =>
-                  handleFilterChange(
-                    "category",
-                    filters.category === category.id ? "" : category.id
-                  )
-                }
-              >
-                {category.name}
-              </Button>
-            ))}
+                >
+                  {category.name}
+                </button>
+              );
+            })}
           </div>
         </div>
 
         {/* Reset Button */}
         <Button
           aria-label="Reset filters"
-          className="w-full mt-4 font-semibold text-danger border-danger/20 hover:bg-danger/10 transition-colors"
+          className="mt-2 w-full border-danger/30 font-semibold text-danger transition-colors duration-fast ease-standard hover:bg-danger/10"
+          radius="md"
           startContent={<RefreshCw size={16} />}
           variant="bordered"
           onClick={resetFilters}
         >
-          Reset All Filters
+          Reset all filters
         </Button>
       </CardBody>
     </Card>

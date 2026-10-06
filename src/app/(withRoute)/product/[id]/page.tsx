@@ -7,6 +7,7 @@ import envConfig from "@/src/config/envConfig";
 import { siteConfig } from "@/src/config/site";
 import { TProduct } from "@/src/types";
 import ProductDetailsClient from "./ProductDetailsClient";
+import { Container } from "@/src/components/UI/Container";
 
 interface ProductResponse {
   data?: TProduct;
@@ -100,9 +101,12 @@ const ProductPage = async ({ params }: { params: Promise<{ id: string }> }) => {
       />
       <Suspense
         fallback={
-          <div className="container mx-auto px-4 py-8">
-            <p className="text-gray-500">Loading product…</p>
-          </div>
+          <Container className="py-10">
+            <div className="xm-skeleton h-8 w-48 rounded-xs bg-surface-sunken" />
+            <p className="mt-3 text-body-sm text-content-subtle">
+              Loading product…
+            </p>
+          </Container>
         }
       >
         <ProductDetailsClient product={product} />
@@ -112,3 +116,4 @@ const ProductPage = async ({ params }: { params: Promise<{ id: string }> }) => {
 };
 
 export default ProductPage;
+

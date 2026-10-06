@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
 import {
@@ -8,7 +9,7 @@ import {
   ChevronRight,
   Heart,
   Minus,
-  PackageCheck,
+  Package,
   Plus,
   RotateCcw,
   Share2,
@@ -16,38 +17,96 @@ import {
   ShoppingCart,
   Truck,
   X,
+  ZoomIn,
 } from "lucide-react";
 import { toast } from "sonner";
 
-import { Button } from "@heroui/button";
-import { Card, CardBody } from "@heroui/card";
-import { Chip } from "@heroui/chip";
-import { Image } from "@heroui/image";
-
 import { useCart } from "@/src/hooks/useCart";
+import { useProducts } from "@/src/hooks/useProducts";
+import { useWishlist } from "@/src/hooks/useWishlist";
 import {
   formatCurrency,
+  formatNumber,
   getDiscountedPrice,
   getProductStock,
   getStockStatus,
 } from "@/src/lib/productUtils";
 import { TProduct } from "@/src/types";
+import { Container } from "@/src/components/UI/Container";
+import ProductCard from "@/src/components/UI/ProductCard";
 
 type Props = { product: TProduct };
 
+/* ── Small presentational helpers ─────────────────────────────────────────── */
+
+const Chip = ({
+  children,
+  tone = "neutral",
+}: {
+  children: React.ReactNode;
+  tone?: "neutral" | "brand" | "danger" | "warning" | "success";
+}) => {
+  const tones = {
+    neutral: "bg-surface-sunken text-content-muted",
+    brand: "bg-brand-subtle text-brand",
+    danger: "bg-danger/15 text-danger",
+    warning: "bg-warning/15 text-warning",
+    success: "bg-success/15 text-success",
+  } as const;
+
+  return (
+    <span
+      className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide ${tones[tone]}`}
+    >
+      {children}
+    </span>
+  );
+};
+
 const ProductDetailsClient = ({ product }: Props) => {
   const [quantity, setQuantity] = useState(1);
-  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
-  const [isImageViewerOpen, setIsImageViewerOpen] = useState(false);
-  const [shareUrl, setShareUrl] = useState("");
-  const [isAddingToCart, setIsAddingToCart] = useState(false);
-  const { addItem } = useCart();
+  const [activeImage, setActiveImage] = useState(0);
+  const [viewerOpen, setViewerOpen] = useState(false);
+  const [pending, setPending] = useState<"cart" | "wishlist" | null>(null);
+
+  const { addItem, isInCart } = useCart();
+  const {
+    addItem: addToWishlist,
+    removeItem: removeFromWishlist,
+    isInWishlist,
+  } = useWishlist();
+
+  /**
+   * Related products: same category first, topped up with the same
+   * sub-category, then anything else active so the shelf never looks empty.
+   * The current product is always excluded.
+   */
+  const { data: relatedRes, isLoading: relatedLoading } = useProducts(
+    { category: product.category, status: "ACTIVE" },
+    { limit: 8, page: 1, sortBy: "createdAt", sortOrder: "desc" }
+  );
+
+  const related = useMemo(() => {
+    const pool = (relatedRes?.data ?? []).filter((p) => p._id !== product._id);
+
+    const rank = (p: TProduct) =>
+      p.subCategory && p.subCategory === product.subCategory ? 0 : 1;
+
+    return pool.sort((a, b) => rank(a) - rank(b)).slice(0, 4);
+  }, [relatedRes, product._id, product.subCategory]);
 
   const totalStock = getProductStock(product);
+  const { canAddToCart } = getStockStatus(totalStock);
   const images = product.images?.length ? product.images : ["/placeholder.jpg"];
   const finalPrice = getDiscountedPrice(product.price, product.discount);
   const hasDiscount = finalPrice < product.price;
-  const stockStatus = getStockStatus(totalStock);
+  const wishlisted = isInWishlist(product._id);
+  const lowStock = canAddToCart && totalStock <= 10;
+
+  const discountText =
+    product.discount?.type === "fixed"
+      ? formatCurrency(product.discount.value)
+      : `${product.discount?.value}%`;
 
   const handleAddToCart = () => {
     if (totalStock <= 0) {
@@ -55,12 +114,16 @@ const ProductDetailsClient = ({ product }: Props) => {
 
       return;
     }
+
     if (quantity > totalStock) {
-      toast.error(`Only ${totalStock} unit${totalStock === 1 ? "" : "s"} available.`);
+      toast.error(
+        `Only ${totalStock} unit${totalStock === 1 ? "" : "s"} available.`
+      );
 
       return;
     }
-    setIsAddingToCart(true);
+
+    setPending("cart");
     addItem({
       productId: product._id,
       quantity,
@@ -69,11 +132,32 @@ const ProductDetailsClient = ({ product }: Props) => {
       image: images[0],
       stock: totalStock,
     });
-    setTimeout(() => setIsAddingToCart(false), 600);
+    toast.success(`${product.name} added to cart`);
+    window.setTimeout(() => setPending(null), 500);
+  };
+
+  const handleWishlist = () => {
+    setPending("wishlist");
+
+    if (wishlisted) {
+      removeFromWishlist(product._id);
+      toast(`${product.name} removed from wishlist`);
+    } else {
+      addToWishlist({
+        productId: product._id,
+        price: finalPrice,
+        name: product.name,
+        image: images[0],
+        stock: totalStock,
+      });
+      toast.success(`${product.name} saved to wishlist`);
+    }
+
+    window.setTimeout(() => setPending(null), 500);
   };
 
   const handleShare = async () => {
-    const url = typeof window !== "undefined" ? window.location.href : shareUrl;
+    const url = window.location.href;
 
     try {
       await navigator.share({ title: product.name, text: product.description, url });
@@ -88,273 +172,407 @@ const ProductDetailsClient = ({ product }: Props) => {
     }
   };
 
+  /* Stock is per-branch; summarise it rather than dumping every row. */
+  const branchStock =
+    product.inventories?.filter((i) => (i.stock ?? 0) > 0).length ?? 0;
+
+  const specs: { label: string; value: string }[] = [
+    { label: "SKU", value: product.sku || product._id.slice(-8).toUpperCase() },
+    { label: "Category", value: product.category },
+    ...(product.subCategory
+      ? [{ label: "Sub-category", value: product.subCategory }]
+      : []),
+    ...(product.manufacturer
+      ? [{ label: "Manufacturer", value: product.manufacturer }]
+      : []),
+    ...(product.supplier ? [{ label: "Supplier", value: product.supplier }] : []),
+    ...(product.weight ? [{ label: "Weight", value: `${product.weight} kg` }] : []),
+    ...(product.barcode ? [{ label: "Barcode", value: product.barcode }] : []),
+  ];
+
   return (
-    <>
-      <div className="container mx-auto px-4 py-8">
-        <motion.nav
-          animate={{ opacity: 1, y: 0 }}
-          className="mb-6 flex flex-wrap items-center gap-2 text-sm text-gray-500 dark:text-gray-400"
-          initial={{ opacity: 0, y: -8 }}
+    <Container className="py-6 sm:py-8">
+      {/* ── Breadcrumbs ──────────────────────────────────────────────── */}
+      <nav
+        aria-label="Breadcrumb"
+        className="mb-5 flex flex-wrap items-center gap-1.5 text-label-sm text-content-subtle"
+      >
+        <Link className="transition-colors hover:text-brand" href="/">
+          Home
+        </Link>
+        <ChevronRight aria-hidden size={13} />
+        <Link className="transition-colors hover:text-brand" href="/shop">
+          Shop
+        </Link>
+        <ChevronRight aria-hidden size={13} />
+        <Link
+          className="transition-colors hover:text-brand"
+          href={`/shop?category=${product.category}`}
         >
-          <Link className="hover:text-primary" href="/">Home</Link>
-          <ChevronRight size={14} />
-          <Link className="hover:text-primary" href="/shop">Shop</Link>
-          <ChevronRight size={14} />
-          <Link className="hover:text-primary" href={`/shop?category=${product.category}`}>
-            {product.category}
-          </Link>
-          <ChevronRight size={14} />
-          <span className="max-w-[240px] truncate text-gray-900 dark:text-gray-100">
-            {product.name}
-          </span>
-        </motion.nav>
+          {product.category}
+        </Link>
+        <ChevronRight aria-hidden size={13} />
+        <span
+          aria-current="page"
+          className="max-w-[16rem] truncate font-medium text-content"
+        >
+          {product.name}
+        </span>
+      </nav>
+      <div className="grid grid-cols-1 gap-8 lg:grid-cols-2 lg:gap-12">
+        {/* ── Gallery ───────────────────────────────────────────────── */}
+        {/* Capped and centred: a full-width square dominated the page and
+            pushed the buy box below the fold on laptops. */}
+        <div className="mx-auto w-full max-w-md lg:sticky lg:top-24 lg:self-start">
+          <div className="relative aspect-square overflow-hidden rounded-lg border border-line-hairline bg-surface-raised">
+            <Image
+              fill
+              priority
+              alt={product.name}
+              className="object-contain p-6"
+              sizes="(max-width: 1024px) 90vw, 26rem"
+              src={images[activeImage]}
+            />
 
-        <section className="grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1.05fr)_minmax(360px,0.95fr)]">
-          <div className="space-y-4">
-            <Card className="overflow-hidden border border-gray-100 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-900">
-              <CardBody className="relative flex aspect-square min-h-[360px] items-center justify-center p-4 sm:p-8">
-                <div className="absolute left-4 top-4 z-10 flex gap-2">
-                  <Chip color={stockStatus.color} size="sm" variant="flat">
-                    {stockStatus.label}
-                  </Chip>
-                  {hasDiscount && (
-                    <Chip color="danger" size="sm" variant="flat">
-                      Save {product.discount?.type === "fixed" ? formatCurrency(product.discount.value) : `${product.discount?.value}%`}
-                    </Chip>
-                  )}
-                </div>
-                <button
-                  aria-label="Open product image viewer"
-                  className="flex h-full w-full items-center justify-center"
-                  type="button"
-                  onClick={() => setIsImageViewerOpen(true)}
-                >
-                  <Image
-                    isZoomed
-                    alt={product.name}
-                    className="max-h-[560px] w-full object-contain"
-                    src={images[selectedImageIndex]}
-                  />
-                </button>
-              </CardBody>
-            </Card>
-
-            {images.length > 1 && (
-              <div className="grid grid-cols-5 gap-3 sm:grid-cols-6">
-                {images.map((image, index) => (
-                  <button
-                    key={image + index}
-                    aria-label={`View ${product.name} image ${index + 1}`}
-                    className={`aspect-square overflow-hidden rounded-lg border bg-white p-1 transition ${
-                      index === selectedImageIndex
-                        ? "border-primary ring-2 ring-primary/20"
-                        : "border-gray-200 hover:border-gray-400 dark:border-gray-800"
-                    }`}
-                    type="button"
-                    onClick={() => setSelectedImageIndex(index)}
-                  >
-                    <Image
-                      removeWrapper
-                      alt={`${product.name} thumbnail ${index + 1}`}
-                      className="h-full w-full object-cover"
-                      src={image}
-                    />
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
-
-          <div className="space-y-6">
-            <div className="space-y-3">
-              <div className="flex flex-wrap items-center gap-2">
-                <Chip color="primary" size="sm" variant="flat">{product.category}</Chip>
-                {product.status && <Chip size="sm" variant="bordered">{product.status}</Chip>}
-              </div>
-              <h1 className="text-3xl font-bold leading-tight text-gray-950 dark:text-gray-50 sm:text-4xl">
-                {product.name}
-              </h1>
-              <p className="leading-7 text-gray-600 dark:text-gray-300">{product.description}</p>
-            </div>
-
-            <div className="rounded-lg border border-gray-100 bg-gray-50 p-5 dark:border-gray-800 dark:bg-gray-900">
-              <div className="flex flex-wrap items-end gap-3">
-                <span className="text-3xl font-bold text-gray-950 dark:text-gray-50">
-                  {formatCurrency(finalPrice)}
-                </span>
-                {hasDiscount && (
-                  <span className="pb-1 text-lg text-gray-500 line-through">
-                    {formatCurrency(product.price)}
-                  </span>
-                )}
-              </div>
-              {totalStock > 0 && totalStock <= 10 && (
-                <div className="mt-3 flex items-center gap-2 text-sm font-medium text-warning">
-                  <AlertTriangle size={16} />
-                  <span>Low stock. Order soon to reserve this item.</span>
-                </div>
+            <div className="pointer-events-none absolute left-4 top-4 flex flex-wrap items-center gap-2">
+              {hasDiscount && <Chip tone="danger">-{discountText}</Chip>}
+              {canAddToCart ? (
+                <Chip tone="success">In stock</Chip>
+              ) : (
+                <Chip tone="danger">Out of stock</Chip>
               )}
             </div>
 
-            <Card className="shadow-sm">
-              <CardBody className="space-y-5">
-                <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                  <div>
-                    <p className="text-sm font-semibold text-gray-700 dark:text-gray-300">Quantity</p>
-                    <p className="text-xs text-gray-500">Available: {totalStock}</p>
-                  </div>
-                  <div className="grid h-12 w-36 grid-cols-3 overflow-hidden rounded-lg border border-gray-200 dark:border-gray-800">
-                    <Button
-                      isIconOnly
-                      aria-label="Decrease quantity"
-                      className="h-full rounded-none"
-                      isDisabled={quantity <= 1 || totalStock <= 0}
-                      variant="light"
-                      onPress={() => setQuantity((q) => Math.max(1, q - 1))}
-                    >
-                      <Minus size={16} />
-                    </Button>
-                    <div className="flex items-center justify-center border-x border-gray-200 font-semibold dark:border-gray-800">
-                      {quantity}
-                    </div>
-                    <Button
-                      isIconOnly
-                      aria-label="Increase quantity"
-                      className="h-full rounded-none"
-                      isDisabled={quantity >= totalStock || totalStock <= 0}
-                      variant="light"
-                      onPress={() => setQuantity((q) => Math.min(Math.max(totalStock, 1), q + 1))}
-                    >
-                      <Plus size={16} />
-                    </Button>
-                  </div>
-                </div>
+            {images.length > 1 && (
+              <button
+                aria-label="View larger image"
+                className="absolute bottom-4 right-4 inline-flex size-9 items-center justify-center rounded-sm border border-line-hairline bg-surface-raised text-content-muted shadow-sm transition-colors hover:border-brand/50 hover:text-brand"
+                type="button"
+                onClick={() => setViewerOpen(true)}
+              >
+                <ZoomIn aria-hidden size={16} />
+              </button>
+            )}
+          </div>
 
-                <div className="flex flex-col gap-3 sm:flex-row">
-                  <Button
-                    className="h-12 flex-1 font-semibold"
-                    color="primary"
-                    isDisabled={totalStock <= 0}
-                    isLoading={isAddingToCart}
-                    startContent={!isAddingToCart && <ShoppingCart size={20} />}
-                    onPress={handleAddToCart}
-                  >
-                    {stockStatus.canAddToCart ? "Add to Cart" : "Out of Stock"}
-                  </Button>
-                  <Button
-                    isIconOnly
-                    aria-label="Share product"
-                    className="h-12 w-full sm:w-12"
-                    variant="bordered"
-                    onPress={handleShare}
-                  >
-                    <Share2 size={20} />
-                  </Button>
-                  <Button
-                    isIconOnly
-                    aria-label="Save product"
-                    className="h-12 w-full sm:w-12"
-                    variant="bordered"
-                    onPress={() => toast.info("Wishlist is under development.")}
-                  >
-                    <Heart size={20} />
-                  </Button>
-                </div>
-              </CardBody>
-            </Card>
-
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-              {[
-                { icon: Truck, title: "Fast delivery", text: "Branch-based fulfillment" },
-                { icon: ShieldCheck, title: "Secure checkout", text: "Protected payment flow" },
-                { icon: RotateCcw, title: "Easy support", text: "Order tracking included" },
-              ].map((item) => (
-                <div
-                  key={item.title}
-                  className="rounded-lg border border-gray-100 bg-white p-4 dark:border-gray-800 dark:bg-gray-900"
+          {images.length > 1 && (
+            <div className="mt-3 grid grid-cols-5 gap-2.5">
+              {images.map((image, index) => (
+                <button
+                  key={image + index}
+                  aria-label={`View image ${index + 1} of ${images.length}`}
+                  aria-pressed={index === activeImage}
+                  className={[
+                    "relative aspect-square overflow-hidden rounded-sm border-2 bg-surface-raised",
+                    "transition-colors duration-fast ease-standard",
+                    index === activeImage
+                      ? "border-brand"
+                      : "border-line-hairline hover:border-line-strong",
+                  ].join(" ")}
+                  type="button"
+                  onClick={() => setActiveImage(index)}
                 >
-                  <item.icon className="mb-3 text-primary" size={22} />
-                  <p className="text-sm font-semibold">{item.title}</p>
-                  <p className="mt-1 text-xs text-gray-500">{item.text}</p>
-                </div>
+                  <Image
+                    fill
+                    alt=""
+                    className="object-contain p-1.5"
+                    sizes="96px"
+                    src={image}
+                  />
+                </button>
               ))}
             </div>
+          )}
+        </div>
 
-            <Card className="shadow-sm">
-              <CardBody className="space-y-3">
-                <div className="flex items-center gap-2">
-                  <PackageCheck className="text-primary" size={20} />
-                  <h2 className="font-semibold">Product Details</h2>
-                </div>
-                <dl className="grid grid-cols-1 gap-3 text-sm sm:grid-cols-2">
-                  <div>
-                    <dt className="text-gray-500">SKU</dt>
-                    <dd className="font-medium">{product.sku || product._id.slice(-8).toUpperCase()}</dd>
-                  </div>
-                  <div>
-                    <dt className="text-gray-500">Availability</dt>
-                    <dd className="font-medium">{stockStatus.label}</dd>
-                  </div>
-                  {product.manufacturer && (
-                    <div>
-                      <dt className="text-gray-500">Manufacturer</dt>
-                      <dd className="font-medium">{product.manufacturer}</dd>
-                    </div>
-                  )}
-                  {product.weight && (
-                    <div>
-                      <dt className="text-gray-500">Weight</dt>
-                      <dd className="font-medium">{product.weight}</dd>
-                    </div>
-                  )}
-                </dl>
-              </CardBody>
-            </Card>
+        {/* ── Buy box ───────────────────────────────────────────────── */}
+        <div className="min-w-0">
+          <div className="flex flex-wrap items-center gap-2">
+            <Chip tone="brand">{product.category}</Chip>
+            {product.subCategory && <Chip>{product.subCategory}</Chip>}
+            {product.operationType === "PROMOTIONAL" && (
+              <Chip tone="warning">Promotional</Chip>
+            )}
           </div>
-        </section>
+
+          <h1 className="mt-3 text-display-sm font-bold text-content">
+            {product.name}
+          </h1>
+
+          {product.description && (
+            <p className="mt-3 text-body-sm leading-relaxed text-content-muted">
+              {product.description}
+            </p>
+          )}
+
+          {/* Price + stock */}
+          <div className="mt-6 rounded-lg border border-line-hairline bg-surface-raised p-5">
+            <div className="flex flex-wrap items-end gap-3">
+              <span className="tabular text-display-sm font-bold text-content">
+                {formatCurrency(finalPrice)}
+              </span>
+              {hasDiscount && (
+                <span className="tabular pb-1 text-body-sm text-content-subtle line-through">
+                  {formatCurrency(product.price)}
+                </span>
+              )}
+              {hasDiscount && (
+                <Chip tone="danger">
+                  Save {discountText}
+                </Chip>
+              )}
+            </div>
+
+            <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2 border-t border-line-hairline pt-4 text-label-sm">
+              <span className="flex items-center gap-1.5 text-content-muted">
+                <Package aria-hidden className="text-content-subtle" size={15} />
+                {formatNumber(totalStock)} in stock
+              </span>
+              {branchStock > 0 && (
+                <span className="text-content-subtle">
+                  across {branchStock}{" "}
+                  {branchStock === 1 ? "branch" : "branches"}
+                </span>
+              )}
+            </div>
+
+            {lowStock && (
+              <p className="mt-3 flex items-center gap-2 text-label-sm font-medium text-warning">
+                <AlertTriangle aria-hidden size={15} />
+                Running low — only {formatNumber(totalStock)} left.
+              </p>
+            )}
+          </div>
+
+          {/* Quantity + actions */}
+          <div className="mt-5 flex flex-col gap-4 sm:flex-row sm:items-center">
+            <div className="flex items-center gap-3">
+              <span className="text-label-sm font-semibold text-content-muted">
+                Qty
+              </span>
+              <div className="grid h-11 w-32 grid-cols-3 overflow-hidden rounded-md border border-line-hairline">
+                <button
+                  aria-label="Decrease quantity"
+                  className="grid place-items-center text-content-muted transition-colors hover:bg-surface-sunken hover:text-content disabled:opacity-30"
+                  disabled={quantity <= 1 || totalStock <= 0}
+                  type="button"
+                  onClick={() => setQuantity((q) => Math.max(1, q - 1))}
+                >
+                  <Minus aria-hidden size={15} />
+                </button>
+                <span
+                  aria-label="Selected quantity"
+                  aria-live="polite"
+                  className="tabular grid place-items-center border-x border-line-hairline text-body-sm font-semibold text-content"
+                >
+                  {quantity}
+                </span>
+                <button
+                  aria-label="Increase quantity"
+                  className="grid place-items-center text-content-muted transition-colors hover:bg-surface-sunken hover:text-content disabled:opacity-30"
+                  disabled={quantity >= totalStock || totalStock <= 0}
+                  type="button"
+                  onClick={() =>
+                    setQuantity((q) => Math.min(Math.max(totalStock, 1), q + 1))
+                  }
+                >
+                  <Plus aria-hidden size={15} />
+                </button>
+              </div>
+            </div>
+
+            <div className="flex flex-1 gap-2">
+              <button
+                className={[
+                  "inline-flex h-11 flex-1 items-center justify-center gap-2 rounded-sm",
+                  "text-body-sm font-semibold transition-colors duration-fast ease-standard",
+                  canAddToCart
+                    ? isInCart(product._id) || pending === "cart"
+                      ? "bg-brand-subtle text-brand"
+                      : "bg-brand text-brand-contrast hover:bg-brand-hover"
+                    : "cursor-not-allowed bg-surface-sunken text-content-subtle",
+                ].join(" ")}
+                disabled={!canAddToCart || pending === "cart"}
+                type="button"
+                onClick={handleAddToCart}
+              >
+                <ShoppingCart aria-hidden size={17} />
+                {canAddToCart
+                  ? isInCart(product._id)
+                    ? "In cart"
+                    : "Add to cart"
+                  : "Out of stock"}
+              </button>
+
+              <button
+                aria-label={wishlisted ? "Remove from wishlist" : "Save to wishlist"}
+                aria-pressed={wishlisted}
+                className={[
+                  "inline-flex size-11 shrink-0 items-center justify-center rounded-sm border",
+                  "transition-colors duration-fast ease-standard",
+                  wishlisted
+                    ? "border-brand/50 bg-brand-subtle text-brand"
+                    : "border-line-hairline bg-surface-raised text-content-muted hover:border-brand/50 hover:text-brand",
+                ].join(" ")}
+                disabled={pending === "wishlist"}
+                type="button"
+                onClick={handleWishlist}
+              >
+                <Heart
+                  aria-hidden
+                  className={wishlisted ? "fill-brand" : ""}
+                  size={17}
+                />
+              </button>
+
+              <button
+                aria-label="Share product"
+                className="inline-flex size-11 shrink-0 items-center justify-center rounded-sm border border-line-hairline bg-surface-raised text-content-muted transition-colors duration-fast ease-standard hover:border-brand/50 hover:text-brand"
+                type="button"
+                onClick={handleShare}
+              >
+                <Share2 aria-hidden size={17} />
+              </button>
+            </div>
+          </div>
+
+          {/* Reassurance */}
+          <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-3">
+            {[
+              { icon: Truck, title: "Fast delivery", text: "From your nearest branch" },
+              { icon: ShieldCheck, title: "Secure checkout", text: "Protected payments" },
+              { icon: RotateCcw, title: "Easy support", text: "Order tracking included" },
+            ].map((item) => (
+              <div
+                key={item.title}
+                className="rounded-md border border-line-hairline bg-surface-raised p-4"
+              >
+                <item.icon aria-hidden className="mb-2.5 text-brand" size={20} />
+                <p className="text-body-sm font-semibold text-content">
+                  {item.title}
+                </p>
+                <p className="mt-0.5 text-label-sm text-content-subtle">
+                  {item.text}
+                </p>
+              </div>
+            ))}
+          </div>
+
+          {/* Specs */}
+          {specs.length > 0 && (
+            <section className="mt-6 overflow-hidden rounded-lg border border-line-hairline bg-surface-raised">
+              <header className="border-b border-line-hairline px-5 py-3.5">
+                <h2 className="text-title-md font-semibold text-content">
+                  Product details
+                </h2>
+              </header>
+              <dl className="grid grid-cols-1 gap-x-8 sm:grid-cols-2">
+                {specs.map((spec) => (
+                  <div
+                    key={spec.label}
+                    className="flex items-baseline justify-between gap-4 border-b border-line-hairline px-5 py-3 last:border-0 sm:[&:nth-last-child(2)]:border-0"
+                  >
+                    <dt className="text-label-sm text-content-subtle">
+                      {spec.label}
+                    </dt>
+                    <dd className="truncate text-body-sm font-medium text-content">
+                      {spec.value}
+                    </dd>
+                  </div>
+                ))}
+              </dl>
+            </section>
+          )}
+
+          {/* Long description */}
+          {product.description && (
+            <section className="mt-6 rounded-lg border border-line-hairline bg-surface-raised p-5">
+              <h2 className="text-title-md font-semibold text-content">
+                About this product
+              </h2>
+              <p className="mt-2.5 text-body-sm leading-relaxed text-content-muted">
+                {product.description}
+              </p>
+            </section>
+          )}
+        </div>
       </div>
 
+      {/* ── Related products ───────────────────────────────────────── */}
+      {(relatedLoading || related.length > 0) && (
+        <section className="mt-12 border-t border-line-hairline pt-10">
+          <header className="flex flex-wrap items-end justify-between gap-3">
+            <div>
+              <h2 className="text-title-lg font-bold text-content">
+                You may also like
+              </h2>
+              <p className="mt-1 text-label-sm text-content-subtle">
+                More from {product.category.toLowerCase()}
+              </p>
+            </div>
+            <Link
+              className="shrink-0 text-label-sm font-semibold text-brand transition-colors hover:underline"
+              href={`/shop?category=${product.category}`}
+            >
+              View all
+            </Link>
+          </header>
+
+          <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5 lg:grid-cols-4">
+            {relatedLoading
+              ? Array.from({ length: 4 }).map((_, i) => (
+                  <div
+                    key={i}
+                    className="xm-skeleton aspect-[3/4] w-full rounded-lg bg-surface-sunken"
+                  />
+                ))
+              : related.map((item) => (
+                  <ProductCard key={item._id} product={item} />
+                ))}
+          </div>
+        </section>
+      )}
+
+      {/* ── Full-screen viewer ──────────────────────────────────────── */}
       <AnimatePresence>
-        {isImageViewerOpen && (
+        {viewerOpen && (
           <motion.div
             animate={{ opacity: 1 }}
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 p-4"
+            aria-label="Image viewer"
+            aria-modal="true"
+            className="fixed inset-0 z-overlay flex items-center justify-center bg-surface-inverse/95 p-4"
             exit={{ opacity: 0 }}
             initial={{ opacity: 0 }}
-            onClick={() => setIsImageViewerOpen(false)}
+            role="dialog"
+            onClick={() => setViewerOpen(false)}
           >
             <motion.div
               animate={{ scale: 1 }}
-              className="relative flex h-full w-full max-w-5xl items-center justify-center"
+              className="relative w-full max-w-4xl"
               exit={{ scale: 0.96 }}
               initial={{ scale: 0.96 }}
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="flex w-full overflow-hidden">
-                {images.map((image, index) => (
-                  <div key={image + index} className="min-w-full px-4">
-                    <Image
-                      alt={`${product.name} ${index + 1}`}
-                      className="max-h-[86vh] w-full object-contain"
-                      src={image}
-                    />
-                  </div>
-                ))}
-              </div>
-              <Button
-                isIconOnly
+              <Image
+                alt={`${product.name} — image ${activeImage + 1}`}
+                className="mx-auto max-h-[85vh] w-auto object-contain"
+                height={900}
+                src={images[activeImage]}
+                width={900}
+              />
+              <button
                 aria-label="Close image viewer"
-                className="absolute right-2 top-2 rounded-full"
-                color="danger"
-                onPress={() => setIsImageViewerOpen(false)}
+                className="absolute right-0 top-0 inline-flex size-10 items-center justify-center rounded-sm bg-surface-raised/10 text-content-inverted transition-colors hover:bg-surface-raised/20"
+                type="button"
+                onClick={() => setViewerOpen(false)}
               >
-                <X size={22} />
-              </Button>
+                <X aria-hidden size={20} />
+              </button>
             </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
-    </>
+    </Container>
   );
 };
 
