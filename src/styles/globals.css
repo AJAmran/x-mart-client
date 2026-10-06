@@ -2,6 +2,360 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ==========================================================================
+   X-MART DESIGN SYSTEM
+   Single source of truth for the visual language.
+
+   Tier 1  Primitive palette  -> emerald / lime / ink raw scales
+   Tier 2  Semantic tokens    -> surface / content / line / brand roles
+   Tier 3  Scales&motion      -> radius, elevation, duration, easing, z-index
+
+   Tier 2 is theme-aware. Components must ONLY consume Tier 2 + Tier 3 so a
+   single `dark` class swap re-themes the entire product.
+   ========================================================================== */
+
+@media (min-width: 640px) {
+  :root {
+    --rail-item: 17.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  :root {
+    --rail-item: 19rem;
+  }
+}
+
+@media (min-width: 1280px) {
+  :root {
+    --rail-item: 20.5rem;
+  }
+}
+
+@layer base {
+  :root {
+    /* ---- Tier 3: radius ------------------------------------------------ */
+    --radius-xs: 6px;
+    --radius-sm: 10px;
+    --radius-md: 14px;
+    --radius-lg: 18px;
+    --radius-xl: 24px;
+    --radius-2xl: 32px;
+
+    /* ---- Tier 3: motion ------------------------------------------------ */
+    --duration-instant: 120ms;
+    --duration-fast: 180ms;
+    --duration-base: 240ms;
+    --duration-slow: 320ms;
+    --duration-slower: 480ms;
+
+    --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+    --ease-entrance: cubic-bezier(0.16, 1, 0.3, 1);
+    --ease-exit: cubic-bezier(0.4, 0, 1, 1);
+
+    /* ---- Tier 3: z-index ------------------------------------------------ */
+    --z-base: 0;
+    --z-raised: 10;
+    --z-sticky: 100;
+    --z-header: 200;
+    --z-overlay: 300;
+    --z-modal: 400;
+    --z-toast: 500;
+
+    /* ---- Tier 3: horizontal rail item width (product carousels) --------- */
+    --rail-item: 15rem;
+
+    /* ---- Tier 1: brand primitives -------------------------------------- */
+    --emerald-50: 236 253 245;
+    --emerald-100: 209 250 229;
+    --emerald-200: 167 243 208;
+    --emerald-300: 110 231 183;
+    --emerald-400: 52 211 153;
+    --emerald-500: 16 185 129;
+    --emerald-600: 5 150 105;
+    --emerald-700: 4 120 87;
+    --emerald-800: 6 95 70;
+    --emerald-900: 6 78 59;
+
+    --lime-100: 236 252 203;
+    --lime-200: 217 249 157;
+    --lime-300: 190 242 100;
+    --lime-400: 163 230 53;
+    --lime-500: 132 204 22;
+
+    /* ---- Tier 1: neutrals ---------------------------------------------- */
+    --ink-0: 255 255 255;
+    --ink-25: 250 250 250;
+    --ink-50: 248 250 252;
+    --ink-100: 241 245 249;
+    --ink-200: 226 232 240;
+    --ink-300: 203 213 225;
+    --ink-400: 148 163 184;
+    --ink-500: 100 116 139;
+    --ink-600: 71 85 105;
+    --ink-700: 51 65 85;
+    --ink-800: 30 41 59;
+    --ink-850: 20 28 43;
+    --ink-900: 12 18 28;
+    --ink-950: 7 11 18;
+
+    /* ---- Tier 2: semantic — LIGHT -------------------------------------- */
+    color-scheme: light;
+
+    --surface: var(--ink-50);
+    --surface-raised: var(--ink-0);
+    --surface-sunken: var(--ink-100);
+    --surface-inset: var(--ink-50);
+    --surface-inverse: var(--ink-900);
+
+    --content: var(--ink-900);
+    --content-muted: var(--ink-600);
+    --content-subtle: var(--ink-500);
+    --content-inverted: var(--ink-0);
+
+    --line: var(--ink-200);
+    --line-strong: var(--ink-300);
+    --line-hairline: 226 232 240;
+
+    --brand: var(--emerald-600);
+    --brand-hover: var(--emerald-700);
+    --brand-subtle: var(--emerald-50);
+    --brand-contrast: var(--ink-0);
+    --accent: var(--lime-500);
+    --accent-subtle: 240 249 219;
+
+    --ring: var(--emerald-500);
+
+    /* Tier 3: elevation — light */
+    --shadow-xs: 0 1px 2px 0 rgb(15 23 42 / 0.05);
+    --shadow-sm: 0 1px 2px 0 rgb(15 23 42 / 0.06), 0 1px 3px 0 rgb(15 23 42 / 0.05);
+    --shadow-md: 0 4px 8px -2px rgb(15 23 42 / 0.08), 0 2px 4px -2px rgb(15 23 42 / 0.05);
+    --shadow-lg: 0 12px 24px -6px rgb(15 23 42 / 0.12), 0 4px 8px -4px rgb(15 23 42 / 0.06);
+    --shadow-xl: 0 24px 48px -12px rgb(15 23 42 / 0.18), 0 8px 16px -8px rgb(15 23 42 / 0.08);
+    --shadow-brand: 0 8px 24px -8px rgb(var(--emerald-500) / 0.45);
+  }
+
+  .dark {
+    color-scheme: dark;
+
+    /* ---- Tier 2: semantic — DARK --------------------------------------- */
+    --surface: var(--ink-950);
+    --surface-raised: var(--ink-900);
+    --surface-sunken: var(--ink-0);
+    --surface-inset: var(--ink-850);
+    --surface-inverse: var(--ink-0);
+
+    --content: var(--ink-50);
+    --content-muted: var(--ink-400);
+    --content-subtle: var(--ink-500);
+    --content-inverted: var(--ink-950);
+
+    --line: var(--ink-800);
+    --line-strong: var(--ink-700);
+    --line-hairline: 30 41 59;
+
+    --brand: var(--emerald-400);
+    --brand-hover: var(--emerald-300);
+    --brand-subtle: 6 78 59;
+    --brand-contrast: var(--ink-950);
+    --accent: var(--lime-400);
+    --accent-subtle: 30 41 20;
+
+    --ring: var(--emerald-400);
+
+    /* Tier 3: elevation — dark. Dark UIs need stronger, less diffuse shadows
+       plus a top-edge highlight to read as a lit surface. */
+    --shadow-xs: 0 1px 2px 0 rgb(0 0 0 / 0.4);
+    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.5), inset 0 1px 0 0 rgb(255 255 255 / 0.04);
+    --shadow-md: 0 4px 10px -2px rgb(0 0 0 / 0.55), inset 0 1px 0 0 rgb(255 255 255 / 0.05);
+    --shadow-lg: 0 14px 28px -8px rgb(0 0 0 / 0.65), inset 0 1px 0 0 rgb(255 255 255 / 0.06);
+    --shadow-xl: 0 28px 56px -16px rgb(0 0 0 / 0.75), inset 0 1px 0 0 rgb(255 255 255 / 0.07);
+    --shadow-brand: 0 8px 28px -8px rgb(var(--emerald-400) / 0.4);
+  }
+
+  * {
+    border-color: var(--line);
+  }
+
+  html {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    background-color: rgb(var(--surface));
+    color: rgb(var(--content));
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+
+  /* Consistent, on-brand focus treatment across every interactive element. */
+  :focus-visible {
+    outline: 2px solid rgb(var(--ring));
+    outline-offset: 2px;
+  }
+
+  ::selection {
+    background-color: rgb(var(--brand) / 0.25);
+  }
+
+  /* Tabular numerals for prices, order ids and analytics figures. */
+  .tabular {
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+@layer components {
+  /* Frosted overlay used by sticky headers and floating control clusters. */
+  .glass {
+    background-color: rgb(var(--surface-raised) / 0.72);
+    backdrop-filter: blur(16px) saturate(180%);
+    -webkit-backdrop-filter: blur(16px) saturate(180%);
+  }
+
+  /* Ambient brand bloom. Decorative only — always aria-hidden. */
+  .bloom {
+    position: absolute;
+    border-radius: 9999px;
+    filter: blur(120px);
+    pointer-events: none;
+  }
+
+  .hairline {
+    border-color: rgb(var(--line-hairline));
+  }
+}
+
+@layer utilities {
+  /* Animated gradient hairline used to separate the sticky header stack. */
+  .rule-brand {
+    background-image: linear-gradient(
+      to right,
+      transparent,
+      rgb(var(--brand) / 0.5),
+      rgb(var(--accent) / 0.5),
+      transparent
+    );
+  }
+
+  .mask-fade-r {
+    mask-image: linear-gradient(to right, black 82%, transparent 100%);
+  }
+}
+
+/* ==========================================================================
+   MOTION
+   Every animation is opt-in and globally gated on the user's motion
+   preference. `prefers-reduced-motion` collapses transforms and durations
+   rather than disabling feedback entirely.
+   ========================================================================== */
+
+@keyframes xm-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes xm-rise {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes xm-scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes xm-shimmer {
+  from {
+    background-position: 200% 0;
+  }
+  to {
+    background-position: -200% 0;
+  }
+}
+
+@keyframes xm-marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.xm-animate-fade {
+  animation: xm-fade-in var(--duration-slow) var(--ease-entrance) both;
+}
+
+.xm-animate-rise {
+  animation: xm-rise var(--duration-slower) var(--ease-entrance) both;
+}
+
+.xm-animate-scale {
+  animation: xm-scale-in var(--duration-base) var(--ease-entrance) both;
+}
+
+.xm-stagger > * {
+  animation: xm-rise var(--duration-slower) var(--ease-entrance) both;
+}
+
+.xm-stagger > *:nth-child(1) { animation-delay: 0ms; }
+.xm-stagger > *:nth-child(2) { animation-delay: 45ms; }
+.xm-stagger > *:nth-child(3) { animation-delay: 90ms; }
+.xm-stagger > *:nth-child(4) { animation-delay: 135ms; }
+.xm-stagger > *:nth-child(5) { animation-delay: 180ms; }
+.xm-stagger > *:nth-child(6) { animation-delay: 225ms; }
+.xm-stagger > *:nth-child(7) { animation-delay: 270ms; }
+.xm-stagger > *:nth-child(8) { animation-delay: 315ms; }
+
+/* Loading shimmer shared by every skeleton in the product. */
+.xm-skeleton {
+  background-image: linear-gradient(
+    90deg,
+    rgb(var(--surface-sunken)) 0%,
+    rgb(var(--line)) 50%,
+    rgb(var(--surface-sunken)) 100%
+  );
+  background-size: 200% 100%;
+  animation: xm-shimmer 1.6s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .xm-animate-rise,
+  .xm-animate-scale,
+  .xm-stagger > * {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* ==========================================================================
+   CAROUSEL (Embla)
+   ========================================================================== */
 
 .embla {
   --slide-spacing: 0;
@@ -11,7 +365,6 @@
 
 .embla__viewport {
   overflow: hidden;
-  border-radius: 1rem;
 }
 
 .embla__container {
@@ -26,19 +379,4 @@
   min-width: 0;
   padding-left: var(--slide-spacing);
   position: relative;
-}
-
-.animate-slide-up {
-  animation: slideUp 0.5s ease-out;
-}
-
-@keyframes slideUp {
-  from {
-    transform: translateY(20px);
-    opacity: 0;
-  }
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
 }
