@@ -12,12 +12,13 @@ import { useRouter } from "next/navigation";
 import { format } from "date-fns";
 import { ArrowLeft, Package, Truck, CheckCircle, Clock, XCircle } from "lucide-react";
 import { use } from "react";
+import { Container } from "@/src/components/UI/Container";
 
 const OrderDetailsPage = ({ params }: { params: Promise<{ id: string }> }) => {
   const { id } = use(params);
   const { data, isLoading, error } = useOrderById(id);
   const router = useRouter();
-  const order: TOrder = data?.data;
+  const order = data?.data as TOrder | undefined;
 
   const getStatusColor = (status: keyof typeof ORDER_STATUS) => {
     switch (status) {
@@ -91,7 +92,7 @@ const OrderDetailsPage = ({ params }: { params: Promise<{ id: string }> }) => {
   );
 
   return (
-    <div className="container mx-auto py-8">
+    <Container className="py-8">
       <div className="mb-6">
         <Button
           className="mb-4"
@@ -340,8 +341,9 @@ const OrderDetailsPage = ({ params }: { params: Promise<{ id: string }> }) => {
           </Card>
         </div>
       </div>
-    </div>
+    </Container>
   );
 };
 
 export default OrderDetailsPage;
+
