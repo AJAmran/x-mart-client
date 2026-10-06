@@ -23,6 +23,22 @@ type AuthFormProps = {
   type: "login" | "register";
 };
 
+/**
+ * Only ever redirect to a path inside this app.
+ *
+ * `?redirect=` is attacker-controllable, so `//evil.com` and
+ * `https://evil.com` would otherwise turn a successful login into an open
+ * redirect that leaks the referrer and phishs the freshly authenticated user.
+ */
+const safeRedirect = (target: string | null): string => {
+  if (!target) return "/";
+
+  // Must be a single leading slash: rejects `//host`, `/\host` and absolute URLs.
+  if (!target.startsWith("/") || target.startsWith("//")) return "/";
+
+  return target;
+};
+
 const AuthForm: React.FC<AuthFormProps> = ({ type }) => {
   const isRegister = type === "register";
   const router = useRouter();
@@ -59,11 +75,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ type }) => {
           const response = await loginMutation(data as LoginFormData);
 
           if (response.success) {
-            // Get the redirect URL from query parameters
-            const redirectUrl = searchParams.get("redirect");
-
-            // Redirect to the original protected route or home page
-            router.push(redirectUrl || "/");
+            router.push(safeRedirect(searchParams.get("redirect")));
           }
         }
       } catch {
