@@ -14,12 +14,10 @@ import { siteConfig } from "@/src/config/site";
 // Metadata for SEO
 export const metadata: Metadata = {
   title: "Shop",
-  description:
-    "Browse a wide range of groceries, household items, and exclusive deals at X-mart. Filter by category, price, and more!",
+  description: `Browse a wide range of groceries, household items, and exclusive deals at ${siteConfig.name}. Filter by category, price, and more!`,
   openGraph: {
-    title: "Shop at X-mart",
-    description:
-      "Discover fresh produce, kitchen gadgets, and more with X-mart's online shop.",
+    title: `Shop at ${siteConfig.name}`,
+    description: `Discover fresh produce, kitchen gadgets, and more with ${siteConfig.name}'s online shop.`,
     images: [siteConfig.ogImage],
     url: `${siteConfig.url}/shop`,
   },

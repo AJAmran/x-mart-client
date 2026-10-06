@@ -8,6 +8,7 @@ import { ArrowRight, ShoppingBag } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 import { Container } from "@/src/components/UI/Container";
+import { siteConfig } from "@/src/config/site";
 
 export default function HeroSection() {
   const { theme } = useTheme();
@@ -69,7 +70,7 @@ export default function HeroSection() {
       {/* Hero Image with Parallax */}
       <motion.div className="absolute inset-0 z-0" style={{ y }}>
         <Image
-          alt="X-mart hero background"
+          alt={`${siteConfig.name} hero background`}
           className="object-cover w-full h-full opacity-30"
           height={1080}
           loading="lazy"
@@ -93,7 +94,7 @@ export default function HeroSection() {
             className="text-4xl sm:text-5xl md:text-6xl font-extrabold mb-6 tracking-tight drop-shadow-lg"
             variants={childVariants}
           >
-            Discover X-mart
+            Discover {siteConfig.name}
           </motion.h1>
 
           {/* Subheadline */}
@@ -133,7 +134,7 @@ export default function HeroSection() {
               whileTap="tap"
             >
               <Button
-                aria-label="Learn more about X-mart"
+                aria-label={`Learn more about ${siteConfig.name}`}
                 as={Link}
                 className="font-semibold px-8 py-3 border-2 border-white text-white dark:border-gray-300 dark:text-gray-300 hover:bg-white/20 dark:hover:bg-gray-800/20"
                 endContent={<ShoppingBag size={20} />}

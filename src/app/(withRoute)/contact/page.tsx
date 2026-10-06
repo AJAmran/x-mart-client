@@ -14,6 +14,8 @@ import {
   Send,
 } from "lucide-react";
 
+import { siteConfig } from "@/src/config/site";
+
 import { Container } from "@/src/components/UI/Container";
 import { SectionHeading } from "@/src/components/UI/Section";
 
@@ -39,9 +41,9 @@ const channels = [
   {
     icon: Mail,
     title: "Email us",
-    lines: ["support@xmart.com", "partnerships@xmart.com"],
+    lines: [siteConfig.supportEmail, "partnerships@xmart.com"],
     detail: "Replies within one business day",
-    href: "mailto:support@xmart.com",
+    href: `mailto:${siteConfig.supportEmail}`,
   },
   {
     icon: MapPin,
@@ -98,7 +100,7 @@ export default function ContactPage() {
     const subject = `[${values.topic}] ${values.name}`;
     const body = `${values.message}\n\n—\n${values.name}\n${values.email}`;
 
-    window.location.href = `mailto:support@xmart.com?subject=${encodeURIComponent(
+    window.location.href = `mailto:${siteConfig.supportEmail}?subject=${encodeURIComponent(
       subject
     )}&body=${encodeURIComponent(body)}`;
 
@@ -197,9 +199,9 @@ export default function ContactPage() {
                     If nothing happened, email us directly at{" "}
                     <a
                       className="font-medium text-brand underline underline-offset-2"
-                      href="mailto:support@xmart.com"
+                      href={`mailto:${siteConfig.supportEmail}`}
                     >
-                      support@xmart.com
+                      {siteConfig.supportEmail}
                     </a>
                     .
                   </p>

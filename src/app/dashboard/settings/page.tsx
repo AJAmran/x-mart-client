@@ -16,14 +16,17 @@ import { ThemeSwitch } from "@/src/components/theme-switch";
 import { Input, Textarea } from "@heroui/input";
 import { Button } from "@heroui/button";
 import { Switch } from "@heroui/switch";
+import { siteConfig } from "@/src/config/site";
 
 export default function SettingsPage() {
+  // Seeded from the configured store identity so the admin console shows the
+  // buyer's store, not the demo name, on first open.
   const [profile, setProfile] = useState({
-    storeName: "X-Mart",
-    storeEmail: "admin@xmart.com",
-    storePhone: "+8801234567890",
+    storeName: siteConfig.name,
+    storeEmail: siteConfig.supportEmail,
+    storePhone: siteConfig.supportPhone,
     storeAddress: "Dhaka, Bangladesh",
-    storeDescription: "Your trusted online marketplace",
+    storeDescription: siteConfig.tagline,
   });
 
   const [notifications, setNotifications] = useState({
@@ -242,7 +245,7 @@ export default function SettingsPage() {
                   { label: "Store", value: profile.storeName },
                   { label: "Region", value: "Bangladesh (en-BD)" },
                   { label: "Currency", value: "Taka (৳)" },
-                  { label: "Console", value: "X-Mart Admin" },
+                  { label: "Console", value: `${siteConfig.name} Admin` },
                 ].map((row) => (
                   <div
                     key={row.label}

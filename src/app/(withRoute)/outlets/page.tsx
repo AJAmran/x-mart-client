@@ -5,13 +5,13 @@ import { Container } from "@/src/components/UI/Container";
 import OutletsBrowser from "@/src/components/outlets/OutletsBrowser";
 import { getAllBranches } from "@/src/services/BranchService";
 import type { TBranch } from "@/src/interface/branch";
+import { siteConfig } from "@/src/config/site";
 
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Our Outlets",
-  description:
-    "Find your nearest X-mart outlet. Every location lists its address, opening hours and a direct link to turn-by-turn directions.",
+  description: `Find your nearest ${siteConfig.name} outlet. Every location lists its address, opening hours and a direct link to turn-by-turn directions.`,
 };
 
 const promises = [

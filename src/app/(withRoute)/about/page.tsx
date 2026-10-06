@@ -5,25 +5,29 @@ import TeamSection from "@/src/components/about/TeamSection";
 import ValuesSection from "@/src/components/about/ValuesSection";
 import { Metadata } from "next";
 
+import { siteConfig } from "@/src/config/site";
+
+const aboutDescription = `Learn about ${siteConfig.name}, our mission to deliver quality products, our dedicated team, and the values that drive us.`;
 
 // SEO Metadata
 export const metadata: Metadata = {
-  title: "About X-mart | Our Story, Team, and Values",
-  description:
-    "Learn about X-mart, our mission to deliver quality products, our dedicated team, and the values that drive us.",
-  keywords: ["X-mart", "about us", "e-commerce", "company story", "team", "values"],
+  title: `About ${siteConfig.name} | Our Story, Team, and Values`,
+  description: aboutDescription,
+  keywords: [siteConfig.name, "about us", "e-commerce", "company story", "team", "values"],
   openGraph: {
-    title: "About X-mart",
-    description: "Discover the story, team, and values behind X-mart.",
-    url: "https://your-site.com/about",
-    images: [{ url: "/og-image.jpg", width: 1200, height: 630 }],
+    title: `About ${siteConfig.name}`,
+    description: `Discover the story, team, and values behind ${siteConfig.name}.`,
+    // Was the literal "https://your-site.com/about", which shipped as-is and
+    // pointed search engines at a domain that does not belong to the buyer.
+    url: `${siteConfig.url}/about`,
+    images: [siteConfig.ogImage],
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "About X-mart",
-    description: "Discover the story, team, and values behind X-mart.",
-    images: ["/og-image.jpg"],
+    title: `About ${siteConfig.name}`,
+    description: `Discover the story, team, and values behind ${siteConfig.name}.`,
+    images: [siteConfig.ogImage],
   },
 };
 
@@ -31,17 +35,14 @@ export const metadata: Metadata = {
 const structuredData = {
   "@context": "https://schema.org",
   "@type": "AboutPage",
-  name: "About X-mart",
-  description:
-    "Learn about X-mart, our mission to deliver quality products, our dedicated team, and the values that drive us.",
+  name: `About ${siteConfig.name}`,
+  description: aboutDescription,
   publisher: {
     "@type": "Organization",
-    name: "X-mart",
+    name: siteConfig.legalName,
     logo: {
       "@type": "ImageObject",
-      url: "/logo-on-light.png",
-      width: 765,
-      height: 195,
+      url: `${siteConfig.url}${siteConfig.ogImage}`,
     },
   },
 };
@@ -52,7 +53,7 @@ export default async function AboutPage() {
     story: [
       {
         year: 2018,
-        title: "Founded X-mart",
+        title: `Founded ${siteConfig.name}`,
         description: "Started with a vision to revolutionize e-commerce with quality and trust.",
       },
       {

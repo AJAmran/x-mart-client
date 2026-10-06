@@ -87,7 +87,7 @@ export function Footer() {
         <div className="grid gap-10 border-b border-line-hairline py-12 lg:grid-cols-12 lg:gap-8 lg:py-14">
           <div className="lg:col-span-5">
             <NextLink
-              aria-label="X-mart — go to homepage"
+              aria-label={`${siteConfig.name} — go to homepage`}
               className="inline-flex items-center"
               href="/"
             >
@@ -176,7 +176,7 @@ export function Footer() {
             {socials.map(({ label, href, Icon }) => (
               <li key={label}>
                 <a
-                  aria-label={`X-mart on ${label}`}
+                  aria-label={`${siteConfig.name} on ${label}`}
                   className="grid size-9 place-items-center rounded-sm text-content-subtle transition-colors duration-fast ease-standard hover:bg-surface-sunken hover:text-content"
                   href={href}
                   rel="noopener noreferrer"

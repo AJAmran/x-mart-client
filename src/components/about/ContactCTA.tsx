@@ -5,6 +5,7 @@ import { Link } from "@heroui/link";
 import { motion, Variants } from "framer-motion";
 import { Mail } from "lucide-react";
 import { Container } from "@/src/components/UI/Container";
+import { siteConfig } from "@/src/config/site";
 
 export default function ContactCTA() {
   const containerVariants: Variants = {
@@ -28,7 +29,7 @@ export default function ContactCTA() {
             Get in Touch
           </h2>
           <p className="text-lg mb-8 max-w-xl mx-auto">
-            Have questions or want to learn more about X-mart? We&apos;re here to help!
+            Have questions or want to learn more about {siteConfig.name}? We&apos;re here to help!
           </p>
           <Button
             aria-label="Contact us"

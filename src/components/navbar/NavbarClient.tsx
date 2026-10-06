@@ -13,6 +13,7 @@ import MobileMenu from "./MobileMenu";
 import UserActions from "./UserActions";
 import { categoriesData } from "@/src/data/CategoriesData";
 import { primaryNav } from "@/src/config/navigation";
+import { siteConfig } from "@/src/config/site";
 import type { IUser } from "@/src/types";
 
 export function NavbarClient({ user }: { user: IUser | null }) {
@@ -65,7 +66,7 @@ export function NavbarClient({ user }: { user: IUser | null }) {
         <Container className="flex h-16 items-center gap-3 sm:h-18">
           {/* ---- Brand ---- */}
           <NextLink
-            aria-label="X-mart — go to homepage"
+            aria-label={`${siteConfig.name} — go to homepage`}
             className="group flex shrink-0 items-center"
             href="/"
           >
