@@ -1,4 +1,3 @@
-// components/cart/CartItem.tsx
 "use client";
 
 import { Button } from "@heroui/button";

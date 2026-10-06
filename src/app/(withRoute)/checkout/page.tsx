@@ -23,6 +23,8 @@ import { useCart } from "@/src/hooks/useCart";
 import { useCreateOrder } from "@/src/hooks/useOrder";
 import { useInitPayment } from "@/src/hooks/usePayment";
 import { getErrorMessage } from "@/src/lib/getErrorMessage";
+import { isValidBdPhone, normaliseBdPhone } from "@/src/lib/phone";
+import { Container } from "@/src/components/UI/Container";
 
 const CheckoutPage = () => {
   const router = useRouter();
@@ -91,7 +93,7 @@ const CheckoutPage = () => {
     }
     if (!shippingInfo.division) newErrors.division = "Division is required.";
     if (!shippingInfo.phone) newErrors.phone = "Phone number is required.";
-    else if (!/^(?:\+8801|8801|01)\d{9}$/.test(shippingInfo.phone)) {
+    else if (!isValidBdPhone(shippingInfo.phone)) {
       newErrors.phone = "Invalid Bangladeshi phone number.";
     }
 
@@ -131,7 +133,13 @@ const CheckoutPage = () => {
 
     const orderData = {
       items: cart.items,
-      shippingInfo,
+      shippingInfo: {
+        ...shippingInfo,
+        // The API only accepts `01XXXXXXXXX`, but this field is pre-filled with
+        // the account's stored `+8801…` number. Send the canonical form so a
+        // valid-looking number is never rejected at the last step.
+        phone: normaliseBdPhone(shippingInfo.phone) ?? shippingInfo.phone,
+      },
       branchId: selectedBranchId || undefined,
       paymentMethod,
     };
@@ -139,7 +147,7 @@ const CheckoutPage = () => {
     if (paymentMethod === "ONLINE") {
       createOrder(orderData, {
         onSuccess: (data) => {
-          const orderId = data?.data?._id || data?._id;
+          const orderId = data?.data?._id;
 
           if (!orderId) {
             const message =
@@ -186,7 +194,7 @@ const CheckoutPage = () => {
       createOrder(orderData, {
         onSuccess: (data) => {
           clearCart();
-          const orderId = data?.data?._id || data?._id;
+          const orderId = data?.data?._id;
 
           router.push(orderId ? `/orders/${orderId}` : "/orders");
         },
@@ -205,7 +213,7 @@ const CheckoutPage = () => {
   const isPending = isCreating || isPaying;
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <Container className="py-8">
       <div className="mb-8 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <p className="text-sm font-semibold uppercase tracking-wide text-primary">
@@ -294,33 +302,51 @@ const CheckoutPage = () => {
 
           <Card className="shadow-sm">
             <CardBody className="space-y-3">
-              <div className="flex items-center gap-3">
-                <Store className="text-primary" size={22} />
-                <div>
-                  <h2 className="text-lg font-semibold">Fulfillment Branch</h2>
-                  <p className="text-sm text-gray-500">
-                    Pick a preferred branch or let us assign the best match.
-                  </p>
+<div className="flex items-center gap-3">
+                  <Store className="text-primary" size={22} />
+                  <div>
+                    <h2 className="text-lg font-semibold">Fulfillment Branch</h2>
+                    <p className="text-sm text-content-subtle">
+                      Pick a preferred branch or let us assign the best match.
+                    </p>
+                  </div>
                 </div>
-              </div>
-              <Select
-                aria-label="Select branch"
-                isDisabled={branchesLoading}
-                placeholder={
-                  branchesLoading ? "Loading branches..." : "Choose a branch"
-                }
-                selectedKeys={selectedBranchId ? [selectedBranchId] : []}
-                startContent={<MapPin size={18} />}
-                onSelectionChange={(keys) => {
-                  const val = Array.from(keys)[0] as string;
+                <Select
+                  classNames={{
+                    trigger:
+                      "border border-line-hairline bg-surface-sunken text-content",
+                    label: "text-label-sm font-medium text-content",
+                    popoverContent:
+                      "bg-surface-raised border border-line-hairline",
+                  }}
+                  isDisabled={branchesLoading}
+                  label="Fulfillment branch"
+                  labelPlacement="outside-left"
+                  placeholder={
+                    branchesLoading ? "Loading branches..." : "Choose a branch"
+                  }
+                  radius="md"
+                  selectedKeys={selectedBranchId ? [selectedBranchId] : []}
+                  startContent={<MapPin size={18} />}
+                  onSelectionChange={(keys) => {
+                    // HeroUI reports "all" when nothing is selected on a
+                    // multi-select; this is single-select so it only ever
+                    // yields real ids (or an empty set).
+                    const next = Array.from(keys).filter(
+                      (key): key is string =>
+                        typeof key === "string" && key !== "all"
+                    );
 
-                  setSelectedBranchId(val || "");
-                }}
-              >
-                {branches.map((branch: { _id: string; name: string }) => (
-                  <SelectItem key={branch._id}>{branch.name}</SelectItem>
-                ))}
-              </Select>
+                    setSelectedBranchId(next[0] ?? "");
+                  }}
+                >
+                  {/* HeroUI's Select is a Listbox: the React `key` IS the selection
+                      identity (`ItemProps` has no `value` prop), so `selectedKeys`
+                      is matched against these keys. */}
+                  {branches.map((branch) => (
+                    <SelectItem key={branch._id}>{branch.name}</SelectItem>
+                  ))}
+                </Select>
             </CardBody>
           </Card>
         </div>
@@ -347,8 +373,9 @@ const CheckoutPage = () => {
           </p>
         </div>
       </div>
-    </div>
+    </Container>
   );
 };
 
 export default CheckoutPage;
+

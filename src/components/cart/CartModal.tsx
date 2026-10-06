@@ -1,4 +1,3 @@
-// components/cart/CartModal.tsx
 "use client";
 
 import {
@@ -31,11 +30,11 @@ export const CartModal = () => {
         <Button 
           isIconOnly 
           aria-label="Shopping cart" 
-          className="relative text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
+          className="relative size-10 min-w-10 rounded-sm text-content-muted transition-colors duration-fast ease-standard hover:bg-surface-sunken hover:text-content"
           variant="light"
           onPress={onOpen}
         >
-          <ShoppingCart className="w-5 h-5" />
+          <ShoppingCart className="size-5" />
         </Button>
       </Badge>
 
@@ -95,11 +94,14 @@ export const CartModal = () => {
               
               {cart.items.length > 0 && (
                 <ModalFooter className="flex justify-between border-t dark:border-gray-700">
-                  <Button 
-                    color="danger" 
-                    startContent={<Trash2 size={16} />} 
+                  {/* Wrapped, not passed by reference: `onPress` hands the
+                      PressEvent to the callback, which would land in
+                      `clearCart`'s options argument. */}
+                  <Button
+                    color="danger"
+                    startContent={<Trash2 size={16} />}
                     variant="light"
-                    onPress={clearCart}
+                    onPress={() => clearCart()}
                   >
                     Clear Cart
                   </Button>
