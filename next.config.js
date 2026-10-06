@@ -1,5 +1,8 @@
 /** @type {import('next').NextConfig} */
 
+// Hosts that ship with the product (product imagery, stock photos). A store
+// owner using their own CDN or Cloudinary account adds theirs via
+// NEXT_PUBLIC_IMAGE_HOSTS, so white-labelling does not require a code change.
 const allowedImageHosts = [
   "res.cloudinary.com",
   "ik.imagekit.io",
@@ -8,10 +11,18 @@ const allowedImageHosts = [
   "encrypted-tbn0.gstatic.com",
   "placehold.co",
   "placehold.it",
-  "media.licdn.com"
+  "media.licdn.com",
+  ...(process.env.NEXT_PUBLIC_IMAGE_HOSTS ?? "")
+    .split(",")
+    .map((host) => host.trim())
+    .filter(Boolean),
 ];
 
 const nextConfig = {
+  // Produces .next/standalone with only the modules actually imported, which is
+  // what keeps the production Docker image small enough to ship.
+  output: "standalone",
+
   images: {
     remotePatterns: allowedImageHosts.map((hostname) => ({
       protocol: "https",
@@ -48,9 +59,6 @@ const nextConfig = {
 
   poweredByHeader: false,
   reactStrictMode: true,
-  typescript: {
-    ignoreBuildErrors: true,
-  },
 };
 
 module.exports = nextConfig;
