@@ -41,11 +41,22 @@ export const metadata: Metadata = {
     creator: "@xmart",
   },
   icons: {
-    icon: "/favicon.ico",
-    shortcut: "/favicon-16x16.png",
+    icon: [
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
+      { url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
+    ],
+    shortcut: "/favicon-32x32.png",
     apple: "/apple-touch-icon.png",
   },
-  manifest: `/site.webmanifest`,
+  manifest: "/site.webmanifest",
+  applicationName: siteConfig.name,
+  category: "shopping",
+  formatDetection: {
+    telephone: false,
+    address: false,
+    email: false,
+  },
   robots: {
     index: true,
     follow: true,
@@ -60,9 +71,12 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "white" },
-    { media: "(prefers-color-scheme: dark)", color: "black" },
+    { media: "(prefers-color-scheme: light)", color: "#F8FAFC" },
+    { media: "(prefers-color-scheme: dark)", color: "#070B12" },
   ],
 };
 
@@ -74,16 +88,29 @@ export default function RootLayout({
   return (
     <html suppressHydrationWarning lang="en">
       <head />
-      <body
-        className={clsx(
-          "min-h-screen bg-background font-sans antialiased",
-          fontSans.variable
-        )}
-      >
+      <body className={clsx("min-h-dvh font-sans antialiased", fontSans.variable)}>
         <Providers themeProps={{ attribute: "class", defaultTheme: "dark" }}>
+          <a
+            href="#main"
+            className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-toast focus:rounded-md focus:bg-brand focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-brand-contrast"
+          >
+            Skip to content
+          </a>
           {children}
         </Providers>
-        <Toaster />
+        <Toaster
+          position="bottom-right"
+          closeButton
+          toastOptions={{
+            classNames: {
+              toast:
+                "!bg-surface-raised !text-content !border !border-line !rounded-md !shadow-lg",
+              title: "!text-content !font-semibold",
+              description: "!text-content-muted",
+              actionButton: "!bg-brand !text-brand-contrast !rounded-sm",
+            },
+          }}
+        />
       </body>
     </html>
   );

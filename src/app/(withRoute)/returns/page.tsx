@@ -1,18 +1,27 @@
-"use client";
-
-import { Card, CardBody } from "@heroui/card";
+import type { Metadata } from "next";
 import { RotateCcw } from "lucide-react";
 
-export default function ReturnsPage() {
+import { ComingSoon } from "@/src/components/UI/ComingSoon";
+
+export const metadata: Metadata = {
+  title: "Returns and refunds",
+  description: "Not right? Most items can be returned within 30 days of delivery, unopened. Perishables and personal care items are non-returnable for safety reasons.",
+  robots: { index: false, follow: true },
+};
+
+export default function Page() {
   return (
-    <div className="container mx-auto p-8 flex items-center justify-center min-h-[60vh]">
-      <Card className="max-w-md w-full shadow-lg border-none">
-        <CardBody className="p-12 flex flex-col items-center text-center gap-4">
-          <RotateCcw className="w-16 h-16 text-primary" />
-          <h1 className="text-3xl font-bold">Returns & Refunds</h1>
-          <p className="text-gray-500 dark:text-gray-400">This page is under development</p>
-        </CardBody>
-      </Card>
-    </div>
+    <ComingSoon
+      cta={{ label: "Start a return", href: "/orders" }}
+      description="Not right? Most items can be returned within 30 days of delivery, unopened. Perishables and personal care items are non-returnable for safety reasons."
+      eyebrow="30-day returns"
+      highlights={[
+        "30-day window",
+        "Refund timing",
+        "Exclusions"
+      ]}
+      icon={RotateCcw}
+      title="Returns and refunds"
+    />
   );
 }

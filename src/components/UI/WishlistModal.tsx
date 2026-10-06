@@ -1,4 +1,3 @@
-// components/wishlist/WishlistModal.tsx
 "use client";
 
 import {
@@ -60,11 +59,11 @@ export const WishlistModal = () => {
         <Button
           isIconOnly
           aria-label="Wishlist"
-          className="relative text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
+          className="relative size-10 min-w-10 rounded-sm text-content-muted transition-colors duration-fast ease-standard hover:bg-surface-sunken hover:text-content"
           variant="light"
           onPress={onOpen}
         >
-          <Heart className="w-5 h-5" />
+          <Heart className="size-5" />
         </Button>
       </Badge>
 

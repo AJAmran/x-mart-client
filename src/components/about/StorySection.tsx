@@ -1,4 +1,5 @@
 import { Card, CardBody } from "@heroui/card";
+import { Container } from "@/src/components/UI/Container";
 
 interface StoryItem {
   year: number;
@@ -13,7 +14,7 @@ interface StorySectionProps {
 export default function StorySection({ story }: StorySectionProps) {
   return (
     <section className="py-16 bg-white dark:bg-gray-800">
-      <div className="container mx-auto px-4">
+      <Container>
         <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 text-gray-900 dark:text-white">
           Our Story
         </h2>
@@ -44,7 +45,7 @@ export default function StorySection({ story }: StorySectionProps) {
             </div>
           ))}
         </div>
-      </div>
+      </Container>
     </section>
   );
 }

@@ -1,24 +1,23 @@
 import { Suspense } from "react";
-import { Metadata } from "next";
+import type { Metadata } from "next";
 
 import Categories from "@/src/components/homepageComponent/Categories";
-import HeroSkeleton from "@/src/components/homepageComponent/HeroSkeleton";
 import CategoriesSkeleton from "@/src/components/homepageComponent/CategoriesSkeleton";
+import CategoriesShowcase from "@/src/components/categories/CategoriesShowcase";
 import FeatureProduct from "@/src/components/homepageComponent/FeatureProducts";
 import FeatureProductSkeleton from "@/src/components/homepageComponent/FeatureProductSkeleton";
 import HeroSection from "@/src/components/heroSection/HeroSection";
-import CategoriesShowcase from "@/src/components/categories/CategoriesShowcase";
 import { siteConfig } from "@/src/config/site";
 
-// Metadata for SEO
 export const metadata: Metadata = {
-  title: "Your One-Stop Shop for Groceries & More",
+  title: `${siteConfig.name} — ${siteConfig.tagline}`,
   description:
-    "Discover fresh produce, trendy kitchen gadgets, and exclusive deals at X-mart. Shop now and enjoy free shipping on select items!",
+    "Fresh produce, pantry staples, kitchenware and daily essentials in one basket. Same-day delivery inside Dhaka, free over Tk 999, secure SSLCommerz checkout.",
+  alternates: { canonical: "/" },
   openGraph: {
-    title: "X-mart | Your One-Stop Shop",
+    title: `${siteConfig.name} — ${siteConfig.tagline}`,
     description:
-      "Explore a wide range of groceries, household items, and more with X-mart.",
+      "Fresh produce, pantry staples and daily essentials with same-day delivery.",
     images: [siteConfig.ogImage],
     url: siteConfig.url,
   },
@@ -26,26 +25,19 @@ export const metadata: Metadata = {
 
 export default function HomePage() {
   return (
-    <main className="min-h-screen">
-      <h1 className="sr-only">X-mart - Fresh Groceries, Premium Kitchenware & Daily Essentials</h1>
-
-      {/* Hero Section with Suspense */}
-      <Suspense fallback={<HeroSkeleton />}>
-        <HeroSection />
-      </Suspense>
-
-      {/* Categories Section with Suspense */}
+    <>
+      {/* The hero is above the fold, so it is not wrapped in Suspense — a
+          skeleton flash there would be worse than waiting. */}
+      <HeroSection />
       <Suspense fallback={<CategoriesSkeleton />}>
         <Categories />
       </Suspense>
-
-      {/* Featured Products Section with Suspense */}
       <Suspense fallback={<FeatureProductSkeleton />}>
         <FeatureProduct />
       </Suspense>
       <Suspense fallback={<FeatureProductSkeleton />}>
         <CategoriesShowcase />
       </Suspense>
-    </main>
+    </>
   );
 }

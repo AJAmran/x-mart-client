@@ -6,6 +6,8 @@ import FiltersSkeleton from "@/src/components/shop/FiltersSkeleton";
 import Filters from "@/src/components/shop/Filters";
 import ProductGridSkeleton from "@/src/components/shop/ProductGridSkeleton";
 import ProductGrid from "@/src/components/shop/ProductGrid";
+import { Container } from "@/src/components/UI/Container";
+import { PageHeader } from "@/src/components/UI/Section";
 
 import { siteConfig } from "@/src/config/site";
 
@@ -32,24 +34,35 @@ export default async function ShopPage() {
   };
 
   return (
-    <main className="container mx-auto px-4 py-8 min-h-screen">
-      <h1 className="text-2xl md:text-3xl font-bold mb-6">Shop Our Products</h1>
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-        {/* Filters Sidebar */}
-        <Suspense fallback={<FiltersSkeleton />}>
-          <Filters
-            categories={categoriesData}
-            initialFilters={initialFilters}
-          />
-        </Suspense>
+    <>
+      <PageHeader
+        description="Everyday essentials, fresh produce and kitchenware — filter by department and price to narrow the range."
+        eyebrow="Catalogue"
+        title="Shop all products"
+      />
 
-        {/* Product Grid and Pagination */}
-        <div className="col-span-1 lg:col-span-3">
-          <Suspense fallback={<ProductGridSkeleton />}>
-            <ProductGrid initialFilters={initialFilters} />
-          </Suspense>
+      <Container className="py-8 sm:py-10">
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
+          {/* Filter rail. Sticky on desktop so it stays reachable while
+              scrolling a long result set. */}
+          <div className="lg:col-span-3">
+            <div className="lg:sticky lg:top-32">
+              <Suspense fallback={<FiltersSkeleton />}>
+                <Filters
+                  categories={categoriesData}
+                  initialFilters={initialFilters}
+                />
+              </Suspense>
+            </div>
+          </div>
+
+          <div className="lg:col-span-9">
+            <Suspense fallback={<ProductGridSkeleton />}>
+              <ProductGrid initialFilters={initialFilters} />
+            </Suspense>
+          </div>
         </div>
-      </div>
-    </main>
+      </Container>
+    </>
   );
 }

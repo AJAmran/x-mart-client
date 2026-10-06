@@ -1,18 +1,27 @@
-"use client";
-
-import { Card, CardBody } from "@heroui/card";
+import type { Metadata } from "next";
 import { Heart } from "lucide-react";
 
-export default function WishlistPage() {
+import { ComingSoon } from "@/src/components/UI/ComingSoon";
+
+export const metadata: Metadata = {
+  title: "Your wishlist",
+  description: "Sign in to see the items you have saved, move them into your cart, or get notified when they drop in price.",
+  robots: { index: false, follow: true },
+};
+
+export default function Page() {
   return (
-    <div className="container mx-auto p-8 flex items-center justify-center min-h-[60vh]">
-      <Card className="max-w-md w-full shadow-lg border-none">
-        <CardBody className="p-12 flex flex-col items-center text-center gap-4">
-          <Heart className="w-16 h-16 text-primary" />
-          <h1 className="text-3xl font-bold">Wishlist</h1>
-          <p className="text-gray-500 dark:text-gray-400">This page is under development</p>
-        </CardBody>
-      </Card>
-    </div>
+    <ComingSoon
+      cta={{ label: "Continue shopping", href: "/shop" }}
+      description="Sign in to see the items you have saved, move them into your cart, or get notified when they drop in price."
+      eyebrow="Saved for later"
+      highlights={[
+        "Price alerts",
+        "One-tap to cart",
+        "Saved locally"
+      ]}
+      icon={Heart}
+      title="Your wishlist"
+    />
   );
 }

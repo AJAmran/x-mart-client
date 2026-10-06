@@ -10,7 +10,8 @@ import { Chip } from "@heroui/chip";
 import { MapPinIcon, ChevronDownIcon, Navigation, Search, Clock, Store } from "lucide-react";
 import { Skeleton } from "@heroui/skeleton";
 import { useBranches } from "@/src/hooks/useBranch";
-import { TBranch, TBranchOperatingHours } from "@/src/interface/branch";
+import { TBranch } from "@/src/interface/branch";
+import { isOpenNow } from "@/src/lib/branchHours";
 import { toast } from "sonner";
 import { ScrollShadow } from "@heroui/scroll-shadow";
 
@@ -32,28 +33,6 @@ const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: numbe
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 
   return R * c;
-};
-
-const isOpenNow = (operatingHours: TBranchOperatingHours[]): boolean => {
-  if (!operatingHours || operatingHours.length === 0) return false;
-
-  const now = new Date();
-  const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-  const currentDay = days[now.getDay()];
-
-  const todaySchedule = operatingHours.find(h => h.day === currentDay);
-
-  if (!todaySchedule || todaySchedule.isClosed) return false;
-
-  const currentTime = now.getHours() * 60 + now.getMinutes();
-
-  const [openHour, openMin] = todaySchedule.openingTime.split(':').map(Number);
-  const [closeHour, closeMin] = todaySchedule.closingTime.split(':').map(Number);
-
-  const openTime = openHour * 60 + openMin;
-  const closeTime = closeHour * 60 + closeMin;
-
-  return currentTime >= openTime && currentTime <= closeTime;
 };
 
 const getGeolocationErrorMessage = (error: GeolocationPositionError) => {
@@ -322,7 +301,7 @@ export default function BranchSelector({ isMobile = false }: BranchSelectorProps
                   ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       {processedBranches.map((branch) => {
-                        const isOpen = isOpenNow(branch.operatingHours);
+                        const isOpen = isOpenNow(branch);
                         const dist = (branch as any).distance;
                         const isSelected = selectedBranch === branch._id;
 

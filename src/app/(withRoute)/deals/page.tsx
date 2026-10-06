@@ -13,6 +13,7 @@ import DealsGrid from "@/src/components/deals/DealsGrid";
 import DealsSkeleton from "@/src/components/deals/DealsSkeleton";
 import DealsEmptyState from "@/src/components/deals/DealsEmptyState";
 import DealsErrorState from "@/src/components/deals/DealsErrorState";
+import { Container } from "@/src/components/UI/Container";
 
 const CATEGORY_OPTIONS = [
   { key: "", label: "All Deals" },
@@ -117,12 +118,14 @@ export default function DealsPage() {
 
       {/* Dynamic Navigation/Filtering Section */}
       <div className="sticky top-0 z-30 bg-white/80 backdrop-blur-md dark:bg-black/85 border-b border-gray-100 dark:border-gray-900 mb-10 transition-all">
-        <div className="mx-auto max-w-7xl px-4 py-4 sm:px-6 lg:px-8 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+        <Container className="py-4">
           
           {/* Custom Horizontal Scrollable Category Container */}
           <div className="relative flex items-center group w-full lg:max-w-4xl overflow-hidden">
-            <button 
-              className="absolute left-0 z-10 p-1 bg-white/90 dark:bg-gray-950/90 shadow-md rounded-full border border-gray-100 dark:border-gray-800 opacity-0 group-hover:opacity-100 transition-opacity hidden sm:block" 
+            <button
+              aria-label="Scroll categories left"
+              className="absolute left-0 z-10 hidden rounded-full border border-line-hairline bg-surface-raised/90 p-1 text-content shadow-md backdrop-blur-md transition-opacity duration-fast group-hover:opacity-100 sm:block"
+              type="button"
               onClick={() => scrollCategories("left")}
             >
               <ChevronLeft size={16} />
@@ -152,8 +155,10 @@ export default function DealsPage() {
               })}
             </div>
 
-            <button 
-              className="absolute right-0 z-10 p-1 bg-white/90 dark:bg-gray-950/90 shadow-md rounded-full border border-gray-100 dark:border-gray-800 opacity-0 group-hover:opacity-100 transition-opacity hidden sm:block" 
+            <button
+              aria-label="Scroll categories right"
+              className="absolute right-0 z-10 hidden rounded-full border border-line-hairline bg-surface-raised/90 p-1 text-content shadow-md backdrop-blur-md transition-opacity duration-fast group-hover:opacity-100 sm:block"
+              type="button"
               onClick={() => scrollCategories("right")}
             >
               <ChevronRight size={16} />
@@ -179,7 +184,7 @@ export default function DealsPage() {
               Search
             </button>
           </form>
-        </div>
+        </Container>
       </div>
 
       {/* Main Deals Grid Space */}
@@ -224,3 +229,4 @@ export default function DealsPage() {
     </main>
   );
 }
+

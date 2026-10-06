@@ -1,198 +1,330 @@
 "use client";
-import { FC, useState, useEffect } from "react";
+
+import { useEffect, useState } from "react";
+import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
+import clsx from "clsx";
 import {
   Box,
-  Users,
-  ShoppingCart,
+  LayoutDashboard,
   LineChart,
+  LogOut,
+  Menu,
   Package,
   Settings,
-  LogOut,
-  ChevronDown,
-  ChevronUp,
-  Menu,
+  ShoppingCart,
+  Users,
   X,
-  LayoutDashboard,
+  type LucideIcon,
 } from "lucide-react";
-import Link from "next/link";
-import { ThemeSwitch } from "../theme-switch";
-import { usePathname } from "next/navigation";
 
-interface MenuItem {
+import { Logo } from "@/src/components/UI/Logo";
+import { logout } from "@/src/services/AuthService";
+
+/* ── Nav model ────────────────────────────────────────────────────────────── */
+
+type SubItem = { label: string; href: string };
+type NavItem = {
   label: string;
   href?: string;
-  icon: React.ComponentType<{ className?: string }>;
-  submenu?: { label: string; href: string }[];
-}
+  icon: LucideIcon;
+  submenu?: SubItem[];
+};
+type NavGroup = { title: string; items: NavItem[] };
 
-const menuItems: MenuItem[] = [
-  { label: "Overview", href: "/dashboard", icon: LayoutDashboard },
-  { label: "User Management", href: "/dashboard/user-management", icon: Users },
+const navGroups: NavGroup[] = [
   {
-    label: "Product Management",
-    icon: Box,
-    submenu: [
-      { label: "Overview", href: "/dashboard/product-management" },
-      { label: "Add Product", href: "/dashboard/product-management/add-product" },
-      { label: "Product List", href: "/dashboard/product-management/product-list" },
+    title: "General",
+    items: [
+      { label: "Overview", href: "/dashboard", icon: LayoutDashboard },
+      { label: "User management", href: "/dashboard/user-management", icon: Users },
     ],
   },
-  { label: "Order Management", href: "/dashboard/order-management", icon: ShoppingCart },
   {
-    label: "Sales & Analytics",
-    icon: LineChart,
-    submenu: [
-      { label: "Overview", href: "/dashboard/sales-analytics" },
-      { label: "Reports", href: "/dashboard/sales-analytics/reports" },
-      { label: "Insights", href: "/dashboard/sales-analytics/insights" },
+    title: "Catalog",
+    items: [
+      {
+        label: "Products",
+        icon: Box,
+        submenu: [
+          { label: "Overview", href: "/dashboard/product-management" },
+          {
+            label: "Product list",
+            href: "/dashboard/product-management/product-list",
+          },
+          {
+            label: "Add product",
+            href: "/dashboard/product-management/add-product",
+          },
+        ],
+      },
+      { label: "Inventory", href: "/dashboard/inventory-management", icon: Package },
     ],
   },
-  { label: "Inventory Management", href: "/dashboard/inventory-management", icon: Package },
-  { label: "Settings", href: "/dashboard/settings", icon: Settings },
+  {
+    title: "Operations",
+    items: [
+      { label: "Orders", href: "/dashboard/order-management", icon: ShoppingCart },
+    ],
+  },
+  {
+    title: "Insights",
+    items: [
+      {
+        label: "Sales & analytics",
+        icon: LineChart,
+        submenu: [
+          { label: "Overview", href: "/dashboard/sales-analytics" },
+          { label: "Reports", href: "/dashboard/sales-analytics/reports" },
+          { label: "Insights", href: "/dashboard/sales-analytics/insights" },
+        ],
+      },
+    ],
+  },
+  {
+    title: "Workspace",
+    items: [{ label: "Settings", href: "/dashboard/settings", icon: Settings }],
+  },
 ];
 
-const Sidebar: FC = () => {
+/* ── Sidebar ──────────────────────────────────────────────────────────────── */
+
+export default function Sidebar() {
   const [openSubmenu, setOpenSubmenu] = useState<string | null>(null);
   const [mobileOpen, setMobileOpen] = useState(false);
   const pathname = usePathname();
+  const router = useRouter();
 
-  useEffect(() => {
-    setMobileOpen(false);
-  }, [pathname]);
+  // Close the mobile drawer on navigation.
+  useEffect(() => setMobileOpen(false), [pathname]);
 
+  // Lock background scroll while the drawer is open.
   useEffect(() => {
     document.body.style.overflow = mobileOpen ? "hidden" : "";
 
-    return () => { document.body.style.overflow = ""; };
+    return () => {
+      document.body.style.overflow = "";
+    };
   }, [mobileOpen]);
 
-  const toggleSubmenu = (menu: string) => {
-    setOpenSubmenu(openSubmenu === menu ? null : menu);
-  };
+  const toggleSubmenu = (label: string) =>
+    setOpenSubmenu((prev) => (prev === label ? null : label));
 
   const isActive = (href?: string) => pathname === href;
-  const isSubmenuActive = (submenu?: { href: string }[]) =>
+  const isSubmenuActive = (submenu?: SubItem[]) =>
     submenu?.some((item) => pathname === item.href) ?? false;
 
-  const sidebarContent = (
-    <>
-      <div className="p-4 lg:p-6">
-        <div className="flex items-center justify-between mb-6 lg:mb-8">
-          <Link className="text-xl lg:text-2xl font-bold text-blue-600 dark:text-blue-400 tracking-tight" href="/">
-            X-Mart
-          </Link>
-          <div className="flex items-center gap-2">
-            <ThemeSwitch />
-            <button
-              aria-label="Close sidebar"
-              className="lg:hidden p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-              onClick={() => setMobileOpen(false)}
-            >
-              <X className="w-5 h-5 text-gray-500" />
-            </button>
-          </div>
-        </div>
-        <nav>
-          <ul className="space-y-0.5">
-            {menuItems.map((item) => (
-              <li key={item.label}>
-                {item.href ? (
-                  <Link
-                    className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 text-sm ${
-                      isActive(item.href)
-                        ? "bg-blue-600 text-white shadow-md shadow-blue-500/30"
-                        : "text-gray-700 dark:text-gray-200 hover:bg-blue-50 dark:hover:bg-gray-700 hover:text-blue-600 dark:hover:text-blue-400"
-                    }`}
-                    href={item.href}
-                  >
-                    <item.icon className="w-5 h-5 shrink-0" />
-                    <span className="font-medium">{item.label}</span>
-                  </Link>
-                ) : (
-                  <div
-                    className={`flex items-center justify-between px-3 py-2.5 rounded-lg transition-all duration-200 cursor-pointer text-sm ${
-                      isSubmenuActive(item.submenu)
-                        ? "text-blue-600 dark:text-blue-400 bg-blue-50/50 dark:bg-blue-900/20"
-                        : "text-gray-700 dark:text-gray-200 hover:bg-blue-50 dark:hover:bg-gray-700 hover:text-blue-600 dark:hover:text-blue-400"
-                    }`}
-                    role="button"
-                    tabIndex={0}
-                    onClick={() => toggleSubmenu(item.label)}
-                    onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") toggleSubmenu(item.label); }}
-                  >
-                    <div className="flex items-center gap-3">
-                      <item.icon className="w-5 h-5 shrink-0" />
-                      <span className="font-medium">{item.label}</span>
-                    </div>
-                    {openSubmenu === item.label ? <ChevronUp className="w-4 h-4 shrink-0" /> : <ChevronDown className="w-4 h-4 shrink-0" />}
-                  </div>
-                )}
-                {item.submenu && (openSubmenu === item.label || isSubmenuActive(item.submenu)) && (
-                  <ul className="ml-8 lg:ml-10 space-y-0.5 mt-0.5 mb-1">
-                    {item.submenu.map((subItem) => (
-                      <li key={subItem.label}>
+  /** Sign-out is an action, not a route — it must not be a link. */
+  const handleLogout = async () => {
+    await logout();
+    router.push("/auth/login");
+  };
+
+  const content = (
+    <div className="flex h-full min-h-0 flex-col">
+      {/* Brand */}
+      <div className="flex items-center justify-between px-5 pt-5">
+        <Link className="flex items-center" href="/">
+          <Logo height={24} />
+        </Link>
+        <button
+          aria-label="Close navigation menu"
+          className="grid size-8 place-items-center rounded-md text-content-subtle transition-colors duration-fast ease-standard hover:bg-surface-sunken hover:text-content lg:hidden"
+          type="button"
+          onClick={() => setMobileOpen(false)}
+        >
+          <X aria-hidden className="size-4" />
+        </button>
+      </div>
+
+      {/* Section label, shown only on mobile — it belongs to the drawer. */}
+      <p className="px-5 pb-1 pt-4 text-overline font-bold uppercase tracking-[0.16em] text-content-subtle/80 lg:hidden">
+        Navigation
+      </p>
+
+      {/* Nav */}
+      <nav aria-label="Dashboard" className="min-h-0 flex-1 overflow-y-auto px-3 pb-4 pt-3 lg:pt-4">
+        <ul className="space-y-5">
+          {navGroups.map((group) => (
+            <li key={group.title}>
+              <p className="px-3 pb-1.5 text-overline font-bold uppercase tracking-[0.16em] text-content-subtle/80">
+                {group.title}
+              </p>
+              <ul className="space-y-0.5">
+                {group.items.map((item) => {
+                  const Icon = item.icon;
+                  const active = isActive(item.href);
+                  const subActive = isSubmenuActive(item.submenu);
+                  const subOpen =
+                    openSubmenu === item.label || (subActive && !item.href);
+
+                  if (item.href) {
+                    return (
+                      <li key={item.label}>
                         <Link
-                          className={`flex items-center px-3 py-2 rounded-lg text-sm transition-all duration-200 ${
-                            isActive(subItem.href)
-                              ? "text-blue-600 dark:text-blue-400 font-semibold bg-blue-50 dark:bg-blue-900/30"
-                              : "text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50/30 dark:hover:bg-gray-700/50"
-                          }`}
-                          href={subItem.href}
+                          aria-current={active ? "page" : undefined}
+                          className={clsx(
+                            "group relative flex items-center gap-3 rounded-md px-3 py-2.5 text-body-sm font-medium transition-colors duration-fast ease-standard",
+                            active
+                              ? "bg-brand-subtle text-brand"
+                              : "text-content-muted hover:bg-surface-sunken hover:text-content"
+                          )}
+                          href={item.href}
                         >
-                          <span>{subItem.label}</span>
+                          {active && (
+                            <span
+                              aria-hidden
+                              className="absolute -left-3 top-1/2 h-4 w-0.5 -translate-y-1/2 rounded-r-full bg-brand"
+                            />
+                          )}
+                          <Icon
+                            aria-hidden
+                            className={clsx(
+                              "size-[18px] shrink-0 transition-colors",
+                              active || subActive ? "text-brand" : "text-content-subtle group-hover:text-content"
+                            )}
+                          />
+                          {item.label}
                         </Link>
                       </li>
-                    ))}
-                  </ul>
-                )}
-              </li>
-            ))}
-          </ul>
-        </nav>
-      </div>
-      <div className="p-4 lg:p-6 border-t border-gray-200 dark:border-gray-700">
-        <Link
-          className="flex items-center justify-center gap-2 px-3 py-2.5 rounded-lg bg-red-600 hover:bg-red-700 text-white text-sm font-medium transition-colors duration-200"
-          href="/logout"
+                    );
+                  }
+
+                  return (
+                    <li key={item.label}>
+                      <button
+                        aria-expanded={subOpen}
+                        className={clsx(
+                          "group relative flex w-full items-center justify-between gap-3 rounded-md px-3 py-2.5 text-left text-body-sm font-medium transition-colors duration-fast ease-standard",
+                          subActive
+                            ? "text-content"
+                            : "text-content-muted hover:bg-surface-sunken hover:text-content"
+                        )}
+                        type="button"
+                        onClick={() => toggleSubmenu(item.label)}
+                      >
+                        <span className="flex items-center gap-3">
+                          <Icon
+                            aria-hidden
+                            className={clsx(
+                              "size-[18px] shrink-0 transition-colors",
+                              subActive ? "text-brand" : "text-content-subtle group-hover:text-content"
+                            )}
+                          />
+                          {item.label}
+                        </span>
+                        <svg
+                          aria-hidden
+                          className={clsx(
+                            "size-4 shrink-0 text-content-subtle transition-transform duration-base ease-standard",
+                            subOpen && "rotate-180"
+                          )}
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            d="m6 9 6 6 6-6"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={1.75}
+                          />
+                        </svg>
+                      </button>
+
+                      {subOpen && (
+                        <ul className="mb-1 ml-[1.15rem] mt-1 space-y-0.5 border-l border-line-hairline pl-2.5">
+                          {item.submenu?.map((sub) => {
+                            const subActiveItem = isActive(sub.href);
+
+                            return (
+                              <li key={sub.href}>
+                                <Link
+                                  aria-current={subActiveItem ? "page" : undefined}
+                                  className={clsx(
+                                    "flex items-center rounded-md px-2.5 py-2 text-label-sm transition-colors duration-fast ease-standard",
+                                    subActiveItem
+                                      ? "font-semibold text-brand"
+                                      : "text-content-subtle hover:bg-surface-sunken hover:text-content"
+                                  )}
+                                  href={sub.href}
+                                >
+                                  <span
+                                    aria-hidden
+                                    className={clsx(
+                                      "mr-2 size-1 rounded-full transition-colors",
+                                      subActiveItem ? "bg-brand" : "bg-line-strong"
+                                    )}
+                                  />
+                                  {sub.label}
+                                </Link>
+                              </li>
+                            );
+                          })}
+                        </ul>
+                      )}
+                    </li>
+                  );
+                })}
+              </ul>
+            </li>
+          ))}
+        </ul>
+      </nav>
+
+      {/* Footer */}
+      <div className="space-y-3 border-t border-line-hairline px-5 py-4">
+        <p className="flex items-center gap-2 text-label-sm text-content-subtle">
+          <span className="relative flex size-2">
+            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-success/50" />
+            <span className="relative inline-flex size-2 rounded-full bg-success" />
+          </span>
+          All systems normal
+        </p>
+        <button
+          className="flex w-full items-center justify-center gap-2 rounded-md border border-danger/25 py-2.5 text-body-sm font-medium text-danger transition-colors duration-fast ease-standard hover:bg-danger/10"
+          type="button"
+          onClick={handleLogout}
         >
-          <LogOut className="w-4 h-4 shrink-0" />
-          Logout
-        </Link>
+          <LogOut aria-hidden className="size-4 shrink-0" />
+          Sign out
+        </button>
       </div>
-    </>
+    </div>
   );
 
   return (
     <>
+      {/* Mobile trigger — sits inside the sticky top bar. */}
       <button
-        aria-label="Open sidebar menu"
-        className="fixed bottom-4 left-4 z-50 lg:hidden bg-blue-600 text-white p-3 rounded-full shadow-lg hover:bg-blue-700 transition-all active:scale-95"
+        aria-label="Open navigation menu"
+        className="fixed left-3 top-3 z-overlay grid size-9 place-items-center rounded-md border border-line-hairline bg-surface-raised/95 text-content-muted shadow-sm backdrop-blur transition-colors duration-fast ease-standard hover:text-content lg:hidden"
+        type="button"
         onClick={() => setMobileOpen(true)}
       >
-        <Menu className="w-5 h-5" />
+        <Menu aria-hidden className="size-[18px]" />
       </button>
 
       {mobileOpen && (
-        <div
-          className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm lg:hidden"
+        <button
+          aria-label="Close navigation menu"
+          className="fixed inset-0 z-overlay bg-black/45 backdrop-blur-sm lg:hidden"
+          type="button"
           onClick={() => setMobileOpen(false)}
         />
       )}
 
       <aside
-        className={`
-          fixed lg:sticky top-0 left-0 z-50 h-screen
-          w-72 bg-white dark:bg-gray-800 shadow-lg
-          border-r border-gray-200 dark:border-gray-700
-          flex flex-col justify-between
-          transition-transform duration-300 ease-in-out
-          ${mobileOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}
-        `}
+        className={clsx(
+          "fixed top-0 left-0 z-modal flex h-dvh w-72 flex-col bg-surface-raised",
+          "border-r border-line-hairline shadow-lg",
+          "transition-transform duration-base ease-entrance",
+          "lg:sticky lg:z-header lg:h-dvh lg:translate-x-0 lg:shadow-none",
+          mobileOpen ? "translate-x-0" : "-translate-x-full"
+        )}
       >
-        {sidebarContent}
+        {content}
       </aside>
     </>
   );
-};
-
-export default Sidebar;
+}

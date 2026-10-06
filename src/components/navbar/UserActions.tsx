@@ -1,57 +1,61 @@
-// components/UI/UserActions.tsx
 "use client";
 
-import React from "react";
-import { NavbarItem } from "@heroui/navbar";
-import { Link } from "@heroui/link";
-import { MyButton } from "../UI/MyButton";
-import { UserIcon } from "lucide-react";
-import { ThemeSwitch } from "../theme-switch";
-import { CartModal } from "../cart/CartModal";
-import ProfileModal from "../UI/ProfileModal";
-import { IUser } from "@/src/types";
-import { WishlistModal } from "../UI/WishlistModal";
+import NextLink from "next/link";
+import { LogIn } from "lucide-react";
 
-interface UserActionsProps {
+import { CartModal } from "@/src/components/cart/CartModal";
+import ProfileModal from "@/src/components/UI/ProfileModal";
+import { ThemeSwitch } from "@/src/components/theme-switch";
+import { WishlistModal } from "@/src/components/UI/WishlistModal";
+import type { IUser } from "@/src/types";
+
+const iconButton =
+  "grid size-10 place-items-center rounded-sm text-content-muted transition-colors duration-fast ease-standard hover:bg-surface-sunken hover:text-content";
+
+
+export function UserActions({
+  user,
+  compact = false,
+}: {
   user: IUser | null;
-}
+  compact?: boolean;
+}) {
+  if (compact) {
+    return user ? (
+      <ProfileModal user={user} />
+    ) : (
+      <NextLink
+        aria-label="Sign in"
+        className={iconButton}
+        href="/auth/login"
+      >
+        <LogIn aria-hidden size={19} />
+      </NextLink>
+    );
+  }
 
-export default function UserActions({ user }: UserActionsProps) {
   return (
-    <>
-      {/* Wishlist Modal */}
-      <NavbarItem className="hidden sm:flex">
-        <WishlistModal />
-      </NavbarItem>
+    <div className="flex items-center gap-1">
+      <WishlistModal />
+      <CartModal />
 
-      {/* Cart Modal */}
-      <NavbarItem>
-        <CartModal />
-      </NavbarItem>
+      <span aria-hidden className="mx-1 h-5 w-px bg-line" />
 
-      {/* User Profile / Login */}
-      <NavbarItem className="hidden lg:flex">
-        {user ? (
-          <ProfileModal user={user} />
-        ) : (
-          <MyButton
-            aria-label="Sign In"
-            as={Link}
-            className="flex items-center gap-2 text-sm font-semibold"
-            color="primary"
-            href="/auth/login"
-            variant="flat"
-          >
-            <UserIcon className="w-5 h-5" />
-            Sign In
-          </MyButton>
-        )}
-      </NavbarItem>
+      {user ? (
+        <ProfileModal user={user} />
+      ) : (
+        <NextLink
+          className="ml-1 inline-flex h-10 items-center gap-2 rounded-md bg-brand px-4 text-label-sm font-semibold text-brand-contrast transition-colors duration-fast ease-standard hover:bg-brand-hover"
+          href="/auth/login"
+        >
+          <LogIn aria-hidden size={16} />
+          Sign in
+        </NextLink>
+      )}
 
-      {/* Theme Switch */}
-      <NavbarItem className="hidden sm:flex">
-        <ThemeSwitch />
-      </NavbarItem>
-    </>
+      <ThemeSwitch />
+    </div>
   );
 }
+
+export default UserActions;

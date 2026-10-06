@@ -1,9 +1,11 @@
+import { Container } from "@/src/components/UI/Container";
+
 export default function Loading() {
   return (
     <div className="min-h-screen bg-white dark:bg-gray-900">
       {/* Header Skeleton */}
       <div className="sticky top-0 z-50 w-full border-b bg-white dark:bg-gray-900 dark:border-gray-800">
-        <div className="container mx-auto px-4">
+        <Container>
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
             <div className="flex items-center space-x-3">
@@ -26,12 +28,12 @@ export default function Loading() {
               <div className="w-10 h-10 bg-gray-300 dark:bg-gray-700 rounded-full animate-pulse md:hidden" />
             </div>
           </div>
-        </div>
+        </Container>
       </div>
 
       {/* Navigation Skeleton */}
       <div className="border-b bg-white dark:bg-gray-900 dark:border-gray-800 hidden md:block">
-        <div className="container mx-auto px-4">
+        <Container>
           <div className="flex space-x-8 py-4">
             {Array.from({ length: 6 }).map((_, i) => (
               <div
@@ -40,11 +42,11 @@ export default function Loading() {
               />
             ))}
           </div>
-        </div>
+        </Container>
       </div>
 
       {/* Main Content */}
-      <div className="container mx-auto px-4 py-8">
+      <Container className="py-8">
         {/* Hero/Banner Skeleton */}
         <div className="mb-12">
           <div className="w-full h-64 md:h-96 bg-gray-300 dark:bg-gray-700 rounded-2xl animate-pulse" />
@@ -82,11 +84,11 @@ export default function Loading() {
             <div className="w-full h-48 bg-gray-300 dark:bg-gray-700 rounded-2xl animate-pulse" />
           </div>
         </div>
-      </div>
+      </Container>
 
       {/* Footer Skeleton */}
       <div className="bg-gray-100 dark:bg-gray-800 border-t dark:border-gray-700">
-        <div className="container mx-auto px-4 py-12">
+        <Container className="py-12">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             {Array.from({ length: 4 }).map((_, i) => (
               <div key={i}>
@@ -102,7 +104,7 @@ export default function Loading() {
               </div>
             ))}
           </div>
-        </div>
+        </Container>
       </div>
     </div>
   );

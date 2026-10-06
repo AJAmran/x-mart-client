@@ -1,18 +1,27 @@
-"use client";
+import type { Metadata } from "next";
+import { CircleHelp } from "lucide-react";
 
-import { Card, CardBody } from "@heroui/card";
-import { MessageCircle } from "lucide-react";
+import { ComingSoon } from "@/src/components/UI/ComingSoon";
 
-export default function FaqPage() {
+export const metadata: Metadata = {
+  title: "Frequently asked questions",
+  description: "Delivery windows, payment methods, returns and substitutions - the questions we get asked most, answered plainly.",
+  robots: { index: false, follow: true },
+};
+
+export default function Page() {
   return (
-    <div className="container mx-auto p-8 flex items-center justify-center min-h-[60vh]">
-      <Card className="max-w-md w-full shadow-lg border-none">
-        <CardBody className="p-12 flex flex-col items-center text-center gap-4">
-          <MessageCircle className="w-16 h-16 text-primary" />
-          <h1 className="text-3xl font-bold">FAQ</h1>
-          <p className="text-gray-500 dark:text-gray-400">This page is under development</p>
-        </CardBody>
-      </Card>
-    </div>
+    <ComingSoon
+      cta={{ label: "Visit help centre", href: "/help" }}
+      description="Delivery windows, payment methods, returns and substitutions - the questions we get asked most, answered plainly."
+      eyebrow="Answers, not hold music"
+      highlights={[
+        "Delivery and slots",
+        "Payments",
+        "Returns"
+      ]}
+      icon={CircleHelp}
+      title="Frequently asked questions"
+    />
   );
 }

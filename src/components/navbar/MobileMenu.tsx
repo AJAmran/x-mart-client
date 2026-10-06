@@ -1,155 +1,119 @@
 "use client";
 
-import React from "react";
-import { NavbarMenu } from "@heroui/navbar";
-import { Link } from "@heroui/link";
 import NextLink from "next/link";
 import { useRouter } from "next/navigation";
-import {
-  ShoppingBagIcon,
-  HeartIcon,
-  UserIcon,
-  StoreIcon,
-  PhoneIcon,
-} from "lucide-react";
-import { MyButton } from "../UI/MyButton";
+import { LogIn, LogOut } from "lucide-react";
+
 import CategoriesDropdownClient from "./CategoriesDropdownClient";
-
-import SearchBar from "../SearchBar";
-import { ThemeSwitch } from "../theme-switch";
-import { IUser } from "@/src/types";
+import { accountNav, primaryNav } from "@/src/config/navigation";
 import { logout } from "@/src/services/AuthService";
+import { ThemeSwitch } from "@/src/components/theme-switch";
+import type { Category } from "@/src/data/CategoriesData";
+import type { IUser } from "@/src/types";
 
-import BranchSelector from "./BranchSelection";
-import { Category } from "@/src/data/CategoriesData";
-
-interface MobileMenuProps {
+type MobileMenuProps = {
   user: IUser | null;
   categories: Category[];
   onSearch: (query: string) => void;
-}
+  /** Called after any navigation so the parent can close the drawer. */
+  onNavigate?: () => void;
+};
 
-export default function MobileMenu({
+const rowBase =
+  "flex items-center gap-3 rounded-sm px-3 py-3 text-body-sm font-medium text-content-muted transition-colors duration-fast ease-standard hover:bg-surface-sunken hover:text-content";
+
+/**
+ * Drawer navigation. Links come from the shared navigation config so this
+ * menu can never drift out of sync with the desktop header or the footer.
+ */
+export function MobileMenu({
   user,
   categories,
-  onSearch,
+  onNavigate,
 }: MobileMenuProps) {
   const router = useRouter();
 
   return (
-    <NavbarMenu className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl pt-6 pb-12">
-      <div className="p-4">
-        <SearchBar
-          className="w-full mb-4"
-          debounceDelay={300}
-          placeholder="Search products..."
-          value=""
-          onChange={() => { }}
-          onSearch={onSearch}
-        />
-      </div>
-      <div className="mx-4 flex flex-col gap-4">
-        <BranchSelector isMobile={true} />
+    <nav aria-label="Mobile" className="mt-5 flex flex-col gap-1">
+      <p className="px-3 pb-1 pt-2 text-overline font-semibold uppercase tracking-[0.14em] text-content-subtle">
+        Browse
+      </p>
+      {primaryNav.map((item) => {
+        const Icon = item.icon;
+        return (
+          <NextLink
+            key={item.href}
+            className={rowBase}
+            href={item.href}
+            onClick={onNavigate}
+          >
+            {Icon && <Icon aria-hidden className="size-4.5 shrink-0" size={18} />}
+            {item.label}
+          </NextLink>
+        );
+      })}
+
+      <div className="mt-4">
         <CategoriesDropdownClient
-          buttonText="Shop by Category"
+          buttonText="Shop by category"
           categories={categories}
         />
-        <Link
-          as={NextLink}
-          className="flex items-center gap-3 w-full py-3 text-base font-semibold"
-          href="/track-order"
-          size="lg"
-        >
-          <ShoppingBagIcon className="w-5 h-5" />
-          Track Order
-        </Link>
-        <Link
-          as={NextLink}
-          className="flex items-center gap-3 w-full py-3 text-base font-semibold"
-          href="/deals"
-          size="lg"
-        >
-          Great Deals
-        </Link>
-        <Link
-          as={NextLink}
-          className="flex items-center gap-3 w-full py-3 text-base font-semibold"
-          href="/outlets"
-          size="lg"
-        >
-          <StoreIcon className="w-5 h-5" />
-          Our Outlets
-        </Link>
-        <Link
-          as={NextLink}
-          className="flex items-center gap-3 w-full py-3 text-base font-semibold"
-          href="/helpline"
-          size="lg"
-        >
-          <PhoneIcon className="w-5 h-5" />
-          Helpline
-        </Link>
-        {user ? (
-          <>
-            <Link
-              as={NextLink}
-              className="flex items-center gap-3 w-full py-3 text-base font-semibold"
-              href="/orders"
-              size="lg"
-            >
-              <ShoppingBagIcon className="w-5 h-5" />
-              Orders
-            </Link>
-            <Link
-              as={NextLink}
-              className="flex items-center gap-3 w-full py-3 text-base font-semibold"
-              href="/wishlist"
-              size="lg"
-            >
-              <HeartIcon className="w-5 h-5" />
-              Wishlist
-            </Link>
-            {user.role === "ADMIN" && (
-              <Link
-                as={NextLink}
-                className="flex items-center gap-3 w-full py-3 text-base font-semibold"
-                href="/dashboard"
-                size="lg"
-              >
-                Dashboard
-              </Link>
-            )}
-            <Link
-              as={NextLink}
-              className="flex items-center gap-3 w-full py-3 text-base font-semibold text-danger"
-              href="#"
-              size="lg"
-              onClick={() => {
-                logout();
-                router.push("/auth/login");
-              }}
-            >
-              Logout
-            </Link>
-          </>
-        ) : (
-          <MyButton
-            aria-label="Sign In"
-            as={Link}
-            className="flex items-center gap-3 w-full py-3 text-base font-semibold"
-            color="primary"
-            href="/auth/login"
-            size="lg"
-            variant="flat"
-          >
-            <UserIcon className="w-5 h-5" />
-            Sign In
-          </MyButton>
-        )}
-        <div className="flex items-center gap-3 w-full py-3">
-          <ThemeSwitch />
-        </div>
       </div>
-    </NavbarMenu>
+
+      {user && (
+        <>
+          <p className="mt-6 px-3 pb-1 text-overline font-semibold uppercase tracking-[0.14em] text-content-subtle">
+            My account
+          </p>
+          {accountNav.map((item) => {
+            const Icon = item.icon;
+            return (
+              <NextLink
+                key={item.href}
+                className={rowBase}
+                href={item.href}
+                onClick={onNavigate}
+              >
+                {Icon && <Icon aria-hidden size={18} className="shrink-0" />}
+                {item.label}
+              </NextLink>
+            );
+          })}
+
+          {user.role === "ADMIN" && (
+            <NextLink
+              className={rowBase}
+              href="/dashboard"
+              onClick={onNavigate}
+            >
+              <LogIn aria-hidden size={18} className="shrink-0" />
+              Admin dashboard
+            </NextLink>
+          )}
+
+          <button
+            type="button"
+            className={`${rowBase} text-danger hover:bg-danger/10 hover:text-danger`}
+            onClick={() => {
+              onNavigate?.();
+              logout();
+              router.push("/auth/login");
+            }}
+          >
+            <LogOut aria-hidden size={18} className="shrink-0" />
+            Sign out
+          </button>
+        </>
+      )}
+
+      <div className="mt-6 flex items-center justify-between rounded-sm border border-line-hairline bg-surface-sunken px-3 py-2.5">
+        <span className="text-label-sm font-medium text-content">
+          Appearance
+        </span>
+        <ThemeSwitch showLabel={false} />
+      </div>
+    </nav>
   );
 }
+
+export default MobileMenu;

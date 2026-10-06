@@ -4,6 +4,7 @@ import { Button } from "@heroui/button";
 import { Link } from "@heroui/link";
 import { motion, Variants } from "framer-motion";
 import { Mail } from "lucide-react";
+import { Container } from "@/src/components/UI/Container";
 
 export default function ContactCTA() {
   const containerVariants: Variants = {
@@ -17,7 +18,7 @@ export default function ContactCTA() {
 
   return (
     <section className="py-16 bg-primary-600 text-white">
-      <div className="container mx-auto px-4 text-center">
+      <Container>
         <motion.div
           animate="visible"
           initial="hidden"
@@ -41,7 +42,7 @@ export default function ContactCTA() {
             Contact Us
           </Button>
         </motion.div>
-      </div>
+      </Container>
     </section>
   );
 }

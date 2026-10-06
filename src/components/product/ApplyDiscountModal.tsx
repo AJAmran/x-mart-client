@@ -106,12 +106,8 @@ export default function ApplyDiscountModal({
                     selectedKeys={[field.value]}
                     onChange={field.onChange}
                   >
-                    <SelectItem key="percentage" value="percentage">
-                      Percentage
-                    </SelectItem>
-                    <SelectItem key="fixed" value="fixed">
-                      Fixed
-                    </SelectItem>
+                    <SelectItem key="percentage">Percentage</SelectItem>
+                    <SelectItem key="fixed">Fixed</SelectItem>
                   </Select>
                 )}
               />

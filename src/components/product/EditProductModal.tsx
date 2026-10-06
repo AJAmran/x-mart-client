@@ -152,10 +152,10 @@ export default function EditProductModal({ product }: { product: TProduct }) {
                     selectedKeys={[field.value || ""]}
                     onChange={field.onChange}
                   >
-                    <SelectItem key="percentage" value="percentage">
+                    <SelectItem key="percentage">
                       Percentage
                     </SelectItem>
-                    <SelectItem key="fixed" value="fixed">
+                    <SelectItem key="fixed">
                       Fixed
                     </SelectItem>
                   </Select>

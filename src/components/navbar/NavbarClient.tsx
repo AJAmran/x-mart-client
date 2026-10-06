@@ -1,96 +1,222 @@
 "use client";
 
-import React, { useState, useCallback } from "react";
-import {
-  Navbar as NextUINavbar,
-  NavbarContent,
-  NavbarMenuToggle,
-  NavbarBrand,
-} from "@heroui/navbar";
+import { useCallback, useEffect, useRef, useState } from "react";
 import NextLink from "next/link";
-import { Logo } from "../icons";
 import { useRouter, useSearchParams } from "next/navigation";
-import UserActions from "./UserActions";
-import MobileMenu from "./MobileMenu";
-import MainNavigation from "./MainNavigation";
-import { IUser } from "@/src/types";
-import { categoriesData } from "@/src/data/CategoriesData";
-import SearchBar from "../SearchBar";
+import { Menu, Search, X } from "lucide-react";
+
+import { Container } from "@/src/components/UI/Container";
+import { Logo } from "@/src/components/UI/Logo";
 import BranchSelector from "./BranchSelection";
+import CategoriesDropdownClient from "./CategoriesDropdownClient";
+import MobileMenu from "./MobileMenu";
+import UserActions from "./UserActions";
+import { categoriesData } from "@/src/data/CategoriesData";
+import { primaryNav } from "@/src/config/navigation";
+import type { IUser } from "@/src/types";
 
-interface NavbarClientProps {
-  user: IUser | null;
-}
-
-export default function NavbarClient({ user }: NavbarClientProps) {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
+export function NavbarClient({ user }: { user: IUser | null }) {
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [mobileQuery, setMobileQuery] = useState("");
+  const mobileSearchRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const handleSearch = useCallback(
+  // Move focus into the drawer when it opens, and trap the escape key.
+  // A ref + effect is used instead of `autoFocus` so focus is only moved on a
+  // real user action, not on first render.
+  useEffect(() => {
+    if (!drawerOpen) return;
+
+    mobileSearchRef.current?.focus();
+
+    function onKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape") setDrawerOpen(false);
+    }
+
+    document.addEventListener("keydown", onKeyDown);
+   
+    return () => document.removeEventListener("keydown", onKeyDown);
+  }, [drawerOpen]);
+
+  const navigateToSearch = useCallback(
     (query: string) => {
       const params = new URLSearchParams(searchParams.toString());
-
+      
       params.set("search", query);
       router.push(`/shop?${params.toString()}`);
     },
     [router, searchParams]
   );
 
+  const handleDesktopSearch = useCallback(
+    (event: React.FormEvent<HTMLFormElement>) => {
+      event.preventDefault();
+      const value = new FormData(event.currentTarget).get("q");
+      
+      navigateToSearch(typeof value === "string" ? value.trim() : "");
+    },
+    [navigateToSearch]
+  );
+
   return (
-    <div className="sticky top-0 z-50 w-full">
-      <NextUINavbar
-        isBordered
-        className="bg-white dark:bg-gray-900"
-        isMenuOpen={isMenuOpen}
-        maxWidth="2xl"
-        onMenuOpenChange={setIsMenuOpen}
-      >
-        <NavbarContent justify="start">
-          <NavbarBrand>
-            <NextLink
-              aria-label="X-mart Home"
-              className="flex items-center gap-2"
-              href="/"
-            >
-              <Logo className="w-10 h-10 text-primary-600 dark:text-primary-400" />
-              <p className="font-bold text-2xl tracking-tight text-gray-900 dark:text-white">
-                X-mart
-              </p>
-            </NextLink>
-          </NavbarBrand>
-          <div className="hidden sm:block">
+    <>
+      <header className="sticky top-0 z-header glass border-b border-line-hairline">
+        <Container className="flex h-16 items-center gap-3 sm:h-18">
+          {/* ---- Brand ---- */}
+          <NextLink
+            aria-label="X-mart — go to homepage"
+            className="group flex shrink-0 items-center"
+            href="/"
+          >
+            <Logo
+              className="transition-opacity duration-fast group-hover:opacity-80"
+              height={38}
+              priority
+            />
+          </NextLink>
+
+          {/* ---- Branch selector (desktop) ---- */}
+          <div className="ml-2 hidden lg:block">
             <BranchSelector />
           </div>
-        </NavbarContent>
 
-        <NavbarContent className="hidden sm:flex" justify="center">
-          <SearchBar
-            className="w-96"
-            debounceDelay={300}
-            placeholder="Search products..."
-            value={searchParams.get("search") || ""}
-            onChange={() => {}}
-            onSearch={handleSearch}
+          {/* ---- Search (desktop) ---- */}
+          <form
+            className="mx-auto hidden w-full max-w-lg md:block"
+            role="search"
+            onSubmit={handleDesktopSearch}
+          >
+            <label className="sr-only" htmlFor="site-search">
+              Search products
+            </label>
+            <div className="group relative">
+              <Search
+                aria-hidden
+                className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-content-subtle transition-colors duration-fast group-focus-within:text-brand"
+              />
+              <input
+                id="site-search"
+                className="h-10 w-full rounded-md border border-line-hairline bg-surface-sunken pl-10 pr-4 text-body-sm text-content placeholder:text-content-subtle transition-colors duration-fast ease-standard hover:border-line-strong focus:border-brand focus:outline-none"
+                defaultValue={searchParams.get("search") ?? ""}
+                name="q"
+                placeholder="Search for groceries, kitchenware…"
+                type="search"
+              />
+            </div>
+          </form>
+
+          {/* ---- Actions (desktop) ---- */}
+          <div className="ml-auto hidden shrink-0 items-center gap-1 md:flex">
+            <UserActions user={user} />
+          </div>
+
+          {/* ---- Actions (mobile) ---- */}
+          <div className="ml-auto flex shrink-0 items-center gap-1 md:hidden">
+            <NextLink
+              aria-label="Search products"
+              className="grid size-10 place-items-center rounded-sm text-content-muted transition-colors duration-fast hover:bg-surface-sunken hover:text-content"
+              href="/shop"
+            >
+              <Search aria-hidden size={19} />
+            </NextLink>
+            <UserActions user={user} compact />
+            <button
+              type="button"
+              aria-expanded={drawerOpen}
+              aria-label={drawerOpen ? "Close menu" : "Open menu"}
+              className="grid size-10 place-items-center rounded-sm text-content transition-colors duration-fast hover:bg-surface-sunken"
+              onClick={() => setDrawerOpen((open) => !open)}
+            >
+              {drawerOpen ? (
+                <X aria-hidden size={20} />
+              ) : (
+                <Menu aria-hidden size={20} />
+              )}
+            </button>
+          </div>
+        </Container>
+
+        {/* ---- Category bar ---- */}
+        <nav
+          aria-label="Product categories"
+          className="hidden border-t border-line-hairline bg-surface-raised md:block"
+        >
+          <Container className="flex h-11 items-center gap-1">
+            <CategoriesDropdownClient
+              buttonText="Shop by category"
+              categories={categoriesData}
+            />
+            <span aria-hidden className="mx-2 h-4 w-px bg-line" />
+            {primaryNav.map((item) => {
+              const Icon = item.icon;
+              
+              return (
+                <NextLink
+                  key={item.href}
+                  className="inline-flex items-center gap-1.5 rounded-sm px-3 py-1.5 text-label-sm font-medium text-content-muted transition-colors duration-fast ease-standard hover:bg-surface-sunken hover:text-content"
+                  href={item.href}
+                >
+                  {Icon && <Icon aria-hidden size={15} />}
+                  {item.label}
+                </NextLink>
+              );
+            })}
+          </Container>
+        </nav>
+      </header>
+
+      {/* ---- Mobile drawer ---- */}
+      {drawerOpen && (
+        <div className="fixed inset-0 top-16 z-overlay md:hidden">
+          <button
+            aria-label="Close menu"
+            className="absolute inset-0 h-full w-full bg-black/50 backdrop-blur-sm"
+            onClick={() => setDrawerOpen(false)}
           />
-        </NavbarContent>
+          <div className="absolute inset-x-0 top-0 max-h-[calc(100dvh-4rem)] overflow-y-auto border-b border-line-hairline bg-surface-raised px-4 pb-8 pt-5 shadow-xl">
+            <form
+              className="relative"
+              role="search"
+              onSubmit={(event) => {
+                event.preventDefault();
+                navigateToSearch(mobileQuery.trim());
+                setDrawerOpen(false);
+              }}
+            >
+              <label className="sr-only" htmlFor="mobile-search">
+                Search products
+              </label>
+              <Search
+                aria-hidden
+                className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-content-subtle"
+              />
+              <input
+                id="mobile-search"
+                className="h-11 w-full rounded-md border border-line-hairline bg-surface-sunken pl-10 pr-4 text-body-sm text-content placeholder:text-content-subtle focus:border-brand focus:outline-none"
+                onChange={(event) => setMobileQuery(event.target.value)}
+                placeholder="Search products…"
+                ref={mobileSearchRef}
+                type="search"
+                value={mobileQuery}
+              />
+            </form>
 
-        <NavbarContent justify="end">
-          <UserActions user={user} />
-          <NavbarMenuToggle
-            aria-label={isMenuOpen ? "Close menu" : "Open menu"}
-            className="sm:hidden"
-          />
-        </NavbarContent>
+            <div className="mt-5">
+              <BranchSelector isMobile />
+            </div>
 
-        <MobileMenu
-          categories={categoriesData}
-          user={user}
-          onSearch={handleSearch}
-        />
-      </NextUINavbar>
-
-      <MainNavigation categories={categoriesData} />
-    </div>
+            <MobileMenu
+              categories={categoriesData}
+              user={user}
+              onNavigate={() => setDrawerOpen(false)}
+              onSearch={navigateToSearch}
+            />
+          </div>
+        </div>
+      )}
+    </>
   );
 }
+
+export default NavbarClient;

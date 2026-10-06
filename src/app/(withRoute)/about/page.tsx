@@ -39,7 +39,9 @@ const structuredData = {
     name: "X-mart",
     logo: {
       "@type": "ImageObject",
-      url: "/logo.png",
+      url: "/logo-on-light.png",
+      width: 765,
+      height: 195,
     },
   },
 };

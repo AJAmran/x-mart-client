@@ -7,10 +7,10 @@ import { X } from "lucide-react";
 interface SearchBarProps {
   value: string;
   onChange: (value: string) => void;
-  onSearch: (query: string) => void; // Add onSearch prop
+  onSearch: (query: string) => void;
   className?: string;
   placeholder?: string;
-  debounceDelay?: number; // Delay in milliseconds for debouncing
+  debounceDelay?: number;
 }
 
 const SearchBar: React.FC<SearchBarProps> = ({
@@ -19,7 +19,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
   onSearch,
   className,
   placeholder = "Search products...",
-  debounceDelay = 300, // Default debounce delay
+  debounceDelay = 300,
 }) => {
   const [inputValue, setInputValue] = useState(value);
 

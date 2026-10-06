@@ -29,14 +29,15 @@ const ProfileModal = ({ user }: ProfileModalProps) => {
   return (
     <div className="relative">
       <Button
-        className="flex items-center gap-2 px-3 py-2 rounded-lg transition hover:bg-gray-200 dark:hover:bg-gray-700"
+        aria-label={`Account menu for ${user.name}`}
+        className="grid size-10 min-w-10 place-items-center rounded-full p-0 transition-colors duration-fast ease-standard hover:bg-surface-sunken"
         variant="light"
         onMouseEnter={() => setIsOpen(true)}
         onMouseLeave={() => setIsOpen(false)}
       >
         <Image
-          alt={user.name}
-          className="rounded-full border-2 border-yellow-300"
+          alt=""
+          className="rounded-full ring-2 ring-accent/60"
           height={32}
           src={user.profilePhoto || "/default-avatar.png"}
           width={32}

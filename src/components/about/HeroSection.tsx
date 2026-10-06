@@ -7,6 +7,7 @@ import { motion, useScroll, useTransform, Variants } from "framer-motion";
 import { ArrowRight, ShoppingBag } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
+import { Container } from "@/src/components/UI/Container";
 
 export default function HeroSection() {
   const { theme } = useTheme();
@@ -80,7 +81,7 @@ export default function HeroSection() {
       {/* Glassmorphism Overlay */}
       <div className="absolute inset-0 bg-white/10 dark:bg-black/10 backdrop-blur-md z-10" />
 
-      <div className="container mx-auto px-4 relative z-20">
+      <Container className="relative z-20">
         <motion.div
           animate="visible"
           className="text-center max-w-4xl mx-auto"
@@ -145,7 +146,7 @@ export default function HeroSection() {
             </motion.div>
           </motion.div>
         </motion.div>
-      </div>
+      </Container>
 
       {/* Particle Effect (Optional) */}
       <motion.div

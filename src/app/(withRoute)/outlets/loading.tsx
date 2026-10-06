@@ -1,19 +1,20 @@
 import { Skeleton } from "@heroui/skeleton";
+import { Container } from "@/src/components/UI/Container";
 
 export default function OutletsLoading() {
   return (
     <div className="min-h-screen bg-gray-50">
       <section className="relative">
-        <div className="container mx-auto px-4 py-24 md:py-32">
+        <Container className="py-20 md:py-28">
           <div className="max-w-3xl mx-auto text-center space-y-4">
             <Skeleton className="h-12 w-64 mx-auto rounded-lg" />
             <Skeleton className="h-8 w-96 mx-auto rounded-lg" />
           </div>
-        </div>
+        </Container>
       </section>
 
       <section className="py-12 bg-white">
-        <div className="container mx-auto px-4">
+        <Container>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             {Array.from({ length: 4 }).map((_, i) => (
               <div key={i} className="text-center p-6 rounded-lg">
@@ -23,11 +24,11 @@ export default function OutletsLoading() {
               </div>
             ))}
           </div>
-        </div>
+        </Container>
       </section>
 
       <section className="py-16 bg-gray-50">
-        <div className="container mx-auto px-4">
+        <Container>
           <div className="text-center mb-12 space-y-2">
             <Skeleton className="h-8 w-48 mx-auto rounded-lg" />
             <Skeleton className="h-6 w-72 mx-auto rounded-lg" />
@@ -44,8 +45,9 @@ export default function OutletsLoading() {
               </div>
             ))}
           </div>
-        </div>
+        </Container>
       </section>
     </div>
   );
 }
+

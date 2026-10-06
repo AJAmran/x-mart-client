@@ -3,6 +3,7 @@
 import { Card, CardBody } from "@heroui/card";
 import { motion } from "framer-motion";
 import { Award, Shield, Lightbulb, Leaf } from "lucide-react";
+import { Container } from "@/src/components/UI/Container";
 
 interface Value {
   title: string;
@@ -29,7 +30,7 @@ export default function ValuesSection({ values }: ValuesSectionProps) {
 
   return (
     <section className="py-16 bg-white dark:bg-gray-800">
-      <div className="container mx-auto px-4">
+      <Container>
         <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 text-gray-900 dark:text-white">
           Our Values
         </h2>
@@ -58,7 +59,7 @@ export default function ValuesSection({ values }: ValuesSectionProps) {
             );
           })}
         </div>
-      </div>
+      </Container>
     </section>
   );
 }

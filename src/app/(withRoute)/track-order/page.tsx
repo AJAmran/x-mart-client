@@ -17,6 +17,7 @@ import {
 import { motion } from "framer-motion";
 import { useOrderById } from "@/src/hooks/useOrder";
 import { TOrder, ORDER_STATUS } from "@/src/types";
+import { Container } from "@/src/components/UI/Container";
 
 type StatusKey = keyof typeof ORDER_STATUS;
 
@@ -86,7 +87,7 @@ export default function TrackingPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 dark:from-gray-900 dark:to-gray-800 py-8">
-      <div className="container mx-auto px-4">
+      <Container>
         {/* Header */}
         <motion.div
           animate={{ opacity: 1, y: 0 }}
@@ -448,7 +449,8 @@ export default function TrackingPage() {
             </div>
           </motion.div>
         )}
-      </div>
+      </Container>
     </div>
   );
 }
+

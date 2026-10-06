@@ -1,125 +1,197 @@
-"use client";
+import NextLink from "next/link";
+import {
+  ArrowRight,
+  Clock,
+  Facebook,
+  Instagram,
+  Linkedin,
+  Mail,
+  MapPin,
+  Phone,
+  Twitter,
+} from "lucide-react";
 
-import { Link } from "@heroui/link";
-import { FacebookIcon, InstagramIcon, LinkedInIcon, TwitterIcon } from "../icons";
-import { Button } from "@heroui/button";
-import { Input } from "@heroui/input";
+import { Container } from "./Container";
+import { Logo } from "./Logo";
+import NewsletterForm from "./NewsletterForm";
+import {
+  companyGroup,
+  shopGroup,
+  supportGroup,
+  type NavGroup,
+} from "@/src/config/navigation";
+import { siteConfig } from "@/src/config/site";
 
-const Footer = () => {
+const groups: NavGroup[] = [shopGroup, companyGroup, supportGroup];
+
+const socials = [
+  { label: "Facebook", href: siteConfig.links.facebook, Icon: Facebook },
+  { label: "Instagram", href: siteConfig.links.instagram, Icon: Instagram },
+  { label: "X (Twitter)", href: siteConfig.links.twitter, Icon: Twitter },
+  { label: "LinkedIn", href: siteConfig.links.linkedin, Icon: Linkedin },
+];
+
+/** Payment / trust marks — replace with your real gateway logos. */
+const paymentMarks = ["Visa", "Mastercard", "bKash", "Nagad", "Cash on Delivery"];
+
+function LinkColumn({ group }: { group: NavGroup }) {
+  const headingId = `footer-${group.title.replace(/\s+/g, "-").toLowerCase()}`;
+
   return (
-    <footer className="bg-gray-100 dark:bg-gray-900 py-12 shadow-md">
-      <div className="container mx-auto px-6 md:px-10">
-        {/* Footer Top Section */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-          {/* About Section */}
-          <div>
-            <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">About X-Mart</h3>
-            <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
-              X-Mart is your one-stop destination for all your shopping needs. From groceries to electronics, we provide quality products at competitive prices.
-            </p>
-          </div>
+    <nav aria-labelledby={headingId}>
+      <h2
+        className="text-overline font-semibold uppercase tracking-[0.14em] text-content"
+        id={headingId}
+      >
+        {group.title}
+      </h2>
+      <ul className="mt-4 flex flex-col gap-1">
+        {group.links.map((link) => (
+          <li key={`${group.title}-${link.href}-${link.label}`}>
+            <NextLink
+              className="group inline-flex items-baseline gap-1.5 rounded-xs py-1 text-body-sm text-content-muted transition-colors duration-fast ease-standard hover:text-brand"
+              href={link.href}
+            >
+              {link.label}
+              {link.description && (
+                <span className="text-label-sm text-content-subtle transition-colors group-hover:text-brand/70">
+                  {link.description}
+                </span>
+              )}
+            </NextLink>
+          </li>
+        ))}
+      </ul>
+    </nav>
+  );
+}
 
-          {/* Customer Support */}
-          <div>
-            <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">Customer Support</h3>
-            <ul className="text-sm space-y-2">
+/**
+ * Site footer.
+ *
+ * Four zones, in the order people actually need them:
+ *   1. Contact block + newsletter — the two things a visitor looks for first
+ *   2. Sitemap columns
+ *   3. Trust/payment marks
+ *   4. Legal + social
+ *
+ * Every link is read from the shared navigation config, which is what stopped
+ * the previous version from pointing at routes that 404.
+ */
+export function Footer() {
+  const year = new Date().getFullYear();
+
+  return (
+    <footer className="mt-auto border-t border-line-hairline bg-surface-raised">
+      <Container>
+        {/* ---- Zone 1: brand, contact, newsletter ---- */}
+        <div className="grid gap-10 border-b border-line-hairline py-12 lg:grid-cols-12 lg:gap-8 lg:py-14">
+          <div className="lg:col-span-5">
+            <NextLink
+              aria-label="X-mart — go to homepage"
+              className="inline-flex items-center"
+              href="/"
+            >
+              <Logo height={32} />
+            </NextLink>
+
+            <p className="mt-5 max-w-prose text-body-sm leading-relaxed text-content-muted">
+              Fresh groceries, pantry staples and daily essentials, delivered
+              across Bangladesh. Order by 4pm for a same-day slot inside Dhaka.
+            </p>
+
+            <ul className="mt-6 flex flex-col gap-3">
               <li>
-                <Link className="text-gray-600 dark:text-gray-400 hover:text-primary dark:hover:text-primary transition" href="/help">
-                  Help Center
-                </Link>
+                <a
+                  className="group inline-flex items-start gap-2.5 text-body-sm text-content-muted transition-colors duration-fast hover:text-brand"
+                  href={`tel:${siteConfig.supportPhone.replace(/\s/g, "")}`}
+                >
+                  <Phone aria-hidden className="mt-0.5 shrink-0" size={15} />
+                  {siteConfig.supportPhone}
+                </a>
               </li>
               <li>
-                <Link className="text-gray-600 dark:text-gray-400 hover:text-primary dark:hover:text-primary transition" href="/returns">
-                  Returns & Refunds
-                </Link>
+                <a
+                  className="group inline-flex items-start gap-2.5 text-body-sm text-content-muted transition-colors duration-fast hover:text-brand"
+                  href={`mailto:${siteConfig.supportEmail}`}
+                >
+                  <Mail aria-hidden className="mt-0.5 shrink-0" size={15} />
+                  {siteConfig.supportEmail}
+                </a>
               </li>
-              <li>
-                <Link className="text-gray-600 dark:text-gray-400 hover:text-primary dark:hover:text-primary transition" href="/shipping">
-                  Shipping Policy
-                </Link>
-              </li>
-              <li>
-                <Link className="text-gray-600 dark:text-gray-400 hover:text-primary dark:hover:text-primary transition" href="/faq">
-                  FAQs
-                </Link>
+              <li className="inline-flex items-start gap-2.5 text-body-sm text-content-muted">
+                <Clock aria-hidden className="mt-0.5 shrink-0" size={15} />
+                <span>
+                  Support 9am&ndash;9pm, every day
+                  <span className="block text-label-sm text-content-subtle">
+                    Orders after 4pm dispatch next morning
+                  </span>
+                </span>
               </li>
             </ul>
+
+            <div className="mt-7">
+              <NewsletterForm />
+            </div>
           </div>
 
-          {/* Quick Links */}
-          <div>
-            <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">Quick Links</h3>
-            <ul className="text-sm space-y-2">
-              <li>
-                <Link className="text-gray-600 dark:text-gray-400 hover:text-primary dark:hover:text-primary transition" href="/about">
-                  About Us
-                </Link>
-              </li>
-              <li>
-                <Link className="text-gray-600 dark:text-gray-400 hover:text-primary dark:hover:text-primary transition" href="/products">
-                  Shop
-                </Link>
-              </li>
-              <li>
-                <Link className="text-gray-600 dark:text-gray-400 hover:text-primary dark:hover:text-primary transition" href="/careers">
-                  Careers
-                </Link>
-              </li>
-              <li>
-                <Link className="text-gray-600 dark:text-gray-400 hover:text-primary dark:hover:text-primary transition" href="/contact">
-                  Contact Us
-                </Link>
-              </li>
-            </ul>
-          </div>
-
-          {/* Newsletter Signup */}
-          <div>
-            <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">Stay Connected</h3>
-            <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-              Subscribe to our newsletter for the latest updates and promotions.
-            </p>
-            <form className="flex flex-col sm:flex-row items-center gap-2">
-              <Input
-                required
-                aria-label="Email for newsletter"
-                className="w-full sm:w-auto shadow-md dark:text-gray-900"
-                placeholder="Enter your email"
-                type="email"
-              />
-              <Button className="bg-primary shadow-md text-white px-4 py-2 rounded" type="submit">
-                Subscribe
-              </Button>
-            </form>
+          {/* ---- Zone 2: sitemap ---- */}
+          <div className="grid gap-8 sm:grid-cols-3 lg:col-span-7">
+            {groups.map((group) => (
+              <LinkColumn group={group} key={group.title} />
+            ))}
           </div>
         </div>
 
-        {/* Footer Bottom Section */}
-        <div className="mt-12 border-t border-gray-300 dark:border-gray-700 pt-8 flex flex-col lg:flex-row justify-between items-center gap-4">
-          {/* Social Media Links */}
-          <div className="flex justify-center lg:justify-start space-x-4">
-            <Link className="text-gray-600 dark:text-gray-400 hover:text-primary transition" href="https://facebook.com" rel="noopener noreferrer" target="_blank">
-              <FacebookIcon size={24} />
-            </Link>
-            <Link className="text-gray-600 dark:text-gray-400 hover:text-primary transition" href="https://twitter.com" rel="noopener noreferrer" target="_blank">
-              <TwitterIcon size={24} />
-            </Link>
-            <Link className="text-gray-600 dark:text-gray-400 hover:text-primary transition" href="https://instagram.com" rel="noopener noreferrer" target="_blank">
-              <InstagramIcon size={24} />
-            </Link>
-            <Link className="text-gray-600 dark:text-gray-400 hover:text-primary transition" href="https://linkedin.com" rel="noopener noreferrer" target="_blank">
-              <LinkedInIcon size={24} />
-            </Link>
-          </div>
-
-          {/* Copyright */}
-          <p className="text-sm text-gray-500 dark:text-gray-400 text-center lg:text-left">
-            © {new Date().getFullYear()} X-Mart. All rights reserved.
+        {/* ---- Zone 3: trust marks ---- */}
+        <div className="flex flex-col gap-5 border-b border-line-hairline py-6 sm:flex-row sm:items-center sm:justify-between">
+          <p className="text-label-sm font-medium uppercase tracking-[0.12em] text-content-subtle">
+            We accept
+          </p>
+          <ul className="flex flex-wrap items-center gap-2">
+            {paymentMarks.map((mark) => (
+              <li
+                key={mark}
+                className="rounded-xs border border-line-hairline bg-surface px-2.5 py-1.5 text-label-sm font-medium text-content-muted"
+              >
+                {mark}
+              </li>
+            ))}
+          </ul>
+          <p className="inline-flex items-center gap-2 text-label-sm text-content-subtle">
+            <MapPin aria-hidden size={14} />
+            12 outlets nationwide
           </p>
         </div>
-      </div>
+
+        {/* ---- Zone 4: legal + social ---- */}
+        <div className="flex flex-col-reverse items-center gap-5 py-7 sm:flex-row sm:justify-between">
+          <p className="text-center text-label-sm text-content-subtle sm:text-left">
+            © {year} {siteConfig.legalName}. All rights reserved.{" "}
+            <span className="hidden sm:inline">
+              Prices include VAT. Delivery fees calculated at checkout.
+            </span>
+          </p>
+
+          <ul className="flex items-center gap-1">
+            {socials.map(({ label, href, Icon }) => (
+              <li key={label}>
+                <a
+                  aria-label={`X-mart on ${label}`}
+                  className="grid size-9 place-items-center rounded-sm text-content-subtle transition-colors duration-fast ease-standard hover:bg-surface-sunken hover:text-content"
+                  href={href}
+                  rel="noopener noreferrer"
+                  target="_blank"
+                >
+                  <Icon aria-hidden size={17} />
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </Container>
     </footer>
   );
-};
+}
 
 export default Footer;
