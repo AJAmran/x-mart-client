@@ -1,4 +1,3 @@
-// hooks/useCart.ts
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { TCart, TCartItem } from "../types";
@@ -164,13 +163,19 @@ export const useCart = () => {
   };
 
   // Clear cart
-  const clearCart = () => {
+const clearCart = (options?: { silent?: boolean }) => {
     updateCartMutation.mutate([], {
       onSuccess: () => {
         syncCartQuietly();
-      }
+      },
     });
-    toast.success("Cart cleared!");
+
+    // `silent` is for flows that clear the cart as a side effect of something
+    // else (e.g. returning from the payment gateway), where a "Cart cleared!"
+    // toast would be confusing next to the real confirmation.
+    if (!options?.silent) {
+      toast.success("Cart cleared!");
+    }
   };
 
   // Check if item is in cart

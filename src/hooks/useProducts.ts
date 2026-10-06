@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { useMemo } from "react";
-import { TProduct, TDiscount } from "@/src/types/index";
+import { TProduct, TDiscount, TApiResponse } from "@/src/types/index";
 import * as productService from "@/src/services/ProductServices";
 import { PRODUCT_CATEGORY } from "../constants";
 
@@ -31,7 +31,7 @@ export const useProducts = (
   const stableFilters = useMemo(() => filters, [JSON.stringify(filters)]);
   const stableOptions = useMemo(() => options, [JSON.stringify(options)]);
 
-  return useQuery({
+  return useQuery<TApiResponse<TProduct[]>, Error>({
     queryKey: ["products", stableFilters, stableOptions],
     queryFn: () => productService.getAllProducts(stableFilters, stableOptions),
     placeholderData: (prev) => prev,
@@ -238,19 +238,21 @@ export const useSubCategories = (category?: string) => {
 
 // Get products by main category
 export const useProductsByCategory = (category?: keyof typeof PRODUCT_CATEGORY) => {
-  return useQuery({
+  return useQuery<TApiResponse<TProduct[]>, Error>({
     queryKey: ["products", "category", category],
-    queryFn: () => 
-      productService.getAllProducts({
-        category,
-        status: "ACTIVE",
-      }, {
-        limit: 10, 
-        sortBy: "createdAt",
-        sortOrder: "desc"
-      }),
+    queryFn: () =>
+      productService.getAllProducts(
+        {
+          category,
+          status: "ACTIVE",
+        },
+        {
+          limit: 10,
+          sortBy: "createdAt",
+          sortOrder: "desc",
+        }
+      ),
     enabled: !!category,
-    select: (data) => data.data,
   });
 };
 

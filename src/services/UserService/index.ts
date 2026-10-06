@@ -1,6 +1,6 @@
 "use server";
 
-import axiosInstance from "@/src/lib/serverAxios";
+import axiosInstance, { type TEnvelope } from "@/src/lib/serverAxios";
 import { IUser } from "@/src/types";
 
 export const getAllUsers = async (queryParams?: {
@@ -16,7 +16,9 @@ export const getAllUsers = async (queryParams?: {
       params.append("limit", queryParams.limit.toString());
     if (queryParams?.search) params.append("search", queryParams.search);
 
-    const response = await axiosInstance.get(`/user?${params.toString()}`);
+    const response = await axiosInstance.get<TEnvelope<IUser[]>>(
+      `/user?${params.toString()}`
+    );
 
     return response.data;
   } catch (error) {

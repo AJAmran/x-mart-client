@@ -1,4 +1,3 @@
-// src/types/branch.d.ts
 export type TBranchStatus = "active" | "inactive" | "maintenance";
 
 export type TBranchContact = {
@@ -6,6 +5,7 @@ export type TBranchContact = {
   email: string;
   manager?: string;
   emergencyContact?: string;
+  _id?: string;
 };
 
 export type TBranchLocation = {
@@ -16,25 +16,44 @@ export type TBranchLocation = {
   postalCode: string;
   coordinates?: {
     type: "Point";
+    /** GeoJSON order: [longitude, latitude]. */
     coordinates: [number, number];
   };
+  _id?: string;
 };
 
 export type TBranchOperatingHours = {
-  day: string;
-  openingTime: string;
-  closingTime: string;
+  /** "weekdays" | "weekends" | "holidays" */
+  dayType: string;
+  openingTime?: string;
+  closingTime?: string;
+  is24Hours?: boolean;
   isClosed?: boolean;
+  _id?: string;
+};
+
+export type TBranchFacilities = {
+  parking?: boolean;
+  wifi?: boolean;
+  delivery?: boolean;
+  pickup?: boolean;
+  dining?: boolean;
+  atm?: boolean;
+  pharmacy?: boolean;
+  bakery?: boolean;
+  _id?: string;
 };
 
 export type TBranch = {
   _id?: string;
   name: string;
   code: string;
-  status: TBranchStatus;
+  status: TBranchStatus | string;
+  type?: string;
   contact: TBranchContact;
   location: TBranchLocation;
   operatingHours: TBranchOperatingHours[];
+  facilities?: TBranchFacilities;
   openingDate: Date | string;
   size?: number;
   description?: string;
@@ -59,3 +78,10 @@ export type PaginationOptions = {
   sortBy?: string;
   sortOrder?: "asc" | "desc";
 };
+
+/** Case-insensitive enum match — stored records predate the lowercase enum. */
+export const isBranchStatus = (value: unknown, expected: TBranchStatus): boolean =>
+  String(value ?? "").toLowerCase() === expected;
+
+export const isDayType = (value: unknown, expected: string): boolean =>
+  String(value ?? "").toLowerCase() === expected.toLowerCase();

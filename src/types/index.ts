@@ -178,3 +178,34 @@ export type TOrder = {
   }[];
 };
 
+
+/* -- API envelope ----------------------------------------------------------
+ *
+ * Every list endpoint returns this shape:
+ *   { success, message, data: T[], meta: { page, limit, total, totalPages } }
+ *
+ * The service layer returns the envelope verbatim (`response.data`), so the
+ * query hooks are parameterised on `TApiResponse<T>` below. Before this existed
+ * the hooks were bare `useQuery(...)`, which infers `data` as `{}` and makes
+ * `data.data` / `data.meta` fail to type-check at every call site.
+ */
+
+export type TPaginationMeta = {
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+};
+
+export type TApiResponse<T> = {
+  success: boolean;
+  message: string;
+  data: T;
+  meta?: TPaginationMeta;
+};
+
+export type TApiFailure = {
+  success: false;
+  message: string;
+  errorSources?: { path: string; message: string }[];
+};

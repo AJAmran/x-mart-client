@@ -1,14 +1,19 @@
 "use client";
 
-import { getCurrentUser } from "@/src/services/AuthService";
+import {
+  clearCurrentUserCache,
+  fetchCurrentUser,
+} from "@/src/services/AuthService/clientSession";
 import { IUser } from "@/src/types";
 import {
   createContext,
   Dispatch,
   ReactNode,
   SetStateAction,
+  useCallback,
   useContext,
   useEffect,
+  useMemo,
   useState,
 } from "react";
 
@@ -17,39 +22,46 @@ interface IUserProviderValues {
   isLoading: boolean;
   setUser: (user: IUser | null) => void;
   setIsLoading: Dispatch<SetStateAction<boolean>>;
+  /** Re-fetch the current user, bypassing the short-lived client cache. */
+  refreshUser: () => Promise<void>;
 }
 
 const UserContext = createContext<IUserProviderValues | undefined>(undefined);
 
 const UserProvider = ({ children }: { children: ReactNode }) => {
-  const [user, setUser] = useState<IUser | null>(null);
+  const [user, setUserState] = useState<IUser | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
+  /**
+   * Writes through to the browser-side memo so a later `fetchCurrentUser`
+   * cannot resurrect a stale identity after a login/logout.
+   */
+  const setUser = useCallback((next: IUser | null) => {
+    clearCurrentUserCache();
+    setUserState(next);
+  }, []);
+
+  const refreshUser = useCallback(async () => {
+    try {
+      clearCurrentUserCache();
+      setUserState(await fetchCurrentUser());
+    } catch {
+      setUserState(null);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
   useEffect(() => {
-    let cancelled = false;
+    void refreshUser();
+  }, [refreshUser]);
 
-    (async () => {
-      try {
-        const current = await getCurrentUser();
-
-        if (!cancelled) setUser((current as IUser | null) ?? null);
-      } catch {
-        if (!cancelled) setUser(null);
-      } finally {
-        if (!cancelled) setIsLoading(false);
-      }
-    })();
-
-    return () => {
-      cancelled = true;
-    };
-  }, []); // High-priority fix: empty deps, no infinite re-fetches
-
-  return (
-    <UserContext.Provider value={{ user, setUser, isLoading, setIsLoading }}>
-      {children}
-    </UserContext.Provider>
+  const value = useMemo(
+    () => ({ user, setUser, isLoading, setIsLoading, refreshUser }),
+    [user, setUser, isLoading, refreshUser]
   );
+
+  return <UserContext.Provider value={value}>{children}</UserContext.Provider>;
 };
 
 export const useUser = () => {

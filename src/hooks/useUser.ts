@@ -10,13 +10,14 @@ import {
   updateUserStatus,
   updateUserRole,
 } from "@/src/services/UserService";
+import type { IUser, TApiResponse } from "@/src/types";
 
 export const useUsers = (queryParams?: {
   page?: number;
   limit?: number;
   search?: string;
 }) => {
-  return useQuery({
+  return useQuery<TApiResponse<IUser[]>, Error>({
     queryKey: ["users", queryParams],
     queryFn: () => getAllUsers(queryParams),
   });

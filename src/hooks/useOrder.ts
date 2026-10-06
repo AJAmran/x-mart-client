@@ -10,6 +10,7 @@ import {
   cancelOrder,
 } from "@/src/services/OrderService";
 import { getErrorMessage } from "@/src/lib/getErrorMessage";
+import type { TApiResponse, TOrder } from "@/src/types";
 
 // Fetch all orders (Admin)
 export const useOrders = (
@@ -27,15 +28,18 @@ export const useOrders = (
   const stableFilters = useMemo(() => filters, [JSON.stringify(filters)]);
   const stableOptions = useMemo(() => options, [JSON.stringify(options)]);
 
-  return useQuery({
+  return useQuery<TApiResponse<TOrder[]>, Error>({
     queryKey: ["orders", stableFilters, stableOptions],
     queryFn: () => getAllOrders(stableFilters, stableOptions),
   });
 };
 
+
+export type TApiResult<T> = Omit<TApiResponse<T>, "meta">;
+
 // Fetch a single order by ID
 export const useOrderById = (id: string) => {
-  return useQuery({
+  return useQuery<TApiResult<TOrder>, Error>({
     queryKey: ["order", id],
     queryFn: () => getOrderById(id),
     enabled: !!id,
@@ -44,7 +48,7 @@ export const useOrderById = (id: string) => {
 
 // Fetch user's orders
 export const useUserOrders = () => {
-  return useQuery({
+  return useQuery<TApiResult<TOrder[]>, Error>({
     queryKey: ["userOrders"],
     queryFn: () => getUserOrders(),
   });
@@ -54,7 +58,7 @@ export const useUserOrders = () => {
 export const useCreateOrder = () => {
   const queryClient = useQueryClient();
 
-  return useMutation({
+  return useMutation<TApiResult<TOrder>, Error, Partial<TOrder>>({
     mutationFn: createOrder,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["userOrders"] });

@@ -1,4 +1,3 @@
-// src/constants/branch.ts
 export const BRANCH_STATUS = {
     ACTIVE: "active",
     INACTIVE: "inactive",

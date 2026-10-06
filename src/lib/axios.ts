@@ -3,19 +3,16 @@ import envConfig from "@/src/config/envConfig";
 
 const axiosInstance = axios.create({
   baseURL: envConfig.baseApi,
-  withCredentials: true, // send httpOnly cookies on every request
+  withCredentials: true,
 });
 
 type RetryConfig = InternalAxiosRequestConfig & { _retry?: boolean };
 
 axiosInstance.interceptors.request.use(
   (config) => {
-    // C-10 FIX: access token is now httpOnly. We do NOT read it from JS.
-    // The browser sends it automatically as a cookie. The Authorization
-    // header is reserved for backend-to-backend or service tokens.
     return config;
   },
-  (error) => Promise.reject(error)
+  (error) => Promise.reject(error),
 );
 
 axiosInstance.interceptors.response.use(
@@ -27,9 +24,6 @@ axiosInstance.interceptors.response.use(
     if (status === 401 && config && !config._retry) {
       config._retry = true;
       try {
-        // Hit the same-origin server action (NOT the backend directly), so the
-        // httpOnly cookie is read by Next.js and used to mint a new access
-        // token that is set as a fresh httpOnly cookie.
         const res = await fetch("/api/auth/refresh", {
           method: "POST",
           credentials: "include",
@@ -57,7 +51,7 @@ axiosInstance.interceptors.response.use(
     }
 
     return Promise.reject(new Error(errorMessage));
-  }
+  },
 );
 
 export default axiosInstance;

@@ -2,6 +2,8 @@
 
 import { cookies } from "next/headers";
 
+import type { IUser } from "@/src/types";
+
 const BACKEND = process.env.NEXT_PUBLIC_BASE_API ?? "";
 const ACCESS = "accessToken";
 const REFRESH = "refreshToken";
@@ -137,15 +139,15 @@ export const logout = async () => {
   await clearServerCookies();
 };
 
-export const getCurrentUser = async () => {
+export const getCurrentUser = async (): Promise<IUser | null> => {
   // Always re-verify by calling a server route that decodes the cookie OR
   // by directly calling a backend endpoint. We do the latter for safety.
   try {
-    const res = await callBackend<ApiSuccess<{ user: unknown }>>("/auth/me", {
+    const res = await callBackend<ApiSuccess<{ user: IUser }>>("/auth/me", {
       method: "GET",
     });
 
-    return isApiSuccess<{ user: unknown }>(res) ? res.data.user : null;
+    return isApiSuccess<{ user: IUser }>(res) ? res.data.user : null;
   } catch {
     return null;
   }

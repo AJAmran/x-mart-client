@@ -1,11 +1,11 @@
 "use server";
 
-import axiosInstance from "@/src/lib/serverAxios";
+import axiosInstance, { type TEnvelope } from "@/src/lib/serverAxios";
 import { TOrder } from "@/src/types";
 
 // Create an order
 export const createOrder = async (data: Partial<TOrder>) => {
-  const response = await axiosInstance.post("/orders", data);
+  const response = await axiosInstance.post<TEnvelope<TOrder>>("/orders", data);
 
   return response.data;
 };
@@ -32,21 +32,23 @@ export const getAllOrders = async (
     sortOrder: options.sortOrder || "desc",
   };
 
-  const response = await axiosInstance.get("/orders", { params });
+  const response = await axiosInstance.get<TEnvelope<TOrder[]>>("/orders", { params });
 
   return response.data;
 };
 
 // Get a single order by ID
 export const getOrderById = async (id: string) => {
-  const response = await axiosInstance.get(`/orders/${id}`);
+  const response = await axiosInstance.get<TEnvelope<TOrder>>(`/orders/${id}`);
 
   return response.data;
 };
 
 // Get user's orders
 export const getUserOrders = async () => {
-  const response = await axiosInstance.get("/orders/my-orders");
+  const response = await axiosInstance.get<TEnvelope<TOrder[]>>(
+    "/orders/my-orders"
+  );
 
   return response.data;
 };

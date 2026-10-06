@@ -1,22 +1,6 @@
 import envConfig from "@/src/config/envConfig";
 import { cookies } from "next/headers";
 
-/**
- * SSR fetch wrapper.
- *
- * Why this file exists:
- *  - The old `axiosInstance` set cookies in a response interceptor, which
- *    throws in Next 15+ App Router. We keep a small `axiosInstance`-shaped
- *    object here so existing server-action code (OrderService, PaymentService,
- *    ProductServices, UserService, BranchService, hooks) keeps working
- *    without a large refactor.
- *  - The browser's cookies are forwarded on every call so the backend's
- *    `authMiddleware` (which now reads the access token from the cookie)
- *    continues to authenticate the request.
- *  - On 401 we transparently call /api/auth/refresh and retry once.
- *
- *  `serverFetch` is also exported as a modern alternative for new code.
- */
 
 class HttpError extends Error {
   constructor(message: string, public status: number) {
@@ -70,7 +54,7 @@ const doFetch = async <T = unknown>(
   path: string,
   data?: unknown,
   init: RequestInit & { headers?: Record<string, string>; _retry?: boolean } = {}
-): Promise<{ data: T; status: number }> => {
+): Promise<AxiosLikeResponse<T>> => {
   const url = `${envConfig.baseApi}${path}`;
   const cookieHeader = isServer ? (await cookies()).toString() : "";
   const headers = buildHeaders(cookieHeader, init.headers);
@@ -97,21 +81,24 @@ const doFetch = async <T = unknown>(
   }
 
   const text = await res.text();
-  let json: { data?: T; message?: string; meta?: unknown; errorSources?: Array<{ message: string }> } | null = null;
+  let json: unknown = null;
 
   try {
     json = text ? JSON.parse(text) : null;
   } catch {
     json = null;
   }
-  if (!res.ok) {
-    throw new HttpError(extractErrorMessage(json, `Request failed (${res.status})`), res.status);
-  }
 
-  // Return the full response body so consumers can read `.data`, `.meta`,
-  // `.message`, etc. — mirrors axios's default `response.data` shape and the
-  // wrapper returned by the backend's `sendResponse`.
-  return { data: (json ?? ({} as { data?: T })) as { data?: T; meta?: unknown; message?: string }, status: res.status };
+  type ErrorBody = { message?: string; errorSources?: Array<{ message: string }> };
+
+  if (!res.ok) {
+    throw new HttpError(
+      extractErrorMessage(json as ErrorBody | null, `Request failed (${res.status})`),
+      res.status
+    );
+  }
+  
+  return { data: (json ?? {}) as T, status: res.status };
 };
 
 type AxiosLikeConfig = {
@@ -125,6 +112,14 @@ type AxiosLikeConfig = {
 };
 
 type AxiosLikeResponse<T = unknown> = { data: T; status: number };
+
+/** Envelope shape every list endpoint returns. */
+type TEnvelope<T> = {
+  success: boolean;
+  message: string;
+  data: T;
+  meta?: { page: number; limit: number; total: number; totalPages: number };
+};
 
 const buildPath = (cfg: AxiosLikeConfig, fallback: string) => {
   let path = cfg.url ?? fallback;
@@ -179,3 +174,4 @@ const axiosInstance = {
 export default axiosInstance;
 export { HttpError };
 export const serverFetch = doFetch;
+export type { TEnvelope };

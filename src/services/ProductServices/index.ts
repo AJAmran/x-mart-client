@@ -1,6 +1,6 @@
 "use server";
 
-import axiosInstance from "@/src/lib/serverAxios";
+import axiosInstance, { type TEnvelope } from "@/src/lib/serverAxios";
 import { TDiscount, TProduct } from "@/src/types";
 
 // Create a product
@@ -42,7 +42,9 @@ export async function getAllProducts(
     sortOrder: options.sortOrder || "desc",
   };
 
-  const response = await axiosInstance.get("/products", { params });
+  const response = await axiosInstance.get<TEnvelope<TProduct[]>>("/products", {
+    params,
+  });
 
   return response.data;
 }

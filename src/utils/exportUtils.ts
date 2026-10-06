@@ -9,13 +9,14 @@ const escapeCSVCell = (value: unknown): string => {
   return str;
 };
 
-export const exportToCSV = (data: Record<string, unknown>[], fileName: string) => {
+
+export const exportToCSV = <T extends object>(data: T[], fileName: string) => {
   if (!data || data.length === 0) {
     download(`${fileName}.csv`, new Blob([""], { type: "text/csv;charset=utf-8;" }));
 
     return;
   }
-  const headers = Object.keys(data[0]);
+  const headers = Object.keys(data[0]) as (keyof T)[];
   const lines = [headers.join(",")];
 
   for (const row of data) {
@@ -26,8 +27,9 @@ export const exportToCSV = (data: Record<string, unknown>[], fileName: string) =
 
 export const exportToExcel = exportToCSV;
 
-export const exportToPDF = (data: Record<string, unknown>[], fileName: string) => {
+export const exportToPDF = (data: object[], _fileName: string) => {
   if (typeof window === "undefined") return;
+  void data;
   window.print();
 };
 

@@ -3,8 +3,12 @@ import { FieldValues } from "react-hook-form";
 import { toast } from "sonner";
 import { changePassword, loginUser, registerUser } from "../services/AuthService";
 
+type TAuthResult = { success: boolean; user: unknown };
+
+type TPwChangeResult = { success: true; data: unknown };
+
 export const useUserRegistration = () => {
-  return useMutation<{ message: string; success: boolean }, Error, FieldValues>({
+  return useMutation<TAuthResult, Error, FieldValues>({
     mutationKey: ["USER_REGISTRATION"],
     mutationFn: async (userData) => await registerUser(userData),
     onSuccess: () => {
@@ -17,7 +21,7 @@ export const useUserRegistration = () => {
 };
 
 export const useUserLogin = (onSuccess?: () => void) => {
-  return useMutation<{ message: string; success: boolean }, Error, FieldValues>({
+  return useMutation<TAuthResult, Error, FieldValues>({
     mutationKey: ["USER_LOGIN"],
     mutationFn: async (userData) => await loginUser(userData),
     onSuccess: () => {
@@ -32,7 +36,11 @@ export const useUserLogin = (onSuccess?: () => void) => {
 
 
 export const useChangePassword = () => {
-  return useMutation<{ message: string; success: boolean }, Error, { oldPassword: string; newPassword: string }>({
+  return useMutation<
+    TPwChangeResult,
+    Error,
+    { oldPassword: string; newPassword: string }
+  >({
     mutationKey: ["CHANGE_PASSWORD"],
     mutationFn: async (passwordData) => await changePassword(passwordData),
     onSuccess: () => {
