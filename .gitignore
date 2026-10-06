@@ -25,7 +25,12 @@ yarn-debug.log*
 yarn-error.log*
 
 # local env files
+# `.env` was missing here and only `.env*.local` was ignored, so a store owner's
+# real NEXT_PUBLIC_* values could be committed. Nothing in this file should ever
+# be tracked; .env.example is the template that is.
+.env
 .env*.local
+!.env.example
 
 # vercel
 .vercel

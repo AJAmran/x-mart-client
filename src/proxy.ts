@@ -1,5 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 
+import envConfig from "@/src/config/envConfig";
+
 const ACCESS_COOKIE = "accessToken";
 const REFRESH_COOKIE = "refreshToken";
 
@@ -29,9 +31,8 @@ async function getSession(req: NextRequest): Promise<Session> {
 
   if (!hasAccess && !hasRefresh) return { authenticated: false };
 
-  const baseApi = (
-    process.env.NEXT_PUBLIC_BASE_API ?? "http://localhost:5000/api/v1"
-  ).replace(/\/+$/, "");
+  // Single source of truth for the API URL — see src/config/envConfig.ts.
+  const baseApi = envConfig.baseApi;
 
   try {
     const res = await fetch(`${baseApi}/auth/me`, {

@@ -2,9 +2,13 @@
 
 import { cookies } from "next/headers";
 
+import envConfig from "@/src/config/envConfig";
 import type { IUser } from "@/src/types";
 
-const BACKEND = process.env.NEXT_PUBLIC_BASE_API ?? "";
+// Was `process.env.NEXT_PUBLIC_BASE_API ?? ""`, which silently produced
+// relative URLs like "/auth/me" in server actions and failed with an opaque
+// fetch error whenever the variable was unset.
+const BACKEND = envConfig.baseApi;
 const ACCESS = "accessToken";
 const REFRESH = "refreshToken";
 
