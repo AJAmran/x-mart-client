@@ -1,5 +1,6 @@
 "use client";
 
+import { memo } from "react";
 import NextLink from "next/link";
 import { Receipt } from "lucide-react";
 
@@ -10,8 +11,9 @@ import { ORDER_STATUS, type TOrder } from "@/src/types";
 
 /**
  * The six most recent orders, newest first.
+ * Optimized with React.memo to prevent re-renders when other dashboard widgets update.
  */
-export function RecentOrdersTable({
+export const RecentOrdersTable = memo(function RecentOrdersTable({
   orders,
   loading,
 }: {
@@ -101,4 +103,6 @@ export function RecentOrdersTable({
       </div>
     </Panel>
   );
-}
+});
+
+export default RecentOrdersTable;

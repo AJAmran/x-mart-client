@@ -1,4 +1,7 @@
-import { useState } from "react";
+"use client";
+
+import { useState, useRef, memo, useCallback } from "react";
+import dynamic from "next/dynamic";
 import { format } from "date-fns";
 import {
   ArrowDown,
@@ -15,10 +18,15 @@ import {
 import { Button } from "@heroui/button";
 import { Pagination } from "@heroui/pagination";
 import { Tooltip } from "@heroui/tooltip";
+import { useVirtualizer } from "@tanstack/react-virtual";
 
-import StatusUpdateModal from "./StatusUpdateModal";
 import { StatusBadge, orderStatusTone } from "@/src/components/dashboard/StatusBadge";
 import { TOrder } from "@/src/types";
+
+// Dynamic import for modal code splitting
+const StatusUpdateModal = dynamic(() => import("./StatusUpdateModal"), {
+  ssr: false,
+});
 
 interface OrderTableProps {
   orders: TOrder[];
@@ -36,6 +44,7 @@ interface OrderTableProps {
     options: any
   ) => void;
   isPending: boolean;
+  isVirtualized?: boolean;
 }
 
 const statusIcon = {
@@ -52,11 +61,74 @@ const getSortIcon = (
   column: string
 ) => {
   if (sortBy !== column) return null;
-
   return sortOrder === "asc" ? <ArrowUp size={13} /> : <ArrowDown size={13} />;
 };
 
-const OrderTable = ({
+// Memoized individual order row
+const OrderRow = memo(function OrderRow({
+  order,
+  onSelectOrder,
+  style,
+}: {
+  order: TOrder;
+  onSelectOrder: (order: TOrder) => void;
+  style?: React.CSSProperties;
+}) {
+  const StatusIcon = statusIcon[order.status] ?? CheckCircle2;
+
+  return (
+    <div
+      style={style}
+      className="grid grid-cols-12 items-center gap-4 border-b border-line-hairline px-5 py-3.5 transition-colors duration-fast hover:bg-surface-sunken/60 text-body-sm"
+    >
+      <div className="col-span-3 sm:col-span-4">
+        <Tooltip content={order._id}>
+          <p className="tabular truncate font-semibold text-content">
+            #{order._id.slice(0, 8).toUpperCase()}…
+          </p>
+        </Tooltip>
+      </div>
+      <div className="col-span-2 sm:col-span-2">
+        <Tooltip content={order.userId}>
+          <p className="truncate text-content-muted">
+            {order.shippingInfo?.name ?? `${order.userId.slice(0, 6)}…`}
+          </p>
+        </Tooltip>
+      </div>
+      <div className="col-span-2 sm:col-span-2">
+        <StatusBadge
+          icon={<StatusIcon aria-hidden size={11} />}
+          tone={orderStatusTone(order.status)}
+        >
+          {order.status}
+        </StatusBadge>
+      </div>
+      <div className="tabular col-span-2 text-right font-semibold text-content sm:col-span-2">
+        ৳{Number(order.totalPrice ?? 0).toFixed(2)}
+      </div>
+      <div className="col-span-3 flex items-center justify-end gap-1.5 text-content-muted sm:col-span-2">
+        <Calendar aria-hidden className="size-3.5 shrink-0 text-content-subtle" />
+        <span className="tabular">
+          {format(new Date(order.createdAt), "MMM d, yyyy")}
+        </span>
+      </div>
+      <div className="col-span-1 flex justify-end">
+        <Tooltip content="Update status">
+          <Button
+            color="primary"
+            size="sm"
+            variant="flat"
+            onPress={() => onSelectOrder(order)}
+          >
+            Update
+          </Button>
+        </Tooltip>
+      </div>
+    </div>
+  );
+});
+
+export const OrderTable = memo(function OrderTable({
   orders,
   options,
   meta,
@@ -64,9 +136,24 @@ const OrderTable = ({
   onPageChange,
   updateStatus,
   isPending,
-}: OrderTableProps) => {
+  isVirtualized = false,
+}: OrderTableProps) {
   const [selectedOrder, setSelectedOrder] = useState<TOrder | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const parentRef = useRef<HTMLDivElement>(null);
+
+  // TanStack Virtualizer instance
+  const rowVirtualizer = useVirtualizer({
+    count: orders.length,
+    getScrollElement: () => parentRef.current,
+    estimateSize: () => 56, // row height
+    overscan: 8,
+  });
+
+  const handleSelectOrder = useCallback((order: TOrder) => {
+    setSelectedOrder(order);
+    setIsModalOpen(true);
+  }, []);
 
   const columns: { key: string; label: string; span: string; align?: "right" }[] =
     [
@@ -85,7 +172,7 @@ const OrderTable = ({
       <div className="overflow-x-auto">
         <div className="min-w-[650px]">
           {/* Header */}
-          <div className="grid grid-cols-12 gap-4 border-b border-line-hairline px-5 py-3">
+          <div className="grid grid-cols-12 gap-4 border-b border-line-hairline bg-surface-raised px-5 py-3">
             {columns.map((col) => (
               <button
                 key={col.key}
@@ -106,7 +193,7 @@ const OrderTable = ({
             </div>
           </div>
 
-          {/* Rows */}
+          {/* Empty State */}
           {orders.length === 0 ? (
             <div className="flex flex-col items-center gap-3 px-5 py-16 text-center">
               <span className="grid size-12 place-items-center rounded-full border border-dashed border-line-strong bg-surface-sunken text-content-subtle">
@@ -120,85 +207,81 @@ const OrderTable = ({
                 looking for.
               </p>
             </div>
-          ) : (
-            <div>
-              {orders.map((order) => {
-                const StatusIcon =
-                  statusIcon[order.status] ?? CheckCircle2;
+          ) : isVirtualized ? (
+            /* TanStack Virtualized Scroll Viewport */
+            <div
+              ref={parentRef}
+              className="h-[520px] overflow-auto scrollbar-thin divide-y divide-line-hairline"
+              style={{ contain: "strict" }}
+            >
+              <div
+                style={{
+                  height: `${rowVirtualizer.getTotalSize()}px`,
+                  width: "100%",
+                  position: "relative",
+                }}
+              >
+                {rowVirtualizer.getVirtualItems().map((virtualRow) => {
+                  const order = orders[virtualRow.index];
+                  if (!order) return null;
 
-                return (
-                  <div
-                    key={order._id}
-                    className="grid grid-cols-12 items-center gap-4 border-b border-line-hairline px-5 py-3.5 transition-colors duration-fast last:border-0 hover:bg-surface-sunken/60"
-                  >
-                    <div className="col-span-3 sm:col-span-4">
-                      <Tooltip content={order._id}>
-                        <p className="tabular truncate text-body-sm font-semibold text-content">
-                          #{order._id.slice(0, 8).toUpperCase()}…
-                        </p>
-                      </Tooltip>
-                    </div>
-                    <div className="col-span-2 sm:col-span-2">
-                      <Tooltip content={order.userId}>
-                        <p className="truncate text-body-sm text-content-muted">
-                          {order.shippingInfo?.name ??
-                            `${order.userId.slice(0, 6)}…`}
-                        </p>
-                      </Tooltip>
-                    </div>
-                    <div className="col-span-2 sm:col-span-2">
-                      <StatusBadge
-                        icon={<StatusIcon aria-hidden size={11} />}
-                        tone={orderStatusTone(order.status)}
-                      >
-                        {order.status}
-                      </StatusBadge>
-                    </div>
-                    <div className="tabular col-span-2 text-right text-body-sm font-semibold text-content sm:col-span-2">
-                      ৳{Number(order.totalPrice ?? 0).toFixed(2)}
-                    </div>
-                    <div className="col-span-3 flex items-center justify-end gap-1.5 text-body-sm text-content-muted sm:col-span-2">
-                      <Calendar aria-hidden className="size-3.5 shrink-0 text-content-subtle" />
-                      <span className="tabular">
-                        {format(new Date(order.createdAt), "MMM d, yyyy")}
-                      </span>
-                    </div>
-                    <div className="col-span-1 flex justify-end">
-                      <Tooltip content="Update status">
-                        <Button
-                          color="primary"
-                          size="sm"
-                          variant="flat"
-                          onPress={() => {
-                            setSelectedOrder(order);
-                            setIsModalOpen(true);
-                          }}
-                        >
-                          Update
-                        </Button>
-                      </Tooltip>
-                    </div>
-                  </div>
-                );
-              })}
+                  return (
+                    <OrderRow
+                      key={order._id || virtualRow.key}
+                      order={order}
+                      style={{
+                        position: "absolute",
+                        top: 0,
+                        left: 0,
+                        width: "100%",
+                        height: `${virtualRow.size}px`,
+                        transform: `translateY(${virtualRow.start}px)`,
+                      }}
+                      onSelectOrder={handleSelectOrder}
+                    />
+                  );
+                })}
+              </div>
+            </div>
+          ) : (
+            /* Standard Table Row Rendering */
+            <div>
+              {orders.map((order) => (
+                <OrderRow
+                  key={order._id}
+                  order={order}
+                  onSelectOrder={handleSelectOrder}
+                />
+              ))}
             </div>
           )}
         </div>
       </div>
 
       {/* Footer */}
-      <div className="flex flex-col gap-3 border-t border-line-hairline px-5 py-3.5 sm:flex-row sm:items-center sm:justify-between">
-        <p className="tabular text-label-sm text-content-subtle">
-          Showing {from}–{to} of {meta.total} orders
-        </p>
-        <Pagination
-          color="primary"
-          page={options.page}
-          total={meta.totalPages}
-          variant="flat"
-          onChange={onPageChange}
-        />
-      </div>
+      {!isVirtualized ? (
+        <div className="flex flex-col gap-3 border-t border-line-hairline px-5 py-3.5 sm:flex-row sm:items-center sm:justify-between">
+          <p className="tabular text-label-sm text-content-subtle">
+            Showing {from}–{to} of {meta.total} orders
+          </p>
+          <Pagination
+            color="primary"
+            page={options.page}
+            total={meta.totalPages}
+            variant="flat"
+            onChange={onPageChange}
+          />
+        </div>
+      ) : (
+        <div className="flex items-center justify-between border-t border-line-hairline px-5 py-3.5 text-label-sm text-content-subtle">
+          <span>
+            Virtualized: Showing <strong>{orders.length}</strong> total records smoothly using TanStack Virtual.
+          </span>
+          <span className="text-brand font-medium">
+            Overscan: 8 rows | Visible DOM: ~10 rows
+          </span>
+        </div>
+      )}
 
       {selectedOrder && (
         <StatusUpdateModal
@@ -211,6 +294,6 @@ const OrderTable = ({
       )}
     </section>
   );
-};
+});
 
 export default OrderTable;

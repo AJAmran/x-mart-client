@@ -1,3 +1,6 @@
+"use client";
+
+import { memo, useState, useEffect } from "react";
 import { Input } from "@heroui/input";
 import { Select, SelectItem } from "@heroui/select";
 import { Search } from "lucide-react";
@@ -5,6 +8,7 @@ import { Search } from "lucide-react";
 import { Panel, Toolbar, ToolbarGroup } from "@/src/components/dashboard/Panel";
 import { IconButton } from "@/src/components/dashboard/Controls";
 import { ORDER_STATUS } from "@/src/types";
+import { useDebouncedCallback } from "@/src/hooks/useDebounce";
 
 interface FilterBarProps {
   filters: { status: string; userId: string; search: string };
@@ -12,11 +16,32 @@ interface FilterBarProps {
   onClearFilters: () => void;
 }
 
-const FilterBar = ({
+const FilterBar = memo(function FilterBar({
   filters,
   onFilterChange,
   onClearFilters,
-}: FilterBarProps) => {
+}: FilterBarProps) {
+  // Local immediate state for zero input latency
+  const [localSearch, setLocalSearch] = useState(filters.search);
+  const [localUserId, setLocalUserId] = useState(filters.userId);
+
+  // Synchronize when filters are reset externally
+  useEffect(() => {
+    setLocalSearch(filters.search);
+  }, [filters.search]);
+
+  useEffect(() => {
+    setLocalUserId(filters.userId);
+  }, [filters.userId]);
+
+  // Debounced parent state updates (350ms delay) to avoid network thrashing
+  const debouncedFilterChange = useDebouncedCallback(
+    (key: string, value: string) => {
+      onFilterChange(key, value);
+    },
+    350
+  );
+
   const hasActiveFilters = Boolean(
     filters.status || filters.userId || filters.search
   );
@@ -27,13 +52,17 @@ const FilterBar = ({
         <IconButton
           active={hasActiveFilters}
           label="Clear filters"
-          onClick={onClearFilters}
+          onClick={() => {
+            setLocalSearch("");
+            setLocalUserId("");
+            onClearFilters();
+          }}
         >
           <span className="text-label-sm font-semibold">Clear</span>
         </IconButton>
       }
       className="mb-5"
-      description="Narrow the order list by status, customer, or search."
+      description="Narrow the order list by status, customer, or search (debounced)."
       title="Filters"
     >
       <Toolbar>
@@ -41,19 +70,27 @@ const FilterBar = ({
           <Input
             className="w-full"
             label="Search"
-            placeholder="Order ID, user, or city…"
+            placeholder="Order ID, user, or city (debounced)…"
             startContent={
               <Search aria-hidden className="size-4 text-content-subtle" />
             }
-            value={filters.search}
-            onChange={(e) => onFilterChange("search", e.target.value)}
+            value={localSearch}
+            onChange={(e) => {
+              const val = e.target.value;
+              setLocalSearch(val);
+              debouncedFilterChange("search", val);
+            }}
           />
           <Input
             className="w-full"
             label="User ID"
-            placeholder="Filter by user"
-            value={filters.userId}
-            onChange={(e) => onFilterChange("userId", e.target.value)}
+            placeholder="Filter by user (debounced)"
+            value={localUserId}
+            onChange={(e) => {
+              const val = e.target.value;
+              setLocalUserId(val);
+              debouncedFilterChange("userId", val);
+            }}
           />
           <div className="w-full md:w-52">
             <Select
@@ -74,6 +111,6 @@ const FilterBar = ({
       </Toolbar>
     </Panel>
   );
-};
+});
 
 export default FilterBar;

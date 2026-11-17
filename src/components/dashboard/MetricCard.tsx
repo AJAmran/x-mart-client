@@ -1,5 +1,5 @@
 import clsx from "clsx";
-import type { ComponentType } from "react";
+import { type ComponentType, memo } from "react";
 import NextLink from "next/link";
 
 /**
@@ -24,7 +24,7 @@ const toneChip: Record<MetricTone, string> = {
 /* ── Sparkline ────────────────────────────────────────────────────────────── */
 
 /** Tiny inline area chart. Colours itself via `currentColor`. */
-export function Sparkline({
+export const Sparkline = memo(function Sparkline({
   data,
   className,
 }: {
@@ -78,7 +78,7 @@ export function Sparkline({
       />
     </svg>
   );
-}
+});
 
 /* ── MetricCard ───────────────────────────────────────────────────────────── */
 
@@ -97,7 +97,7 @@ type MetricCardProps = {
   className?: string;
 };
 
-export function MetricCard({
+export const MetricCard = memo(function MetricCard({
   label,
   value,
   icon: Icon,
@@ -163,7 +163,7 @@ export function MetricCard({
   }
 
   return card;
-}
+});
 
 /* ── StatTile (compact) ───────────────────────────────────────────────────── */
 
@@ -177,7 +177,7 @@ type StatTileProps = {
 };
 
 /** Compact stat used inside panels, e.g. secondary KPI rows. */
-export function StatTile({
+export const StatTile = memo(function StatTile({
   label,
   value,
   icon: Icon,
@@ -216,7 +216,7 @@ export function StatTile({
       </div>
     </div>
   );
-}
+});
 
 /* ── Grid helper ──────────────────────────────────────────────────────────── */
 

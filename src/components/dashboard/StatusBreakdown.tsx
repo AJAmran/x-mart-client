@@ -1,27 +1,32 @@
 "use client";
 
-import { useMemo } from "react";
-import {
-  Pie,
-  PieChart,
-  ResponsiveContainer,
-  Cell,
-} from "recharts";
+import { useMemo, memo } from "react";
+import dynamic from "next/dynamic";
 import { TrendingUp } from "lucide-react";
 
 import { Panel } from "./Panel";
 import { StatusBadge, orderStatusTone } from "./StatusBadge";
-import {
-  statusPalette,
-  statusPaletteFallback,
-} from "@/src/config/theme";
 import { formatNumber } from "@/src/lib/productUtils";
 import { ORDER_STATUS, type TOrder } from "@/src/types";
 
+// Dynamic import for Recharts Donut Chart to minimize initial JS bundle
+const DashboardDonutChart = dynamic(
+  () => import("./charts/DashboardDonutChart"),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="flex h-44 w-full animate-pulse items-center justify-center rounded-lg bg-surface-sunken/40">
+        <div className="size-28 rounded-full border-8 border-line-hairline/60" />
+      </div>
+    ),
+  }
+);
+
 /**
  * Donut + legend of every order grouped by pipeline stage.
+ * Wrapped in React.memo to prevent unnecessary re-renders when parent states change.
  */
-export function StatusBreakdown({
+export const StatusBreakdown = memo(function StatusBreakdown({
   orders,
   total,
   loading,
@@ -63,39 +68,7 @@ export function StatusBreakdown({
       loading={loading}
       title="Order status"
     >
-      <div className="relative h-44">
-        <ResponsiveContainer height="100%" width="100%">
-          <PieChart>
-            <Pie
-              cx="50%"
-              cy="50%"
-              data={breakdown}
-              dataKey="value"
-              innerRadius={58}
-              outerRadius={80}
-              paddingAngle={3}
-              stroke="none"
-            >
-              {breakdown.map((entry) => (
-                <Cell
-                  key={entry.status}
-                  fill={statusPalette[entry.status] ?? statusPaletteFallback}
-                />
-              ))}
-            </Pie>
-          </PieChart>
-        </ResponsiveContainer>
-        <div className="pointer-events-none absolute inset-0 grid place-items-center">
-          <div className="text-center">
-            <p className="tabular text-display-sm font-bold text-content">
-              {formatNumber(total)}
-            </p>
-            <p className="text-overline font-semibold uppercase tracking-[0.14em] text-content-subtle">
-              Orders
-            </p>
-          </div>
-        </div>
-      </div>
+      <DashboardDonutChart breakdown={breakdown} total={total} />
 
       <ul className="mt-5 space-y-2.5">
         {breakdown.map((entry) => (
@@ -111,4 +84,6 @@ export function StatusBreakdown({
       </ul>
     </Panel>
   );
-}
+});
+
+export default StatusBreakdown;

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
+import dynamic from "next/dynamic";
 import {
   Banknote,
   RefreshCw,
@@ -9,21 +10,6 @@ import {
   TrendingUp,
   Wallet,
 } from "lucide-react";
-
-import {
-  Bar,
-  BarChart,
-  CartesianGrid,
-  Cell,
-  Line,
-  LineChart,
-  Pie,
-  PieChart,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from "recharts";
 
 import { PageHeader } from "@/src/components/UI/Section";
 import { Container } from "@/src/components/UI/Container";
@@ -41,12 +27,50 @@ import {
   SegmentTabs,
 } from "@/src/components/dashboard/Controls";
 import {
-  chartPalette,
   statusPalette,
   statusPaletteFallback,
 } from "@/src/config/theme";
 import { useOrders } from "@/src/hooks/useOrder";
 import { formatCurrency, formatNumber } from "@/src/lib/productUtils";
+import { ChartSkeleton } from "@/src/components/dashboard/charts/ChartSkeleton";
+
+// Dynamic imports with lazy chunk loading and skeleton fallbacks
+const AnalyticsRevenueBarChart = dynamic(
+  () =>
+    import("@/src/components/dashboard/charts/SalesAnalyticsCharts").then(
+      (mod) => mod.AnalyticsRevenueBarChart
+    ),
+  {
+    ssr: false,
+    loading: () => <ChartSkeleton height={260} />,
+  }
+);
+
+const AnalyticsOrdersLineChart = dynamic(
+  () =>
+    import("@/src/components/dashboard/charts/SalesAnalyticsCharts").then(
+      (mod) => mod.AnalyticsOrdersLineChart
+    ),
+  {
+    ssr: false,
+    loading: () => <ChartSkeleton height={260} />,
+  }
+);
+
+const AnalyticsStatusPieChart = dynamic(
+  () =>
+    import("@/src/components/dashboard/charts/SalesAnalyticsCharts").then(
+      (mod) => mod.AnalyticsStatusPieChart
+    ),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="flex h-56 w-full animate-pulse items-center justify-center rounded-lg bg-surface-sunken/40">
+        <div className="size-32 rounded-full border-8 border-line-hairline/60" />
+      </div>
+    ),
+  }
+);
 
 type Range = "7d" | "30d" | "90d" | "all";
 
@@ -63,8 +87,6 @@ const rangeOptions: { value: Range; label: string }[] = [
   { value: "90d", label: "90D" },
   { value: "all", label: "All" },
 ];
-
-const axisTick = { fontSize: 11 } as const;
 
 export default function SalesAnalyticsPage() {
   const [dateRange, setDateRange] = useState<Range>("30d");
@@ -102,101 +124,131 @@ export default function SalesAnalyticsPage() {
   );
   const totalOrders = orders.length;
   const avgOrderValue = totalOrders > 0 ? totalRevenue / totalOrders : 0;
-  const cancelledOrders = orders.filter(
-    (o: any) => o.status === "CANCELLED"
-  ).length;
+  const cancelledOrders = useMemo(
+    () => orders.filter((o: any) => o.status === "CANCELLED").length,
+    [orders]
+  );
   const cancellationRate =
     totalOrders > 0 ? (cancelledOrders / totalOrders) * 100 : 0;
 
+  // Daily revenue series (last 14 days)
+  const dailyRevenue = useMemo(() => {
+    const map = new Map<string, number>();
+    const days: string[] = [];
+
+    for (let i = 13; i >= 0; i -= 1) {
+      const d = new Date();
+
+      d.setDate(d.getDate() - i);
+      const key = d.toISOString().split("T")[0];
+
+      map.set(key, 0);
+      days.push(key);
+    }
+
+    orders.forEach((o: any) => {
+      const key = new Date(o.createdAt).toISOString().split("T")[0];
+
+      if (map.has(key)) {
+        map.set(key, (map.get(key) || 0) + (o.totalPrice ?? 0));
+      }
+    });
+
+    return days.map((date) => ({
+      date: new Date(date).toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric",
+      }),
+      revenue: map.get(date) || 0,
+    }));
+  }, [orders]);
+
+  // Orders per day series
+  const dailyOrders = useMemo(() => {
+    const map = new Map<string, number>();
+    const days: string[] = [];
+
+    for (let i = 13; i >= 0; i -= 1) {
+      const d = new Date();
+
+      d.setDate(d.getDate() - i);
+      const key = d.toISOString().split("T")[0];
+
+      map.set(key, 0);
+      days.push(key);
+    }
+
+    orders.forEach((o: any) => {
+      const key = new Date(o.createdAt).toISOString().split("T")[0];
+
+      if (map.has(key)) {
+        map.set(key, (map.get(key) || 0) + 1);
+      }
+    });
+
+    return days.map((date) => ({
+      date: new Date(date).toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric",
+      }),
+      count: map.get(date) || 0,
+    }));
+  }, [orders]);
+
+  // Revenue by status (donut)
   const revenueByStatus = useMemo(() => {
     const map: Record<string, number> = {};
 
     orders.forEach((o: any) => {
-      const status = o.status || "UNKNOWN";
+      const s = o.status || "UNKNOWN";
 
-      map[status] = (map[status] || 0) + (o.totalPrice ?? 0);
+      map[s] = (map[s] || 0) + (o.totalPrice ?? 0);
     });
 
-    return Object.entries(map).map(([name, value]) => ({ name, value }));
+    return Object.entries(map).map(([status, value]) => ({
+      name: status,
+      status,
+      value,
+    }));
   }, [orders]);
 
+  // Orders by status (breakdown list)
   const ordersByStatus = useMemo(() => {
     const map: Record<string, number> = {};
 
     orders.forEach((o: any) => {
-      const status = o.status || "UNKNOWN";
+      const s = o.status || "UNKNOWN";
 
-      map[status] = (map[status] || 0) + 1;
+      map[s] = (map[s] || 0) + 1;
     });
 
-    return Object.entries(map).map(([name, value]) => ({ name, value }));
-  }, [orders]);
-
-  const dailyRevenue = useMemo(() => {
-    const map: Record<string, number> = {};
-
-    orders.forEach((o: any) => {
-      const date = new Date(o.createdAt).toLocaleDateString("en-US", {
-        month: "short",
-        day: "numeric",
-      });
-
-      map[date] = (map[date] || 0) + (o.totalPrice ?? 0);
-    });
-
-    return Object.entries(map)
-      .map(([date, revenue]) => ({ date, revenue }))
-      .slice(-14);
-  }, [orders]);
-
-  const dailyOrders = useMemo(() => {
-    const map: Record<string, number> = {};
-
-    orders.forEach((o: any) => {
-      const date = new Date(o.createdAt).toLocaleDateString("en-US", {
-        month: "short",
-        day: "numeric",
-      });
-
-      map[date] = (map[date] || 0) + 1;
-    });
-
-    return Object.entries(map)
-      .map(([date, count]) => ({ date, count }))
-      .slice(-14);
+    return Object.entries(map).map(([status, value]) => ({
+      name: status,
+      value,
+    }));
   }, [orders]);
 
   return (
     <>
       <PageHeader
         action={
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3">
             <SegmentTabs
-              className="hidden sm:inline-flex"
-              label="Date range"
               options={rangeOptions}
               value={dateRange}
               onChange={setDateRange}
             />
-            <IconButton label="Refresh data" onClick={() => refetch()}>
+            <IconButton label="Refresh" onClick={() => refetch()}>
               <RefreshCw className="size-4" />
             </IconButton>
           </div>
         }
-        description="Sales performance, revenue, and order health over time."
-        eyebrow="Sales & analytics"
-        title="Analytics overview"
+        description="Tak collected, order volume, and cancellation rates over time."
+        eyebrow="Analytics"
+        title="Sales & revenue"
       />
 
       <Container className="py-6 sm:py-8">
-        <SegmentTabs
-          className="mb-5 sm:hidden"
-          label="Date range"
-          options={rangeOptions}
-          value={dateRange}
-          onChange={setDateRange}
-        />
-
         {/* KPI row */}
         <div className={metricGrid}>
           <MetricCard
@@ -245,45 +297,7 @@ export default function SalesAnalyticsPage() {
             loading={isLoading}
             title="Daily revenue"
           >
-            <ResponsiveContainer height={260} width="100%">
-              <BarChart data={dailyRevenue} margin={{ top: 4, right: 4, bottom: 0, left: -12 }}>
-                <CartesianGrid
-                  stroke="rgb(var(--line))"
-                  strokeDasharray="3 3"
-                  vertical={false}
-                />
-                <XAxis dataKey="date" tick={axisTick} tickLine={false} />
-                <YAxis
-                  axisLine={false}
-                  tick={axisTick}
-                  tickFormatter={(v: number) =>
-                    v >= 1000 ? `${Math.round(v / 1000)}k` : `${v}`
-                  }
-                  tickLine={false}
-                />
-                <Tooltip
-                  content={({ active, payload, label }: any) =>
-                    active && payload?.length ? (
-                      <div className="rounded-md border border-line-hairline bg-surface-raised px-3 py-2 shadow-lg">
-                        <p className="text-label-sm text-content-subtle">
-                          {label}
-                        </p>
-                        <p className="tabular mt-0.5 text-body-sm font-semibold text-content">
-                          {formatCurrency(Number(payload[0].value ?? 0))}
-                        </p>
-                      </div>
-                    ) : null
-                  }
-                  cursor={{ fill: "rgb(var(--surface-sunken))" }}
-                />
-                <Bar
-                  dataKey="revenue"
-                  fill={chartPalette[0]}
-                  maxBarSize={32}
-                  radius={[5, 5, 0, 0]}
-                />
-              </BarChart>
-            </ResponsiveContainer>
+            <AnalyticsRevenueBarChart data={dailyRevenue} />
           </Panel>
 
           <Panel
@@ -292,45 +306,7 @@ export default function SalesAnalyticsPage() {
             loading={isLoading}
             title="Daily orders"
           >
-            <ResponsiveContainer height={260} width="100%">
-              <LineChart data={dailyOrders} margin={{ top: 4, right: 8, bottom: 0, left: -24 }}>
-                <CartesianGrid
-                  stroke="rgb(var(--line))"
-                  strokeDasharray="3 3"
-                  vertical={false}
-                />
-                <XAxis dataKey="date" tick={axisTick} tickLine={false} />
-                <YAxis
-                  allowDecimals={false}
-                  axisLine={false}
-                  tick={axisTick}
-                  tickLine={false}
-                />
-                <Tooltip
-                  content={({ active, payload, label }: any) =>
-                    active && payload?.length ? (
-                      <div className="rounded-md border border-line-hairline bg-surface-raised px-3 py-2 shadow-lg">
-                        <p className="text-label-sm text-content-subtle">
-                          {label}
-                        </p>
-                        <p className="tabular mt-0.5 text-body-sm font-semibold text-content">
-                          {formatNumber(Number(payload[0].value ?? 0))}{" "}
-                          orders
-                        </p>
-                      </div>
-                    ) : null
-                  }
-                  cursor={{ stroke: "rgb(var(--line))" }}
-                />
-                <Line
-                  dataKey="count"
-                  dot={false}
-                  stroke={chartPalette[1]}
-                  strokeWidth={2.5}
-                  type="monotone"
-                />
-              </LineChart>
-            </ResponsiveContainer>
+            <AnalyticsOrdersLineChart data={dailyOrders} />
           </Panel>
 
           <Panel
@@ -339,39 +315,10 @@ export default function SalesAnalyticsPage() {
             loading={isLoading}
             title="Revenue by status"
           >
-            <div className="relative h-56">
-              <ResponsiveContainer height="100%" width="100%">
-                <PieChart>
-                  <Pie
-                    cx="50%"
-                    cy="50%"
-                    data={revenueByStatus}
-                    dataKey="value"
-                    innerRadius={62}
-                    outerRadius={90}
-                    paddingAngle={3}
-                    stroke="none"
-                  >
-                    {revenueByStatus.map((entry) => (
-                      <Cell
-                        key={entry.name}
-                        fill={statusPalette[entry.name] ?? statusPaletteFallback}
-                      />
-                    ))}
-                  </Pie>
-                </PieChart>
-              </ResponsiveContainer>
-              <div className="pointer-events-none absolute inset-0 grid place-items-center">
-                <div className="text-center">
-                  <p className="tabular text-title-md font-bold text-content">
-                    {formatCurrency(totalRevenue)}
-                  </p>
-                  <p className="text-overline font-semibold uppercase tracking-[0.14em] text-content-subtle">
-                    Total
-                  </p>
-                </div>
-              </div>
-            </div>
+            <AnalyticsStatusPieChart
+              data={revenueByStatus}
+              totalRevenue={totalRevenue}
+            />
           </Panel>
 
           <Panel

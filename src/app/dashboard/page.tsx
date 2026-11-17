@@ -1,18 +1,8 @@
 "use client";
 
 import { useMemo } from "react";
+import dynamic from "next/dynamic";
 import NextLink from "next/link";
-import {
-  Bar,
-  BarChart,
-  CartesianGrid,
-  Line,
-  LineChart,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from "recharts";
 import {
   Banknote,
   Boxes,
@@ -28,51 +18,32 @@ import { Panel } from "@/src/components/dashboard/Panel";
 import { MetricCard, metricGrid } from "@/src/components/dashboard/MetricCard";
 import { RecentOrdersTable } from "@/src/components/dashboard/RecentOrdersTable";
 import { StatusBreakdown } from "@/src/components/dashboard/StatusBreakdown";
-import { chartPalette } from "@/src/config/theme";
+import { ChartSkeleton } from "@/src/components/dashboard/charts/ChartSkeleton";
 import { useOrders } from "@/src/hooks/useOrder";
 import { useProducts } from "@/src/hooks/useProducts";
 import { useUsers } from "@/src/hooks/useUser";
 import { formatCurrency, formatNumber } from "@/src/lib/productUtils";
 import { ORDER_STATUS, type TOrder } from "@/src/types";
 
-/* ── Chart tooltip, themed to match the rest of the product ──────────────── */
+// Dynamic imports with lazy chunk loading and skeleton fallbacks
+const DashboardRevenueChart = dynamic(
+  () => import("@/src/components/dashboard/charts/DashboardRevenueChart"),
+  {
+    ssr: false,
+    loading: () => <ChartSkeleton height={250} />,
+  }
+);
 
-function ChartTooltip({
-  active,
-  payload,
-  label,
-  kind,
-}: {
-  active?: boolean;
-  payload?: { value?: number | string }[];
-  label?: string;
-  kind: "currency" | "count";
-}) {
-  if (!active || !payload?.length) return null;
-  const value = Number(payload[0]?.value ?? 0);
-
-  return (
-    <div className="rounded-md border border-line-hairline bg-surface-raised px-3 py-2 shadow-lg">
-      <p className="text-label-sm text-content-subtle">{label}</p>
-      <p className="tabular mt-0.5 text-body-sm font-semibold text-content">
-        {kind === "currency"
-          ? formatCurrency(value)
-          : `${formatNumber(value)} orders`}
-      </p>
-    </div>
-  );
-}
-
-const axisTick = { fontSize: 11 } as const;
+const DashboardVolumeChart = dynamic(
+  () => import("@/src/components/dashboard/charts/DashboardVolumeChart"),
+  {
+    ssr: false,
+    loading: () => <ChartSkeleton height={250} />,
+  }
+);
 
 export default function DashboardHome() {
   const { data: usersRes, isLoading: usersLoading } = useUsers({ limit: 1 });
-  /**
-   * Revenue is summed client-side from these rows, so the fetch has to cover
-   * every order or the figure silently under-counts once the catalogue passes
-   * the limit. 1000 leaves ample headroom for a demo dataset; the API does not
-   * cap `limit`.
-   */
   const { data: ordersRes, isLoading: ordersLoading } = useOrders(
     {},
     { limit: 1000, sortBy: "createdAt", sortOrder: "desc" }
@@ -88,10 +59,6 @@ export default function DashboardHome() {
   const totalOrders = ordersRes?.meta?.total ?? orders.length;
   const totalProducts = productsRes?.meta?.total ?? 0;
 
-  /**
-   * Revenue counts orders that can actually be collected, so cancelled orders
-   * are excluded. Including them inflated the figure with money never taken.
-   */
   const billableOrders = useMemo(
     () => orders.filter((o) => o.status !== ORDER_STATUS.CANCELLED),
     [orders]
@@ -155,7 +122,10 @@ export default function DashboardHome() {
     return days;
   }, [billableOrders]);
 
-  const hasChartData = chartData.some((d) => d.orders > 0);
+  const ordersSparkline = useMemo(() => chartData.map((d) => d.orders), [chartData]);
+  const revenueSparkline = useMemo(() => chartData.map((d) => d.revenue), [chartData]);
+
+  const hasChartData = useMemo(() => chartData.some((d) => d.orders > 0), [chartData]);
 
   return (
     <>
@@ -197,7 +167,7 @@ export default function DashboardHome() {
             icon={ShoppingBag}
             label="Orders"
             loading={ordersLoading}
-            sparkline={chartData.map((d) => d.orders)}
+            sparkline={ordersSparkline}
             tone="brand"
             value={formatNumber(totalOrders)}
           />
@@ -207,7 +177,7 @@ export default function DashboardHome() {
             icon={Banknote}
             label="Revenue"
             loading={ordersLoading}
-            sparkline={chartData.map((d) => d.revenue)}
+            sparkline={revenueSparkline}
             tone="brand"
             value={formatCurrency(totalRevenue)}
           />
@@ -240,42 +210,7 @@ export default function DashboardHome() {
             loading={ordersLoading}
             title="Revenue"
           >
-            <ResponsiveContainer height={250} width="100%">
-              <BarChart
-                data={chartData}
-                margin={{ top: 4, right: 4, bottom: 0, left: -18 }}
-              >
-                <CartesianGrid
-                  stroke="rgb(var(--line))"
-                  strokeDasharray="3 3"
-                  vertical={false}
-                />
-                <XAxis
-                  axisLine={false}
-                  dataKey="label"
-                  tick={axisTick}
-                  tickLine={false}
-                />
-                <YAxis
-                  axisLine={false}
-                  tick={axisTick}
-                  tickFormatter={(v: number) =>
-                    v >= 1000 ? `${Math.round(v / 1000)}k` : `${v}`
-                  }
-                  tickLine={false}
-                />
-                <Tooltip
-                  content={<ChartTooltip kind="currency" />}
-                  cursor={{ fill: "rgb(var(--surface-sunken))" }}
-                />
-                <Bar
-                  dataKey="revenue"
-                  fill={chartPalette[0]}
-                  maxBarSize={40}
-                  radius={[6, 6, 0, 0]}
-                />
-              </BarChart>
-            </ResponsiveContainer>
+            <DashboardRevenueChart data={chartData} />
           </Panel>
 
           <Panel
@@ -286,50 +221,7 @@ export default function DashboardHome() {
             loading={ordersLoading}
             title="Order volume"
           >
-            <ResponsiveContainer height={250} width="100%">
-              <LineChart
-                data={chartData}
-                margin={{ top: 4, right: 8, bottom: 0, left: -24 }}
-              >
-                <CartesianGrid
-                  stroke="rgb(var(--line))"
-                  strokeDasharray="3 3"
-                  vertical={false}
-                />
-                <XAxis
-                  axisLine={false}
-                  dataKey="label"
-                  tick={axisTick}
-                  tickLine={false}
-                />
-                <YAxis
-                  allowDecimals={false}
-                  axisLine={false}
-                  tick={axisTick}
-                  tickLine={false}
-                />
-                <Tooltip
-                  content={<ChartTooltip kind="count" />}
-                  cursor={{ stroke: "rgb(var(--line))" }}
-                />
-                <Line
-                  activeDot={{
-                    r: 4,
-                    strokeWidth: 2,
-                    stroke: "rgb(var(--surface-raised))",
-                  }}
-                  dataKey="orders"
-                  dot={{
-                    r: 3,
-                    strokeWidth: 2,
-                    stroke: "rgb(var(--surface-raised))",
-                  }}
-                  stroke={chartPalette[1]}
-                  strokeWidth={2.5}
-                  type="monotone"
-                />
-              </LineChart>
-            </ResponsiveContainer>
+            <DashboardVolumeChart data={chartData} />
           </Panel>
         </div>
 

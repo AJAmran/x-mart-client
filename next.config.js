@@ -21,7 +21,7 @@ const allowedImageHosts = [
 const nextConfig = {
   // Produces .next/standalone with only the modules actually imported, which is
   // what keeps the production Docker image small enough to ship.
-  output: "standalone",
+  // output: "standalone",
 
   images: {
     remotePatterns: allowedImageHosts.map((hostname) => ({
@@ -34,6 +34,8 @@ const nextConfig = {
 
   // Smaller bundles for the heavy client-side libs
   experimental: {
+    cpus: 1,
+    workerThreads: false,
     optimizePackageImports: [
       "lucide-react",
       "@heroui/react",

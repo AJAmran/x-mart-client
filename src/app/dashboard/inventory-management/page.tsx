@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useCallback } from "react";
 import { toast } from "sonner";
 import {
   Boxes,
@@ -28,6 +28,7 @@ import {
   SegmentTabs,
 } from "@/src/components/dashboard/Controls";
 import { useProducts } from "@/src/hooks/useProducts";
+import { useDebounce } from "@/src/hooks/useDebounce";
 import { TProduct } from "@/src/types";
 import { exportToCSV } from "@/src/utils/exportUtils";
 import { Pagination } from "@heroui/pagination";
@@ -51,11 +52,12 @@ const stockOptions: { value: StockFilter; label: string }[] = [
 
 export default function InventoryManagementPage() {
   const [page, setPage] = useState(1);
-  const [search, setSearch] = useState("");
+  const [searchInput, setSearchInput] = useState("");
+  const debouncedSearch = useDebounce(searchInput, 350);
   const [stockFilter, setStockFilter] = useState<StockFilter>("all");
 
   const { data, isLoading, refetch } = useProducts(
-    { searchTerm: search },
+    { searchTerm: debouncedSearch },
     { page, limit: 10, sortBy: "createdAt", sortOrder: "desc" }
   );
 
@@ -106,7 +108,7 @@ export default function InventoryManagementPage() {
     [data]
   );
 
-  const downloadReport = () => {
+  const downloadReport = useCallback(() => {
     if (!products.length) {
       toast.error("No products to export");
 
@@ -127,7 +129,7 @@ export default function InventoryManagementPage() {
       `inventory_${new Date().toISOString().split("T")[0]}`
     );
     toast.success("Inventory report downloaded");
-  };
+  }, [products]);
 
   return (
     <>
@@ -204,12 +206,12 @@ export default function InventoryManagementPage() {
                 <input
                   className="h-9 w-full rounded-md border border-line-hairline bg-surface-sunken pl-9 pr-3 text-body-sm text-content transition-colors duration-fast ease-standard placeholder:text-content-subtle hover:border-line-strong focus:border-brand focus:outline-none"
                   id="inventory-search"
-                  placeholder="Search products…"
+                  placeholder="Search products (debounced)…"
                   type="search"
-                  value={search}
+                  value={searchInput}
                   onChange={(e) => {
                     setPage(1);
-                    setSearch(e.target.value);
+                    setSearchInput(e.target.value);
                   }}
                 />
               </div>

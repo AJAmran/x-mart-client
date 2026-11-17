@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback, useMemo } from "react";
+import dynamic from "next/dynamic";
 import {
   FileSpreadsheet,
   FileText,
@@ -10,7 +11,6 @@ import {
 } from "lucide-react";
 
 import UserActions from "@/src/components/user/UserActions";
-import UserFormModal from "@/src/components/user/UserFormModal";
 import {
   StatusBadge,
   userStatusTone,
@@ -21,6 +21,7 @@ import { PageHeader } from "@/src/components/UI/Section";
 import { Container } from "@/src/components/UI/Container";
 import { USER_ROLE } from "@/src/constants";
 import { useUsers, useUpdateUserRole } from "@/src/hooks/useUser";
+import { useDebounce } from "@/src/hooks/useDebounce";
 import { exportToExcel, exportToPDF } from "@/src/utils/exportUtils";
 import { Pagination } from "@heroui/pagination";
 import { Select, SelectItem } from "@heroui/select";
@@ -34,51 +35,61 @@ import {
 } from "@heroui/table";
 import { IUser } from "@/src/types";
 
+// Dynamic import for modal code splitting
+const UserFormModal = dynamic(
+  () => import("@/src/components/user/UserFormModal"),
+  { ssr: false }
+);
+
 const UserManagementPage = () => {
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
-  const [search, setSearch] = useState("");
+  const [searchInput, setSearchInput] = useState("");
+  const debouncedSearch = useDebounce(searchInput, 350);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<IUser | null>(null);
 
   const { data, isLoading, refetch } = useUsers({
     page,
     limit,
-    search,
+    search: debouncedSearch,
   });
 
   const updateUserRole = useUpdateUserRole();
 
-  const users = data?.data || [];
+  const users = useMemo(() => data?.data || [], [data?.data]);
   const total = data?.meta?.total || 0;
   const totalPages = Math.max(1, Math.ceil(total / limit));
 
-  const handleExportExcel = () => {
+  const handleExportExcel = useCallback(() => {
     exportToExcel(users, "users");
-  };
+  }, [users]);
 
-  const handleExportPDF = () => {
+  const handleExportPDF = useCallback(() => {
     exportToPDF(users, "users");
-  };
+  }, [users]);
 
-  const handleOpenForm = (user: IUser | null = null) => {
+  const handleOpenForm = useCallback((user: IUser | null = null) => {
     setSelectedUser(user);
     setIsFormOpen(true);
-  };
+  }, []);
 
-  const handleCloseForm = () => {
+  const handleCloseForm = useCallback(() => {
     setIsFormOpen(false);
     setSelectedUser(null);
-  };
+  }, []);
 
-  const handleRoleChange = async (userId: string, role: string) => {
-    try {
-      await updateUserRole.mutateAsync({ id: userId, role });
-      refetch();
-    } catch {
-      // Role update failed — the table stays on the previous value.
-    }
-  };
+  const handleRoleChange = useCallback(
+    async (userId: string, role: string) => {
+      try {
+        await updateUserRole.mutateAsync({ id: userId, role });
+        refetch();
+      } catch {
+        // Role update failed — the table stays on the previous value.
+      }
+    },
+    [updateUserRole, refetch]
+  );
 
   return (
     <>
@@ -112,17 +123,17 @@ const UserManagementPage = () => {
               aria-hidden
               className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-content-subtle"
             />
-            <input
-              className="h-9 w-full rounded-md border border-line-hairline bg-surface-raised pl-9 pr-3 text-body-sm text-content transition-colors duration-fast ease-standard placeholder:text-content-subtle hover:border-line-strong focus:border-brand focus:outline-none"
-              id="user-search"
-              placeholder="Search by name or email…"
-              type="search"
-              value={search}
-              onChange={(e) => {
-                setPage(1);
-                setSearch(e.target.value);
-              }}
-            />
+              <input
+                className="h-9 w-full rounded-md border border-line-hairline bg-surface-raised pl-9 pr-3 text-body-sm text-content transition-colors duration-fast ease-standard placeholder:text-content-subtle hover:border-line-strong focus:border-brand focus:outline-none"
+                id="user-search"
+                placeholder="Search by name or email (debounced)…"
+                type="search"
+                value={searchInput}
+                onChange={(e) => {
+                  setPage(1);
+                  setSearchInput(e.target.value);
+                }}
+              />
           </div>
           <ToolbarGroup className="md:ml-auto">
             <p className="tabular text-label-sm text-content-subtle">
